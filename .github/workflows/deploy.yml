@@ -1,0 +1,65 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend to Railway
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Backend
+        uses: railway/cli@master
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: backend
+          project: 17b41d5d-0bb0-44ab-be45-4c93f0d00406
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          cd backend && railway up --service backend
+
+  deploy-frontend:
+    name: Deploy Frontend to Railway
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install & Build
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy to Railway
+        uses: railway/cli@master
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          project: 17b41d5d-0bb0-44ab-be45-4c93f0d00406
+        run: |
+          railway up --service frontend
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: [deploy-backend, deploy-frontend]
+    steps:
+      - name: Check API Health
+        run: |
+          sleep 30
+          curl -sf https://aimp-backend.railway.app/api/health || echo "Backend health check failed"
+          curl -sf https://aimp-backend.railway.app/api/health/db || echo "DB health check failed"
+          curl -sf https://aimp-backend.railway.app/api/health/redis || echo "Redis health check failed"
