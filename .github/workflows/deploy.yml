@@ -26,7 +26,7 @@ jobs:
           cd backend
           railway up --service "backend"
         env:
-          RAILWAY_TOKEN: 83f517fb-bc7d-4ecf-8030-cc19df72ad27
+          RAILWAY_TOKEN: e73a33a0-9fc5-4397-8490-0c95c162598d
 
   deploy-frontend:
     name: Deploy Frontend
@@ -52,7 +52,7 @@ jobs:
       - name: Deploy Frontend
         run: railway up --service "frontend"
         env:
-          RAILWAY_TOKEN: 83f517fb-bc7d-4ecf-8030-cc19df72ad27
+          RAILWAY_TOKEN: e73a33a0-9fc5-4397-8490-0c95c162598d
 
   health-check:
     name: Health Check
