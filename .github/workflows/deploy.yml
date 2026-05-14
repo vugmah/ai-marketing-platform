@@ -18,15 +18,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy Backend
+      - name: Link Railway Project & Deploy Backend
         run: |
-          cd backend && railway up --service backend --detach
+          cd backend
+          npx railway@latest link --project "17b41d5d-0bb0-44ab-be45-4c93f0d00406"
+          npx railway@latest up --service backend --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: 17b41d5d-0bb0-44ab-be45-4c93f0d00406
 
   deploy-frontend:
     name: Deploy Frontend to Railway
@@ -41,20 +39,17 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
       - name: Install & Build Frontend
         run: |
           npm install
           npm run build
 
-      - name: Deploy Frontend
+      - name: Link Railway Project & Deploy Frontend
         run: |
-          railway up --service frontend --detach
+          npx railway@latest link --project "17b41d5d-0bb0-44ab-be45-4c93f0d00406"
+          npx railway@latest up --service frontend --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: 17b41d5d-0bb0-44ab-be45-4c93f0d00406
 
   health-check:
     name: Health Check
