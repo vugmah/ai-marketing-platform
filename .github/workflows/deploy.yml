@@ -13,14 +13,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy Backend to Railway
-        uses: bervProject/railway-deploy@main
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: "backend"
-          project_id: "17b41d5d-0bb0-44ab-be45-4c93f0d00406"
-          environment: "production"
-          root_directory: "backend"
+          node-version: '20'
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy Backend
+        run: |
+          cd backend
+          railway up --service "backend"
+        env:
+          RAILWAY_TOKEN: 83f517fb-bc7d-4ecf-8030-cc19df72ad27
 
   deploy-frontend:
     name: Deploy Frontend
@@ -40,14 +46,13 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy Frontend to Railway
-        uses: bervProject/railway-deploy@main
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: "frontend"
-          project_id: "17b41d5d-0bb0-44ab-be45-4c93f0d00406"
-          environment: "production"
-          root_directory: "."
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy Frontend
+        run: railway up --service "frontend"
+        env:
+          RAILWAY_TOKEN: 83f517fb-bc7d-4ecf-8030-cc19df72ad27
 
   health-check:
     name: Health Check
@@ -55,6 +60,4 @@ jobs:
     needs: [deploy-backend, deploy-frontend]
     steps:
       - name: Wait & Check
-        run: |
-          sleep 60
-          echo "Health check placeholder - add backend URL when known"
+        run: sleep 60
