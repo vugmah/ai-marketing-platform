@@ -1,0 +1,26 @@
+name: Debug Railway Services
+
+on: workflow_dispatch
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install -g @railway/cli
+      - name: List Railway services
+        run: |
+          echo "=== Railway Status ==="
+          railway status || true
+          echo "=== Railway Service List ==="
+          railway service || true
+          echo "=== Railway Project Info ==="
+          railway project || true
+          echo "=== Trying up without service ==="
+          cd backend && railway up --verbose 2>&1 || true
+          cd .. && railway up --verbose 2>&1 || true
+        env:
+          RAILWAY_TOKEN: e73a33a0-9fc5-4397-8490-0c95c162598d
