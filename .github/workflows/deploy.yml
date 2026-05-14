@@ -18,11 +18,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Link Railway Project & Deploy Backend
+      - name: Install Railway CLI & Deploy Backend
         run: |
+          npm install -g @railway/cli
           cd backend
-          npx railway@latest link --project "17b41d5d-0bb0-44ab-be45-4c93f0d00406"
-          npx railway@latest up --service backend --detach
+          railway link --project "17b41d5d-0bb0-44ab-be45-4c93f0d00406" --environment production
+          railway up --service backend --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
@@ -44,10 +45,11 @@ jobs:
           npm install
           npm run build
 
-      - name: Link Railway Project & Deploy Frontend
+      - name: Install Railway CLI & Deploy Frontend
         run: |
-          npx railway@latest link --project "17b41d5d-0bb0-44ab-be45-4c93f0d00406"
-          npx railway@latest up --service frontend --detach
+          npm install -g @railway/cli
+          railway link --project "17b41d5d-0bb0-44ab-be45-4c93f0d00406" --environment production
+          railway up --service frontend --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
