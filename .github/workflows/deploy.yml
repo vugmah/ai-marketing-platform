@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-backend:
-    name: Deploy Backend
+  deploy:
+    name: Deploy to Railway
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,43 +21,15 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Deploy Backend
-        run: |
-          cd backend
-          railway up --service "backend"
-        env:
-          RAILWAY_TOKEN: e73a33a0-9fc5-4397-8490-0c95c162598d
-
-  deploy-frontend:
-    name: Deploy Frontend
-    runs-on: ubuntu-latest
-    needs: deploy-backend
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install & Build
-        run: |
-          npm install
-          npm run build
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy Frontend
-        run: railway up --service "frontend"
+      - name: Deploy to ai-marketing-platform
+        run: railway up --service "ai-marketing-platform"
         env:
           RAILWAY_TOKEN: e73a33a0-9fc5-4397-8490-0c95c162598d
 
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
-    needs: [deploy-backend, deploy-frontend]
+    needs: deploy
     steps:
       - name: Wait & Check
         run: sleep 60
