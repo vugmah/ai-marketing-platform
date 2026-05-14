@@ -7,64 +7,54 @@ on:
 
 jobs:
   deploy-backend:
-    name: Deploy Backend to Railway
+    name: Deploy Backend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Deploy Backend to Railway
+        uses: bervProject/railway-deploy@main
         with:
-          node-version: '20'
-
-      - name: Install Railway CLI & Deploy Backend
-        run: |
-          npm install -g @railway/cli
-          cd backend
-          railway link --project "17b41d5d-0bb0-44ab-be45-4c93f0d00406" --environment production
-          railway up --service backend --detach
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: "backend"
+          project_id: "17b41d5d-0bb0-44ab-be45-4c93f0d00406"
+          environment: "production"
+          root_directory: "backend"
 
   deploy-frontend:
-    name: Deploy Frontend to Railway
+    name: Deploy Frontend
     runs-on: ubuntu-latest
     needs: deploy-backend
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install & Build Frontend
+      - name: Install & Build
         run: |
           npm install
           npm run build
 
-      - name: Install Railway CLI & Deploy Frontend
-        run: |
-          npm install -g @railway/cli
-          railway link --project "17b41d5d-0bb0-44ab-be45-4c93f0d00406" --environment production
-          railway up --service frontend --detach
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Deploy Frontend to Railway
+        uses: bervProject/railway-deploy@main
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: "frontend"
+          project_id: "17b41d5d-0bb0-44ab-be45-4c93f0d00406"
+          environment: "production"
+          root_directory: "."
 
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
     needs: [deploy-backend, deploy-frontend]
     steps:
-      - name: Wait for deployment
-        run: sleep 45
-
-      - name: Check Backend Health
+      - name: Wait & Check
         run: |
-          echo "Checking backend health..."
-          curl -sf https://aimp-backend.railway.app/api/health || echo "Backend health check failed"
-          curl -sf https://aimp-backend.railway.app/api/health/db || echo "DB health check failed"
-          curl -sf https://aimp-backend.railway.app/api/health/redis || echo "Redis health check failed"
-        continue-on-error: true
+          sleep 60
+          echo "Health check placeholder - add backend URL when known"
