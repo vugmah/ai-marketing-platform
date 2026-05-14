@@ -13,16 +13,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy Backend
-        uses: railway/cli@master
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: backend
-          project: 17b41d5d-0bb0-44ab-be45-4c93f0d00406
+          node-version: '20'
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy Backend
+        run: |
+          cd backend && railway up --service backend --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: |
-          cd backend && railway up --service backend
+          RAILWAY_PROJECT_ID: 17b41d5d-0bb0-44ab-be45-4c93f0d00406
 
   deploy-frontend:
     name: Deploy Frontend to Railway
@@ -32,34 +36,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install & Build
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Install & Build Frontend
         run: |
           npm install
           npm run build
 
-      - name: Deploy to Railway
-        uses: railway/cli@master
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          project: 17b41d5d-0bb0-44ab-be45-4c93f0d00406
+      - name: Deploy Frontend
         run: |
-          railway up --service frontend
+          railway up --service frontend --detach
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROJECT_ID: 17b41d5d-0bb0-44ab-be45-4c93f0d00406
 
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
     needs: [deploy-backend, deploy-frontend]
     steps:
-      - name: Check API Health
+      - name: Wait for deployment
+        run: sleep 45
+
+      - name: Check Backend Health
         run: |
-          sleep 30
+          echo "Checking backend health..."
           curl -sf https://aimp-backend.railway.app/api/health || echo "Backend health check failed"
           curl -sf https://aimp-backend.railway.app/api/health/db || echo "DB health check failed"
           curl -sf https://aimp-backend.railway.app/api/health/redis || echo "Redis health check failed"
+        continue-on-error: true
