@@ -139,27 +139,27 @@ async function mockRequest<T>(endpoint: string, options: RequestInit): Promise<T
   const body = options.body ? JSON.parse(options.body as string) : {};
 
   // Auth endpoints
-  if (endpoint === '/api/v1/auth/login' && method === 'POST') {
+  if (endpoint === '/api/v2/auth/login' && method === 'POST') {
     return mockApi.login(body.email, body.password) as unknown as T;
   }
-  if (endpoint === '/api/v1/auth/register' && method === 'POST') {
+  if (endpoint === '/api/v2/auth/register' && method === 'POST') {
     return mockApi.register(body) as unknown as T;
   }
-  if (endpoint === '/api/v1/auth/refresh' && method === 'POST') {
+  if (endpoint === '/api/v2/auth/refresh' && method === 'POST') {
     return mockApi.refreshToken(body.refresh_token) as unknown as T;
   }
-  if (endpoint === '/api/v1/auth/me' && method === 'GET') {
+  if (endpoint === '/api/v2/auth/me' && method === 'GET') {
     return mockApi.me() as unknown as T;
   }
-  if (endpoint === '/api/v1/auth/logout' && method === 'POST') {
+  if (endpoint === '/api/v2/auth/logout' && method === 'POST') {
     return mockApi.logout() as unknown as T;
   }
 
   // Company endpoints
-  if (endpoint === '/api/v1/companies' && method === 'GET') {
+  if (endpoint === '/api/v2/companies' && method === 'GET') {
     return mockApi.getCompanies() as unknown as T;
   }
-  if (endpoint === '/api/v1/companies' && method === 'POST') {
+  if (endpoint === '/api/v2/companies' && method === 'POST') {
     return mockApi.createCompany(body) as unknown as T;
   }
   if (endpoint.match(/\/api\/v1\/companies\/\d+$/) && method === 'GET') {
@@ -168,10 +168,10 @@ async function mockRequest<T>(endpoint: string, options: RequestInit): Promise<T
   }
 
   // Branch endpoints
-  if (endpoint === '/api/v1/branches' && method === 'GET') {
+  if (endpoint === '/api/v2/branches' && method === 'GET') {
     return mockApi.getBranches() as unknown as T;
   }
-  if (endpoint === '/api/v1/branches' && method === 'POST') {
+  if (endpoint === '/api/v2/branches' && method === 'POST') {
     return mockApi.createBranch(body) as unknown as T;
   }
 
@@ -195,7 +195,7 @@ export const api = {
   // ── Auth ──────────────────────────────────────────────────────
   auth: {
     login: (data: LoginRequest) =>
-      request<LoginResponse>('/api/v1/auth/login', {
+      request<LoginResponse>('/api/v2/auth/login', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
@@ -208,21 +208,21 @@ export const api = {
       company_id?: number;
       branch_id?: number;
     }) =>
-      request<ApiResponse<User>>('/api/v1/auth/register', {
+      request<ApiResponse<User>>('/api/v2/auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
 
     refresh: (refresh_token: string) =>
-      request<LoginResponse>('/api/v1/auth/refresh', {
+      request<LoginResponse>('/api/v2/auth/refresh', {
         method: 'POST',
         body: JSON.stringify({ refresh_token }),
       }),
 
-    me: () => request<ApiResponse<User>>('/api/v1/auth/me'),
+    me: () => request<ApiResponse<User>>('/api/v2/auth/me'),
 
     logout: () =>
-      request<void>('/api/v1/auth/logout', {
+      request<void>('/api/v2/auth/logout', {
         method: 'POST',
       }),
   },
@@ -237,25 +237,25 @@ export const api = {
             .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
             .join('&')
         : '';
-      return request<ApiResponse<Company[]>>(`/api/v1/companies${query}`);
+      return request<ApiResponse<Company[]>>(`/api/v2/companies${query}`);
     },
 
-    get: (id: number) => request<ApiResponse<Company>>(`/api/v1/companies/${id}`),
+    get: (id: number) => request<ApiResponse<Company>>(`/api/v2/companies/${id}`),
 
     create: (data: Partial<Company>) =>
-      request<ApiResponse<Company>>('/api/v1/companies', {
+      request<ApiResponse<Company>>('/api/v2/companies', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
 
     update: (id: number, data: Partial<Company>) =>
-      request<ApiResponse<Company>>(`/api/v1/companies/${id}`, {
+      request<ApiResponse<Company>>(`/api/v2/companies/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
       }),
 
     delete: (id: number) =>
-      request<void>(`/api/v1/companies/${id}`, {
+      request<void>(`/api/v2/companies/${id}`, {
         method: 'DELETE',
       }),
   },
@@ -270,25 +270,25 @@ export const api = {
             .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
             .join('&')
         : '';
-      return request<ApiResponse<Branch[]>>(`/api/v1/branches${query}`);
+      return request<ApiResponse<Branch[]>>(`/api/v2/branches${query}`);
     },
 
-    get: (id: number) => request<ApiResponse<Branch>>(`/api/v1/branches/${id}`),
+    get: (id: number) => request<ApiResponse<Branch>>(`/api/v2/branches/${id}`),
 
     create: (data: Partial<Branch>) =>
-      request<ApiResponse<Branch>>('/api/v1/branches', {
+      request<ApiResponse<Branch>>('/api/v2/branches', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
 
     update: (id: number, data: Partial<Branch>) =>
-      request<ApiResponse<Branch>>(`/api/v1/branches/${id}`, {
+      request<ApiResponse<Branch>>(`/api/v2/branches/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
       }),
 
     delete: (id: number) =>
-      request<void>(`/api/v1/branches/${id}`, {
+      request<void>(`/api/v2/branches/${id}`, {
         method: 'DELETE',
       }),
   },
@@ -310,31 +310,31 @@ export const api = {
             .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
             .join('&')
         : '';
-      return request<ApiResponse<User[]>>(`/api/v1/users${query}`);
+      return request<ApiResponse<User[]>>(`/api/v2/users${query}`);
     },
 
-    get: (id: number) => request<ApiResponse<User>>(`/api/v1/users/${id}`),
+    get: (id: number) => request<ApiResponse<User>>(`/api/v2/users/${id}`),
 
     create: (data: Partial<User> & { password: string }) =>
-      request<ApiResponse<User>>('/api/v1/users', {
+      request<ApiResponse<User>>('/api/v2/users', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
 
     update: (id: number, data: Partial<User>) =>
-      request<ApiResponse<User>>(`/api/v1/users/${id}`, {
+      request<ApiResponse<User>>(`/api/v2/users/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
       }),
 
     updateRole: (id: number, role: string) =>
-      request<ApiResponse<User>>(`/api/v1/users/${id}/role`, {
+      request<ApiResponse<User>>(`/api/v2/users/${id}/role`, {
         method: 'PATCH',
         body: JSON.stringify({ role }),
       }),
 
     delete: (id: number) =>
-      request<void>(`/api/v1/users/${id}`, {
+      request<void>(`/api/v2/users/${id}`, {
         method: 'DELETE',
       }),
   },
@@ -349,7 +349,7 @@ export const api = {
         active_campaigns: number;
         revenue_this_month: number;
         engagement_rate: number;
-      }>>('/api/v1/dashboard/stats'),
+      }>>('/api/v2/dashboard/stats'),
 
     chart: () =>
       request<ApiResponse<{
@@ -358,7 +358,7 @@ export const api = {
         orders: number[];
         engagement: number[];
         roas: number[];
-      }>>('/api/v1/dashboard/chart'),
+      }>>('/api/v2/dashboard/chart'),
 
     alerts: () =>
       request<ApiResponse<Array<{
@@ -367,7 +367,7 @@ export const api = {
         title: string;
         message: string;
         created_at: string;
-      }>>>('/api/v1/dashboard/alerts'),
+      }>>>('/api/v2/dashboard/alerts'),
   },
 };
 
