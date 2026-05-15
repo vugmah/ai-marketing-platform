@@ -1,8 +1,9 @@
 [build]
-builder = "NIXPACKS"
+builder = "DOCKERFILE"
+dockerfilePath = "backend/Dockerfile"
 
 [deploy]
-startCommand = "npx serve -s dist -l $PORT"
-healthcheckPath = "/"
-restartPolicyType = "ON_FAILURE"
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+healthcheckPath = "/api/health"
+restartPolicyType = "on-failure"
 restartPolicyMaxRetries = 3
