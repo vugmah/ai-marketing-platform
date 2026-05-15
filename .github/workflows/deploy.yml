@@ -21,15 +21,35 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Deploy to ai-marketing-platform
-        run: railway up --service "ai-marketing-platform"
+      - name: Deploy Backend
+        run: |
+          cd backend
+          railway up --service "ai-marketing-backend"
         env:
-          RAILWAY_TOKEN: e73a33a0-9fc5-4397-8490-0c95c162598d
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Deploy Frontend
+        run: |
+          railway up --service "ai-marketing-frontend"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   health-check:
     name: Health Check
     runs-on: ubuntu-latest
     needs: deploy
     steps:
-      - name: Wait & Check
-        run: sleep 60
+      - name: Wait for deployment
+        run: sleep 30
+
+      - name: Check API Health
+        run: |
+          curl -sf "${{ vars.BACKEND_URL }}/api/health" || exit 1
+
+      - name: Check DB Health
+        run: |
+          curl -sf "${{ vars.BACKEND_URL }}/api/health/db" || exit 1
+
+      - name: Check Redis Health
+        run: |
+          curl -sf "${{ vars.BACKEND_URL }}/api/health/redis" || exit 1
