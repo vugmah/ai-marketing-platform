@@ -1,8 +1,9 @@
 """Application configuration using Pydantic Settings."""
 
+import os
 from typing import List
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings
 
 
