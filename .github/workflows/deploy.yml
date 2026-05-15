@@ -93,6 +93,25 @@ jobs:
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
 
   # ── Health Check ──────────────────────────────
+  logs:
+    name: Get Backend Logs
+    needs: deploy-backend
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Show backend logs
+        run: railway logs --service "ai-marketing-platform"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
   health-check:
     name: Post-Deploy Health Check
     needs: [deploy-backend, deploy-frontend]
