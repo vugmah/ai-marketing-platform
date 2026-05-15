@@ -22,12 +22,37 @@ class Settings(BaseSettings):
     )
 
     # Database
-    DATABASE_URL: str = Field(
-        default="mysql+aiomysql://root:password@localhost:3306/ai_marketing"
-    )
+    DATABASE_URL: str = Field(default="")
+    
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def assemble_db_url(cls, v: str) -> str:
+        if v and v != "":
+            return v
+        # Try Railway MySQL env vars
+        host = os.environ.get("MYSQLHOST", "localhost")
+        port = os.environ.get("MYSQLPORT", "3306")
+        user = os.environ.get("MYSQLUSER", "root")
+        password = os.environ.get("MYSQLPASSWORD", "password")
+        database = os.environ.get("MYSQLDATABASE", "ai_marketing")
+        return f"mysql+aiomysql://{user}:{password}@{host}:{port}/{database}"
 
     # Redis
-    REDIS_URL: str = Field(default="redis://localhost:6379/0")
+    REDIS_URL: str = Field(default="")
+    
+    @field_validator("REDIS_URL", mode="before")
+    @classmethod
+    def assemble_redis_url(cls, v: str) -> str:
+        if v and v != "":
+            return v
+        # Try Railway Redis env vars
+        redis_url = os.environ.get("REDIS_URL", "")
+        if redis_url:
+            return redis_url
+        redis_public = os.environ.get("REDISPUBLIC_URL", "")
+        if redis_public:
+            return redis_public
+        return "redis://localhost:6379/0"
 
     # JWT
     JWT_SECRET_KEY: str = Field(default="super-secret-jwt-key-change-in-production")
