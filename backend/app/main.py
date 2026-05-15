@@ -7,8 +7,10 @@ from fastapi import FastAPI
 from app.auth.router import router as auth_router
 from app.branches.router import router as branches_router
 from app.companies.router import health_router, router as companies_router
+from app.analytics.router import router as analytics_router
 from app.dashboard.router import router as dashboard_router
 from app.database import close_db, init_db
+from app.notifications.router import router as notifications_router
 from app.exceptions import register_exception_handlers
 from app.middleware.cors import setup_cors
 from app.middleware.rate_limit import RateLimitMiddleware
@@ -53,3 +55,5 @@ app.include_router(auth_router, prefix="/api/v2/auth", tags=["Authentication"])
 app.include_router(companies_router, prefix="/api/v2/companies", tags=["Companies"])
 app.include_router(branches_router, prefix="/api/v2/branches", tags=["Branches"])
 app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["Dashboard"])
+app.include_router(analytics_router, prefix="/api/v2/analytics", tags=["Analytics"])
+app.include_router(notifications_router, prefix="/api/v2/notifications", tags=["Notifications"])

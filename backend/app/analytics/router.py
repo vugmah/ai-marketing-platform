@@ -5,9 +5,7 @@ demographics. Data is synthesized from company/branch counts and cached
 in Redis with a 5-minute TTL.
 """
 
-import json
 import random
-import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List
 
@@ -20,7 +18,7 @@ from app.branches.models import Branch
 from app.companies.models import Company
 from app.database import get_db
 from app.dependencies import get_current_user
-from app.redis_client import get_cache, get_redis_client
+from app.redis_client import get_cache
 
 router = APIRouter()
 
