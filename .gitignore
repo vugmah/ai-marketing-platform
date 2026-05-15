@@ -1,9 +1,0 @@
-node_modules
-dist
-.DS_Store
-.railway
-.env
-.env.local
-__pycache__/
-*.pyc
-__pycache__/
