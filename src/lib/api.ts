@@ -3,8 +3,6 @@
  * Connects to FastAPI backend with JWT auth, RBAC, tenant isolation
  */
 
-import { mockApi } from './mockApi';
-
 // ─── Configuration ────────────────────────────────────────────────
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -162,7 +160,7 @@ async function mockRequest<T>(endpoint: string, options: RequestInit): Promise<T
   if (endpoint === '/api/v2/companies' && method === 'POST') {
     return mockApi.createCompany(body) as unknown as T;
   }
-  if (endpoint.match(/\/api\/v1\/companies\/\d+$/) && method === 'GET') {
+  if (endpoint.match(/\/api\/v2\/companies\/\d+$/) && method === 'GET') {
     const id = parseInt(endpoint.split('/').pop()!);
     return mockApi.getCompany(id) as unknown as T;
   }
@@ -175,6 +173,58 @@ async function mockRequest<T>(endpoint: string, options: RequestInit): Promise<T
     return mockApi.createBranch(body) as unknown as T;
   }
 
+  // Dashboard endpoints
+  if (endpoint === '/api/v2/dashboard/stats' && method === 'GET') {
+    return {
+      success: true,
+      data: {
+        total_companies: 12,
+        total_branches: 8,
+        total_users: 45,
+        active_campaigns: 6,
+        revenue_this_month: 124580,
+        engagement_rate: 4.6,
+      },
+    } as unknown as T;
+  }
+  if (endpoint === '/api/v2/dashboard/chart' && method === 'GET') {
+    return {
+      success: true,
+      data: {
+        labels: ['1 Oca', '5 Oca', '10 Oca', '15 Oca', '20 Oca', '25 Oca', '30 Oca'],
+        revenue: [32000, 28000, 35000, 42000, 38000, 45000, 48000],
+        orders: [120, 95, 140, 165, 130, 180, 195],
+        engagement: [3.2, 3.8, 4.1, 4.5, 4.2, 4.8, 5.1],
+        roas: [2.8, 3.0, 3.2, 3.5, 3.1, 3.4, 3.6],
+      },
+    } as unknown as T;
+  }
+  if (endpoint === '/api/v2/dashboard/alerts' && method === 'GET') {
+    return {
+      success: true,
+      data: [
+        { id: '1', type: 'error' as const, title: 'Bütçe Limiti Aşıldı', message: 'Günlük reklam bütçeniz %85 oranında kullanıldı.', created_at: '10 dk önce' },
+        { id: '2', type: 'warning' as const, title: 'Düşük Etkileşim', message: 'Son 3 paylaşımınız ortalamanın altında performans gösteriyor.', created_at: '35 dk önce' },
+        { id: '3', type: 'info' as const, title: 'Yeni Rapor Hazır', message: 'Aylık performans raporunuz oluşturuldu.', created_at: '2 saat önce' },
+        { id: '4', type: 'success' as const, title: 'Kampanya Tamamlandı', message: "Yılbaşı kampanyası başarıyla tamamlandı. ROAS: 4.2x", created_at: '5 saat önce' },
+      ],
+    } as unknown as T;
+  }
+
+  // Notifications endpoint
+  if (endpoint === '/api/v2/notifications' && method === 'GET') {
+    return {
+      success: true,
+      data: [
+        { id: '1', type: 'error' as const, title: 'Bütçe Limiti Aşıldı', message: 'Günlük reklam bütçeniz %85 oranında kullanıldı.', created_at: '10 dk önce' },
+        { id: '2', type: 'warning' as const, title: 'Düşük Etkileşim', message: 'Son 3 paylaşımınız ortalamanın altında performans gösteriyor.', created_at: '35 dk önce' },
+        { id: '3', type: 'info' as const, title: 'Yeni Rapor Hazır', message: 'Aylık performans raporunuz oluşturuldu.', created_at: '2 saat önce' },
+        { id: '4', type: 'success' as const, title: 'Kampanya Tamamlandı', message: "Yılbaşı kampanyası başarıyla tamamlandı. ROAS: 4.2x", created_at: '5 saat önce' },
+      ],
+      unread_count: 4,
+    } as unknown as T;
+  }
+
   // Health endpoints
   if (endpoint === '/api/health') {
     return { status: 'ok', version: '2.0.0-mock' } as T;
@@ -184,6 +234,88 @@ async function mockRequest<T>(endpoint: string, options: RequestInit): Promise<T
   }
   if (endpoint === '/api/health/redis') {
     return { status: 'ok', redis: 'connected (mock)' } as T;
+  }
+
+  // Dashboard endpoints
+  if (endpoint === '/api/v1/dashboard/stats' && method === 'GET') {
+    return {
+      success: true,
+      data: {
+        total_companies: 12,
+        total_branches: 8,
+        total_users: 45,
+        active_campaigns: 6,
+        revenue_this_month: 124580,
+        engagement_rate: 4.6,
+      },
+    } as unknown as T;
+  }
+  if (endpoint === '/api/v1/dashboard/chart' && method === 'GET') {
+    return {
+      success: true,
+      data: {
+        labels: ['1 Oca', '5 Oca', '10 Oca', '15 Oca', '20 Oca', '25 Oca', '30 Oca'],
+        revenue: [32000, 28000, 35000, 42000, 38000, 45000, 48000],
+        orders: [120, 95, 140, 165, 130, 180, 195],
+        engagement: [3.2, 3.8, 4.1, 4.5, 4.2, 4.8, 5.1],
+        roas: [2.8, 3.0, 3.2, 3.5, 3.1, 3.4, 3.6],
+      },
+    } as unknown as T;
+  }
+  if (endpoint === '/api/v1/dashboard/alerts' && method === 'GET') {
+    return {
+      success: true,
+      data: [
+        { id: '1', type: 'error' as const, title: 'Bütçe Limiti Aşıldı', message: 'Günlük reklam bütçeniz %85 oranında kullanıldı.', created_at: '10 dk önce' },
+        { id: '2', type: 'warning' as const, title: 'Düşük Etkileşim', message: 'Son 3 paylaşımınız ortalamanın altında performans gösteriyor.', created_at: '35 dk önce' },
+        { id: '3', type: 'info' as const, title: 'Yeni Rapor Hazır', message: 'Aylık performans raporunuz oluşturuldu.', created_at: '2 saat önce' },
+        { id: '4', type: 'success' as const, title: 'Kampanya Tamamlandı', message: "Yılbaşı kampanyası başarıyla tamamlandı. ROAS: 4.2x", created_at: '5 saat önce' },
+      ],
+    } as unknown as T;
+  }
+
+  // Notifications endpoint
+  if (endpoint === '/api/v1/notifications' && method === 'GET') {
+    return {
+      success: true,
+      data: [
+        { id: '1', type: 'error' as const, title: 'Bütçe Limiti Aşıldı', message: 'Günlük reklam bütçeniz %85 oranında kullanıldı.', created_at: '10 dk önce' },
+        { id: '2', type: 'warning' as const, title: 'Düşük Etkileşim', message: 'Son 3 paylaşımınız ortalamanın altında performans gösteriyor.', created_at: '35 dk önce' },
+        { id: '3', type: 'info' as const, title: 'Yeni Rapor Hazır', message: 'Aylık performans raporunuz oluşturuldu.', created_at: '2 saat önce' },
+        { id: '4', type: 'success' as const, title: 'Kampanya Tamamlandı', message: "Yılbaşı kampanyası başarıyla tamamlandı. ROAS: 4.2x", created_at: '5 saat önce' },
+      ],
+      unread_count: 4,
+    } as unknown as T;
+  }
+
+  // Auth endpoints - simple mock responses
+  if (endpoint === '/api/v2/auth/login' && method === 'POST') {
+    return {
+      access_token: 'mock-token',
+      refresh_token: 'mock-refresh',
+      token_type: 'bearer',
+      expires_in: 3600,
+      user: { id: 1, email: 'admin@example.com', full_name: 'Admin User', role: 'super_admin', status: 'active', created_at: new Date().toISOString() },
+    } as unknown as T;
+  }
+  if (endpoint === '/api/v2/auth/me' && method === 'GET') {
+    return {
+      success: true,
+      data: { id: 1, email: 'admin@example.com', full_name: 'Admin User', role: 'super_admin', status: 'active', created_at: new Date().toISOString() },
+    } as unknown as T;
+  }
+  if (endpoint === '/api/v2/auth/logout' && method === 'POST') {
+    return undefined as T;
+  }
+
+  // Company endpoints
+  if (endpoint === '/api/v2/companies' && method === 'GET') {
+    return { success: true, data: [] } as unknown as T;
+  }
+
+  // Branch endpoints
+  if (endpoint === '/api/v2/branches' && method === 'GET') {
+    return { success: true, data: [] } as unknown as T;
   }
 
   throw new ApiError(404, `Mock endpoint not found: ${method} ${endpoint}`);
@@ -368,6 +500,18 @@ export const api = {
         message: string;
         created_at: string;
       }>>>('/api/v2/dashboard/alerts'),
+  },
+
+  // ── Notifications ─────────────────────────────────────────────
+  notifications: {
+    list: () =>
+      request<ApiResponse<Array<{
+        id: string;
+        type: 'warning' | 'error' | 'info' | 'success';
+        title: string;
+        message: string;
+        created_at: string;
+      }>> & { unread_count?: number }>('/api/v1/notifications'),
   },
 };
 

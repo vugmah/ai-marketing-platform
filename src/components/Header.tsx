@@ -15,10 +15,18 @@ import {
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { mockNotificationCount, mockAlerts } from "@/lib/mockApi";
-import type { AlertData } from "@/lib/mockApi";
+import { api } from "@/lib/api";
 
-// ─── Types ───────────────────────────────────────────────
+// ─── Local Types ─────────────────────────────────────────
+
+interface AlertData {
+  id: string;
+  type: "critical" | "warning" | "info" | "ai";
+  title: string;
+  description: string;
+  meta: string;
+  timestamp: string;
+}
 
 interface HeaderProps {
   pageTitle: string;
@@ -58,6 +66,34 @@ const alertBorderMap = {
   ai: "border-l-[#7C3AED]",
 };
 
+// ─── API Type → UI Type Mappers ──────────────────────────
+
+function mapApiAlertType(type: string): "critical" | "warning" | "info" | "ai" {
+  switch (type) {
+    case "error": return "critical";
+    case "success": return "ai";
+    case "warning": return "warning";
+    default: return "info";
+  }
+}
+
+function mapApiNotificationToUI(apiItem: {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  created_at: string;
+}): AlertData {
+  return {
+    id: apiItem.id,
+    type: mapApiAlertType(apiItem.type),
+    title: apiItem.title,
+    description: apiItem.message,
+    meta: "Sistem",
+    timestamp: apiItem.created_at,
+  };
+}
+
 // ─── Component ───────────────────────────────────────────
 
 export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: HeaderProps) {
@@ -68,10 +104,31 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
   const [userOpen, setUserOpen] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(branches[0]);
 
+  // Notification state from API
+  const [notifications, setNotifications] = useState<AlertData[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const branchRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+
+  // Fetch notifications from API
+  useEffect(() => {
+    async function fetchNotifications() {
+      try {
+        const res = await api.notifications.list();
+        if (res.success) {
+          const mapped = (res.data || []).map(mapApiNotificationToUI);
+          setNotifications(mapped);
+          setUnreadCount(res.unread_count || 0);
+        }
+      } catch (err) {
+        console.error("Bildirimler yüklenemedi:", err);
+      }
+    }
+    fetchNotifications();
+  }, []);
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -166,9 +223,9 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
             className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-[#F1F5F9] transition-colors relative"
           >
             <Bell className="w-[18px] h-[18px] text-[#475569]" />
-            {mockNotificationCount > 0 && (
+            {unreadCount > 0 && (
               <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-[#DC2626] rounded-full border-2 border-white">
-                {mockNotificationCount}
+                {unreadCount}
               </span>
             )}
           </button>
@@ -181,7 +238,7 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
                 <button className="text-xs text-[#2563EB] hover:underline">Tümünü Okundu İşaretle</button>
               </div>
               <div className="max-h-[320px] overflow-y-auto">
-                {mockAlerts.map((alert: AlertData) => {
+                {notifications.map((alert: AlertData) => {
                   const Icon = alertIconMap[alert.type];
                   return (
                     <div
