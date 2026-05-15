@@ -44,16 +44,143 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-  mockKPIs,
-  mockSalesData,
-  mockAdSpend,
-  mockAlerts,
-  mockAIInsights,
-  mockBranchPerformance,
-  mockQuickActions,
-} from "@/lib/mockApi";
-import type { KPIData, AlertData, AIInsight, QuickAction } from "@/lib/mockApi";
+import { api } from "@/lib/api";
+
+// ─── Local Types (previously from mockApi) ───────────────
+
+interface KPIData {
+  id: string;
+  title: string;
+  value: string;
+  change: string;
+  trend: "up" | "down";
+  period: string;
+  icon: string;
+  accent: string;
+}
+
+interface AlertData {
+  id: string;
+  type: "critical" | "warning" | "info" | "ai";
+  title: string;
+  description: string;
+  meta: string;
+  timestamp: string;
+}
+
+interface AIInsight {
+  id: string;
+  title: string;
+  description: string;
+  confidence: number;
+  type: "content" | "ads" | "budget" | "general";
+  timestamp: string;
+}
+
+interface QuickAction {
+  id: string;
+  label: string;
+  icon: string;
+  route: string;
+}
+
+interface BranchData {
+  id: string;
+  name: string;
+  city: string;
+  type: string;
+  revenue: number;
+  orders: number;
+  rating: number;
+  status: "active" | "inactive" | "pending";
+  percentage: number;
+}
+
+interface AdSpendDataPoint {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface SalesDataPoint {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
+// ─── Static Mock Data (no API available yet) ─────────────
+
+const mockAdSpend: AdSpendDataPoint[] = [
+  { name: "Meta Ads", value: 18500, color: "#2563EB" },
+  { name: "Google Ads", value: 14200, color: "#EA580C" },
+  { name: "TikTok", value: 8900, color: "#DB2777" },
+  { name: "LinkedIn", value: 5400, color: "#7C3AED" },
+];
+
+const mockAIInsights: AIInsight[] = [
+  {
+    id: "ai-1",
+    title: "Reklam bütçenizin %23'ü verimsiz harcanıyor",
+    description:
+      "Meta Ads kampanyalarınızda 3 ad set düşük performans gösteriyor. Bütçeyi yüksek dönüşümlü kreatiflere kaydırmak ROAS'ı %18 artırabilir. Önerilen eylem: Düşük performanslı 3 ad seti duraklatın.",
+    confidence: 92,
+    type: "budget",
+    timestamp: "2 dakika önce",
+  },
+  {
+    id: "ai-2",
+    title: "Instagram hikaye etkileşimi düşüyor",
+    description:
+      "Son 7 günde hikaye etkileşim oranı %12 düştü. Video içerik paylaşım sıklığını artırmak etkileşimi geri kazanabilir.",
+    confidence: 85,
+    type: "content",
+    timestamp: "15 dakika önce",
+  },
+];
+
+const mockBranchPerformance: BranchData[] = [
+  {
+    id: "bp-1",
+    name: "Nizami Şubesi",
+    city: "Bakü",
+    type: "premium",
+    revenue: 45200,
+    orders: 1240,
+    rating: 4.8,
+    status: "active",
+    percentage: 92,
+  },
+  {
+    id: "bp-2",
+    name: "Gənclik Şubesi",
+    city: "Bakü",
+    type: "standard",
+    revenue: 38100,
+    orders: 1050,
+    rating: 4.6,
+    status: "active",
+    percentage: 78,
+  },
+  {
+    id: "bp-3",
+    name: "28 May Şubesi",
+    city: "Bakü",
+    type: "standard",
+    revenue: 29500,
+    orders: 820,
+    rating: 4.5,
+    status: "active",
+    percentage: 61,
+  },
+];
+
+const mockQuickActions: QuickAction[] = [
+  { id: "qa-1", label: "Yeni Kampanya", icon: "PlusCircle", route: "/ads" },
+  { id: "qa-2", label: "Sosyal Medya Paylaşımı", icon: "Share2", route: "/social-media" },
+  { id: "qa-3", label: "Kreatif Tasarla", icon: "Palette", route: "/creative-studio" },
+  { id: "qa-4", label: "AI Raporu Al", icon: "Brain", route: "/ai-reports" },
+  { id: "qa-5", label: "Müşteri Yorumları", icon: "MessageSquare", route: "/communication" },
+];
 
 // ─── KPI Icon Map ────────────────────────────────────────
 
@@ -101,6 +228,34 @@ const qaBranchColors = [
 // ─── Time Range Options ──────────────────────────────────
 
 const timeRanges = ["Bugün", "Son 7 Gün", "Son 30 Gün", "Son 90 Gün", "Bu Yıl"];
+
+// ─── API Type → UI Type Mappers ──────────────────────────
+
+function mapApiAlertType(type: string): "critical" | "warning" | "info" | "ai" {
+  switch (type) {
+    case "error": return "critical";
+    case "success": return "ai";
+    case "warning": return "warning";
+    default: return "info";
+  }
+}
+
+function mapApiAlertToUI(apiAlert: {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  created_at: string;
+}): AlertData {
+  return {
+    id: apiAlert.id,
+    type: mapApiAlertType(apiAlert.type),
+    title: apiAlert.title,
+    description: apiAlert.message,
+    meta: "Sistem",
+    timestamp: apiAlert.created_at,
+  };
+}
 
 // ─── Custom Tooltip for Sales Chart ──────────────────────
 
@@ -221,6 +376,15 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [visibleInsights, setVisibleInsights] = useState(1);
 
+  // Loading & error states
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // API data states
+  const [kpis, setKpis] = useState<KPIData[]>([]);
+  const [salesData, setSalesData] = useState<SalesDataPoint[]>([]);
+  const [alerts, setAlerts] = useState<AlertData[]>([]);
+
   // Simulate typing effect for AI insight
   const [typedText, setTypedText] = useState("");
   const fullText = mockAIInsights[0]?.description || "";
@@ -239,10 +403,166 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [fullText]);
 
-  // Refresh handler
+  // Fetch dashboard data from API
+  useEffect(() => {
+    async function fetchDashboard() {
+      try {
+        setLoading(true);
+        setError(null);
+        const [statsRes, chartRes, alertsRes] = await Promise.all([
+          api.dashboard.stats(),
+          api.dashboard.chart(),
+          api.dashboard.alerts(),
+        ]);
+
+        if (statsRes.success) {
+          const s = statsRes.data;
+          setKpis([
+            {
+              id: "kpi-revenue",
+              title: "Aylık Gelir",
+              value: `₼${s.revenue_this_month.toLocaleString()}`,
+              change: "+12.5%",
+              trend: "up",
+              period: "Geçen aya göre",
+              icon: "Wallet",
+              accent: "#0D9488",
+            },
+            {
+              id: "kpi-orders",
+              title: "Aktif Kampanya",
+              value: s.active_campaigns.toString(),
+              change: "+8.2%",
+              trend: "up",
+              period: "Geçen aya göre",
+              icon: "ShoppingCart",
+              accent: "#EA580C",
+            },
+            {
+              id: "kpi-engagement",
+              title: "Etkileşim Oranı",
+              value: `%${s.engagement_rate.toFixed(1)}`,
+              change: "+2.1%",
+              trend: "up",
+              period: "Geçen aya göre",
+              icon: "Heart",
+              accent: "#DB2777",
+            },
+            {
+              id: "kpi-roas",
+              title: "ROAS",
+              value: "3.2x",
+              change: "-0.4",
+              trend: "down",
+              period: "Geçen aya göre",
+              icon: "Target",
+              accent: "#7C3AED",
+            },
+          ]);
+        }
+
+        if (chartRes.success) {
+          const c = chartRes.data;
+          const mapped = c.labels.map((label: string, i: number) => ({
+            date: label,
+            revenue: c.revenue[i],
+            orders: c.orders[i],
+          }));
+          setSalesData(mapped);
+        }
+
+        if (alertsRes.success) {
+          const mappedAlerts = alertsRes.data.map(mapApiAlertToUI);
+          setAlerts(mappedAlerts);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Veriler yüklenemedi");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboard();
+  }, []);
+
+  // Refresh handler - re-fetches API data
   const handleRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 800);
+    async function refetch() {
+      try {
+        const [statsRes, chartRes, alertsRes] = await Promise.all([
+          api.dashboard.stats(),
+          api.dashboard.chart(),
+          api.dashboard.alerts(),
+        ]);
+
+        if (statsRes.success) {
+          const s = statsRes.data;
+          setKpis([
+            {
+              id: "kpi-revenue",
+              title: "Aylık Gelir",
+              value: `₼${s.revenue_this_month.toLocaleString()}`,
+              change: "+12.5%",
+              trend: "up",
+              period: "Geçen aya göre",
+              icon: "Wallet",
+              accent: "#0D9488",
+            },
+            {
+              id: "kpi-orders",
+              title: "Aktif Kampanya",
+              value: s.active_campaigns.toString(),
+              change: "+8.2%",
+              trend: "up",
+              period: "Geçen aya göre",
+              icon: "ShoppingCart",
+              accent: "#EA580C",
+            },
+            {
+              id: "kpi-engagement",
+              title: "Etkileşim Oranı",
+              value: `%${s.engagement_rate.toFixed(1)}`,
+              change: "+2.1%",
+              trend: "up",
+              period: "Geçen aya göre",
+              icon: "Heart",
+              accent: "#DB2777",
+            },
+            {
+              id: "kpi-roas",
+              title: "ROAS",
+              value: "3.2x",
+              change: "-0.4",
+              trend: "down",
+              period: "Geçen aya göre",
+              icon: "Target",
+              accent: "#7C3AED",
+            },
+          ]);
+        }
+
+        if (chartRes.success) {
+          const c = chartRes.data;
+          const mapped = c.labels.map((label: string, i: number) => ({
+            date: label,
+            revenue: c.revenue[i],
+            orders: c.orders[i],
+          }));
+          setSalesData(mapped);
+        }
+
+        if (alertsRes.success) {
+          const mappedAlerts = alertsRes.data.map(mapApiAlertToUI);
+          setAlerts(mappedAlerts);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Veriler yüklenemedi");
+      } finally {
+        setRefreshing(false);
+      }
+    }
+    refetch();
   };
 
   // Ad spend total
@@ -250,6 +570,28 @@ export default function Dashboard() {
     () => mockAdSpend.reduce((sum, item) => sum + item.value, 0),
     []
   );
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <RefreshCw className="animate-spin h-8 w-8 text-gray-400" />
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-500 font-medium">{error}</p>
+        <Button onClick={handleRefresh} variant="outline" size="sm">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Tekrar Dene
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -313,7 +655,7 @@ export default function Dashboard() {
 
       {/* ═══ Section 2: KPI Cards ═════════════════════════ */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        {mockKPIs.map((kpi, index) => (
+        {kpis.map((kpi, index) => (
           <KPICard key={kpi.id} data={kpi} index={index} />
         ))}
       </div>
@@ -343,7 +685,7 @@ export default function Dashboard() {
         <CardContent>
           <div className="h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={mockSalesData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <ComposedChart data={salesData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#2563EB" stopOpacity={0.15} />
@@ -505,7 +847,7 @@ export default function Dashboard() {
                   Kritik Uyarılar
                 </CardTitle>
                 <Badge className="bg-[#FEE2E2] text-[#DC2626] hover:bg-[#FEE2E2] text-[11px] h-5 px-1.5">
-                  {mockAlerts.length}
+                  {alerts.length}
                 </Badge>
               </div>
               <CardDescription className="text-[13px] text-[#94A3B8] mt-0.5">
@@ -515,7 +857,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-0 max-h-[280px] overflow-y-auto">
-              {mockAlerts.map((alert: AlertData, index: number) => {
+              {alerts.map((alert: AlertData, index: number) => {
                 const Icon = alertIconMap[alert.type];
                 const colors = alertColorMap[alert.type];
                 return (
