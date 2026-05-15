@@ -30,7 +30,15 @@ class Settings(BaseSettings):
     def assemble_db_url(cls, v: str) -> str:
         if v and v != "":
             return v
-        # Try Railway MySQL env vars
+        # Try Railway DATABASE_URL
+        db_url = os.environ.get("DATABASE_URL", "")
+        if db_url:
+            return db_url
+        # Try Railway MYSQL_URL (convert mysql:// to mysql+aiomysql://)
+        mysql_url = os.environ.get("MYSQL_URL", "")
+        if mysql_url:
+            return mysql_url.replace("mysql://", "mysql+aiomysql://", 1)
+        # Try individual Railway MySQL env vars
         host = os.environ.get("MYSQLHOST", "localhost")
         port = os.environ.get("MYSQLPORT", "3306")
         user = os.environ.get("MYSQLUSER", "root")
@@ -50,9 +58,12 @@ class Settings(BaseSettings):
         redis_url = os.environ.get("REDIS_URL", "")
         if redis_url:
             return redis_url
-        redis_public = os.environ.get("REDISPUBLIC_URL", "")
+        redis_public = os.environ.get("REDIS_PUBLIC_URL", "")
         if redis_public:
             return redis_public
+        redis_private = os.environ.get("REDISPRIVATE_URL", "")
+        if redis_private:
+            return redis_private
         return "redis://localhost:6379/0"
 
     # JWT
