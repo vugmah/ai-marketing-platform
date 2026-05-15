@@ -2,14 +2,6 @@
 builder = "DOCKERFILE"
 dockerfilePath = "backend/Dockerfile"
 
-[env]
-DATABASE_URL = "${{MYSQL_URL}}"
-REDIS_URL = "${{Redis.REDIS_PUBLIC_URL}}"
-JWT_SECRET_KEY = "change-me-in-railway-dashboard"
-SECRET_KEY = "change-me-in-railway-dashboard"
-ALLOWED_ORIGINS = '["*"]'
-DEBUG = "false"
-
 [deploy]
 startCommand = "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"
 healthcheckPath = "/api/health"
