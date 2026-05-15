@@ -145,6 +145,11 @@ class Branch(Base):
 
     # Relationships
     company = relationship("Company", back_populates="branches")
+    users = relationship(
+        "User",
+        back_populates="branch",
+        lazy="selectin",
+    )
 
     def __repr__(self) -> str:
         return (

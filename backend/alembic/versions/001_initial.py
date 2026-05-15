@@ -1,5 +1,5 @@
 """
-Initial migration: create companies and branches tables.
+Initial migration: create companies, branches, and users tables.
 
 Revision ID: 001
 Revises:
@@ -8,6 +8,7 @@ Create Date: 2025-01-01 00:00:00.000000
 This migration sets up the multi-tenant core schema:
 - companies: tenant table with subscription and limit tracking
 - branches: per-company locations with targets and manager info
+- users: authentication accounts with roles, linked to companies and branches
 """
 
 from alembic import op
@@ -43,6 +44,22 @@ def upgrade() -> None:
         "active", "inactive", "pending", name="branchstatus"
     )
     branchstatus.create(op.get_bind(), checkfirst=True)
+
+    userrole = sa.Enum(
+        "super_admin",
+        "company_admin",
+        "branch_manager",
+        "marketing_manager",
+        "support_agent",
+        "analyst",
+        name="userrole",
+    )
+    userrole.create(op.get_bind(), checkfirst=True)
+
+    userstatus = sa.Enum(
+        "active", "inactive", "pending", name="userstatus"
+    )
+    userstatus.create(op.get_bind(), checkfirst=True)
 
     # ------------------------------------------------------------------
     # 2. Create "companies" table
@@ -283,11 +300,145 @@ def upgrade() -> None:
         schema="public",
     )
 
+    # ------------------------------------------------------------------
+    # 4. Create "users" table
+    # ------------------------------------------------------------------
+    op.create_table(
+        "users",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("email", sa.String(length=255), nullable=False),
+        sa.Column("password_hash", sa.String(length=255), nullable=False),
+        sa.Column("first_name", sa.String(length=100), nullable=True),
+        sa.Column("last_name", sa.String(length=100), nullable=True),
+        sa.Column(
+            "role",
+            sa.Enum(
+                "super_admin",
+                "company_admin",
+                "branch_manager",
+                "marketing_manager",
+                "support_agent",
+                "analyst",
+                name="userrole",
+            ),
+            server_default="company_admin",
+            nullable=False,
+        ),
+        sa.Column(
+            "status",
+            sa.Enum(
+                "active", "inactive", "pending", name="userstatus"
+            ),
+            server_default="active",
+            nullable=False,
+        ),
+        sa.Column("company_id", sa.Integer(), nullable=True),
+        sa.Column("branch_id", sa.Integer(), nullable=True),
+        sa.Column(
+            "is_active",
+            sa.Boolean(),
+            server_default=sa.text("true"),
+            nullable=False,
+        ),
+        sa.Column(
+            "email_verified",
+            sa.Boolean(),
+            server_default=sa.text("false"),
+            nullable=False,
+        ),
+        sa.Column("last_login_at", sa.DateTime(), nullable=True),
+        sa.Column(
+            "created_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
+        # Primary key
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_users")),
+        # Unique constraint on email
+        sa.UniqueConstraint("email", name=op.f("uq_users_email")),
+        # Foreign keys
+        sa.ForeignKeyConstraint(
+            ["company_id"],
+            ["public.companies.id"],
+            name=op.f("fk_users_company_id"),
+            ondelete="SET NULL",
+            onupdate="CASCADE",
+        ),
+        sa.ForeignKeyConstraint(
+            ["branch_id"],
+            ["public.branches.id"],
+            name=op.f("fk_users_branch_id"),
+            ondelete="SET NULL",
+            onupdate="CASCADE",
+        ),
+        # Table args
+        schema="public",
+        comment="User accounts for authentication",
+    )
+
+    # Indexes on users
+    op.create_index(
+        op.f("ix_users_id"), "users", ["id"], unique=False, schema="public"
+    )
+    op.create_index(
+        op.f("ix_users_email"),
+        "users",
+        ["email"],
+        unique=True,
+        schema="public",
+    )
+    op.create_index(
+        op.f("ix_users_company_id"),
+        "users",
+        ["company_id"],
+        unique=False,
+        schema="public",
+    )
+    op.create_index(
+        op.f("ix_users_branch_id"),
+        "users",
+        ["branch_id"],
+        unique=False,
+        schema="public",
+    )
+    op.create_index(
+        op.f("ix_users_created_at"),
+        "users",
+        ["created_at"],
+        unique=False,
+        schema="public",
+    )
+
 
 def downgrade() -> None:
-    """Drop branches and companies tables with their ENUM types."""
+    """Drop users, branches, and companies tables with their ENUM types."""
 
-    # 1. Drop branches table and its indexes
+    # 1. Drop users table and its indexes
+    op.drop_index(
+        op.f("ix_users_created_at"), table_name="users", schema="public"
+    )
+    op.drop_index(
+        op.f("ix_users_branch_id"), table_name="users", schema="public"
+    )
+    op.drop_index(
+        op.f("ix_users_company_id"), table_name="users", schema="public"
+    )
+    op.drop_index(
+        op.f("ix_users_email"), table_name="users", schema="public"
+    )
+    op.drop_index(
+        op.f("ix_users_id"), table_name="users", schema="public"
+    )
+    op.drop_table("users", schema="public")
+
+    # 2. Drop branches table and its indexes
     op.drop_index(
         op.f("ix_branches_created_at"), table_name="branches", schema="public"
     )
@@ -305,7 +456,7 @@ def downgrade() -> None:
     )
     op.drop_table("branches", schema="public")
 
-    # 2. Drop companies table and its indexes
+    # 3. Drop companies table and its indexes
     op.drop_index(
         op.f("ix_companies_created_at"), table_name="companies", schema="public"
     )
@@ -317,7 +468,9 @@ def downgrade() -> None:
     )
     op.drop_table("companies", schema="public")
 
-    # 3. Drop ENUM types
+    # 4. Drop ENUM types
+    sa.Enum(name="userstatus").drop(op.get_bind(), checkfirst=True)
+    sa.Enum(name="userrole").drop(op.get_bind(), checkfirst=True)
     sa.Enum(name="branchstatus").drop(op.get_bind(), checkfirst=True)
     sa.Enum(name="branchtype").drop(op.get_bind(), checkfirst=True)
     sa.Enum(name="subscriptionstatus").drop(op.get_bind(), checkfirst=True)

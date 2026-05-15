@@ -1,13 +1,12 @@
-"""Authentication service layer with mock implementations.
+"""Authentication service layer with real async database operations."""
 
-Note: These are mock implementations. In production, replace with real
-database operations using the User model and proper async queries.
-"""
-
-import uuid
 from datetime import datetime, timezone
-from typing import Dict, Optional
+from typing import Optional
 
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.auth.models import User
 from app.auth.schemas import TokenResponse, UserRegister, UserResponse
 from app.auth.utils import (
     create_access_token,
@@ -17,38 +16,28 @@ from app.auth.utils import (
     verify_token,
 )
 from app.config import settings
+from app.database import get_db_context
 from app.exceptions import AlreadyExistsError, AuthenticationError, NotFoundError
-
-# In-memory mock user store for demonstration
-# Key: email, Value: dict with user data
-_mock_users: Dict[str, Dict] = {}
-
-# Revoked token store (for logout)
-_revoked_tokens: set = set()
+from app.redis_client import get_redis_client
 
 
-def _generate_user_id() -> str:
-    """Generate a unique user ID."""
-    return str(uuid.uuid4())
-
-
-def _user_to_response(user_data: Dict) -> UserResponse:
-    """Convert stored user dict to UserResponse schema."""
+def _user_to_response(user: User) -> UserResponse:
+    """Convert User model instance to UserResponse schema."""
     return UserResponse(
-        id=user_data["id"],
-        email=user_data["email"],
-        first_name=user_data.get("first_name"),
-        last_name=user_data.get("last_name"),
-        role=user_data.get("role", "user"),
-        company_id=user_data.get("company_id"),
-        branch_id=user_data.get("branch_id"),
-        is_active=user_data.get("is_active", True),
-        created_at=user_data.get("created_at"),
+        id=user.id,
+        email=user.email,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        role=user.role,
+        company_id=user.company_id,
+        branch_id=user.branch_id,
+        is_active=user.is_active,
+        created_at=user.created_at,
     )
 
 
 async def register_user(data: UserRegister) -> UserResponse:
-    """Register a new user (mock implementation).
+    """Register a new user with real database operations.
 
     Args:
         data: User registration data.
@@ -61,32 +50,38 @@ async def register_user(data: UserRegister) -> UserResponse:
     """
     email = data.email.lower().strip()
 
-    if email in _mock_users:
-        raise AlreadyExistsError(detail=f"User with email '{email}' already exists")
+    async with get_db_context() as db:
+        # Check if user already exists
+        result = await db.execute(select(User).where(User.email == email))
+        existing_user = result.scalar_one_or_none()
 
-    user_id = _generate_user_id()
-    now = datetime.now(timezone.utc)
+        if existing_user is not None:
+            raise AlreadyExistsError(
+                detail=f"User with email '{email}' already exists"
+            )
 
-    user_data = {
-        "id": user_id,
-        "email": email,
-        "password_hash": hash_password(data.password),
-        "first_name": data.first_name,
-        "last_name": data.last_name,
-        "role": "user",
-        "company_id": None,
-        "branch_id": None,
-        "is_active": True,
-        "created_at": now,
-    }
+        # Create new user
+        user = User(
+            email=email,
+            password_hash=hash_password(data.password),
+            first_name=data.first_name,
+            last_name=data.last_name,
+            role="user",
+            company_id=None,
+            branch_id=None,
+            is_active=True,
+            created_at=datetime.now(timezone.utc),
+        )
 
-    _mock_users[email] = user_data
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
 
-    return _user_to_response(user_data)
+        return _user_to_response(user)
 
 
 async def login_user(email: str, password: str) -> TokenResponse:
-    """Authenticate a user and return tokens (mock implementation).
+    """Authenticate a user against the database and return tokens.
 
     Args:
         email: User email address.
@@ -99,40 +94,42 @@ async def login_user(email: str, password: str) -> TokenResponse:
         AuthenticationError: If credentials are invalid.
     """
     email = email.lower().strip()
-    user_data = _mock_users.get(email)
 
-    if user_data is None:
-        # For demo, auto-create user if not exists (remove in production)
-        raise AuthenticationError(detail="Invalid email or password")
+    async with get_db_context() as db:
+        result = await db.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
 
-    if not verify_password(password, user_data["password_hash"]):
-        raise AuthenticationError(detail="Invalid email or password")
+        if user is None:
+            raise AuthenticationError(detail="Invalid email or password")
 
-    if not user_data.get("is_active", True):
-        raise AuthenticationError(detail="Account is deactivated")
+        if not verify_password(password, user.password_hash):
+            raise AuthenticationError(detail="Invalid email or password")
 
-    token_payload = {
-        "sub": user_data["id"],
-        "email": user_data["email"],
-        "role": user_data.get("role", "user"),
-        "company_id": user_data.get("company_id"),
-        "branch_id": user_data.get("branch_id"),
-    }
+        if not user.is_active:
+            raise AuthenticationError(detail="Account is deactivated")
 
-    access_token = create_access_token(token_payload)
-    refresh_token = create_refresh_token(token_payload)
+        token_payload = {
+            "sub": user.id,
+            "email": user.email,
+            "role": user.role,
+            "company_id": user.company_id,
+            "branch_id": user.branch_id,
+        }
 
-    return TokenResponse(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer",
-        expires_in=settings.ACCESS_TOKEN_EXPIRE_HOURS * 3600,
-        refresh_expires_in=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
-    )
+        access_token = create_access_token(token_payload)
+        refresh_token = create_refresh_token(token_payload)
+
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="bearer",
+            expires_in=settings.ACCESS_TOKEN_EXPIRE_HOURS * 3600,
+            refresh_expires_in=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+        )
 
 
 async def get_current_user(token: str) -> UserResponse:
-    """Get the current user from an access token.
+    """Get the current user from an access token via database lookup.
 
     Args:
         token: JWT access token.
@@ -141,25 +138,34 @@ async def get_current_user(token: str) -> UserResponse:
         Current user response.
 
     Raises:
-        AuthenticationError: If the token is invalid or user not found.
+        AuthenticationError: If the token is invalid, revoked, or user not found.
     """
     try:
         payload = verify_token(token)
     except ValueError as exc:
         raise AuthenticationError(detail=str(exc)) from exc
 
-    if token in _revoked_tokens:
+    # Check if token is revoked in Redis
+    redis = await get_redis_client()
+    revoked = await redis.get(f"revoked:{token}")
+    if revoked:
         raise AuthenticationError(detail="Token has been revoked")
 
     user_id = payload.get("sub")
-    email = payload.get("email", "").lower()
+    if not user_id:
+        raise AuthenticationError(detail="Invalid token payload")
 
-    # Find user by email (mock lookup)
-    user_data = _mock_users.get(email)
-    if user_data is None or user_data["id"] != user_id:
-        raise NotFoundError(detail="User not found")
+    async with get_db_context() as db:
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
 
-    return _user_to_response(user_data)
+        if user is None:
+            raise NotFoundError(detail="User not found")
+
+        if not user.is_active:
+            raise AuthenticationError(detail="Account is deactivated")
+
+        return _user_to_response(user)
 
 
 async def refresh_access_token(refresh_token: str) -> TokenResponse:
@@ -172,14 +178,17 @@ async def refresh_access_token(refresh_token: str) -> TokenResponse:
         New token response with fresh access and refresh tokens.
 
     Raises:
-        AuthenticationError: If the refresh token is invalid.
+        AuthenticationError: If the refresh token is invalid or revoked.
     """
     try:
         payload = verify_token(refresh_token)
     except ValueError as exc:
         raise AuthenticationError(detail=f"Invalid refresh token: {exc}") from exc
 
-    if refresh_token in _revoked_tokens:
+    # Check if refresh token is revoked in Redis
+    redis = await get_redis_client()
+    revoked = await redis.get(f"revoked:{refresh_token}")
+    if revoked:
         raise AuthenticationError(detail="Refresh token has been revoked")
 
     # Check token type
@@ -187,42 +196,69 @@ async def refresh_access_token(refresh_token: str) -> TokenResponse:
     if token_type != "refresh":
         raise AuthenticationError(detail="Invalid token type")
 
-    email = payload.get("email", "").lower()
-    user_data = _mock_users.get(email)
-    if user_data is None:
-        raise NotFoundError(detail="User not found")
+    user_id = payload.get("sub")
+    if not user_id:
+        raise AuthenticationError(detail="Invalid token payload")
 
-    token_payload = {
-        "sub": user_data["id"],
-        "email": user_data["email"],
-        "role": user_data.get("role", "user"),
-        "company_id": user_data.get("company_id"),
-        "branch_id": user_data.get("branch_id"),
-    }
+    async with get_db_context() as db:
+        result = await db.execute(select(User).where(User.id == user_id))
+        user = result.scalar_one_or_none()
 
-    new_access_token = create_access_token(token_payload)
-    new_refresh_token = create_refresh_token(token_payload)
+        if user is None:
+            raise NotFoundError(detail="User not found")
 
-    # Revoke the old refresh token
-    _revoked_tokens.add(refresh_token)
+        if not user.is_active:
+            raise AuthenticationError(detail="Account is deactivated")
 
-    return TokenResponse(
-        access_token=new_access_token,
-        refresh_token=new_refresh_token,
-        token_type="bearer",
-        expires_in=settings.ACCESS_TOKEN_EXPIRE_HOURS * 3600,
-        refresh_expires_in=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
-    )
+        token_payload = {
+            "sub": user.id,
+            "email": user.email,
+            "role": user.role,
+            "company_id": user.company_id,
+            "branch_id": user.branch_id,
+        }
+
+        new_access_token = create_access_token(token_payload)
+        new_refresh_token = create_refresh_token(token_payload)
+
+        # Revoke the old refresh token in Redis
+        await redis.setex(
+            f"revoked:{refresh_token}",
+            settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+            "1",
+        )
+
+        return TokenResponse(
+            access_token=new_access_token,
+            refresh_token=new_refresh_token,
+            token_type="bearer",
+            expires_in=settings.ACCESS_TOKEN_EXPIRE_HOURS * 3600,
+            refresh_expires_in=settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+        )
 
 
-async def logout_user(access_token: Optional[str] = None, refresh_token: Optional[str] = None) -> None:
-    """Logout a user by revoking their tokens.
+async def logout_user(
+    access_token: Optional[str] = None,
+    refresh_token: Optional[str] = None,
+) -> None:
+    """Logout a user by revoking their tokens in Redis.
 
     Args:
         access_token: Optional access token to revoke.
         refresh_token: Optional refresh token to revoke.
     """
+    redis = await get_redis_client()
+
     if access_token:
-        _revoked_tokens.add(access_token)
+        await redis.setex(
+            f"revoked:{access_token}",
+            settings.ACCESS_TOKEN_EXPIRE_HOURS * 3600,
+            "1",
+        )
+
     if refresh_token:
-        _revoked_tokens.add(refresh_token)
+        await redis.setex(
+            f"revoked:{refresh_token}",
+            settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400,
+            "1",
+        )

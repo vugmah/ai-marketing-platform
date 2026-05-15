@@ -11,6 +11,11 @@ from sqlalchemy.orm import declarative_base
 
 from app.config import settings
 
+# Import all models so Base.metadata includes them
+from app.auth.models import User  # noqa: F401
+from app.companies.models import Company  # noqa: F401
+from app.branches.models import Branch  # noqa: F401
+
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
