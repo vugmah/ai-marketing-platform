@@ -62,7 +62,7 @@ jobs:
       - name: Deploy Backend to Railway
         run: |
           cd backend
-          railway up --service "ai-marketing-platform"
+          railway up --service "ai-marketing-platform" || (echo "=== DEPLOY FAILED - Fetching logs ===" && railway logs --service "ai-marketing-platform" && exit 1)
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
