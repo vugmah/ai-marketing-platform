@@ -12,7 +12,14 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = Field(default="AI Marketing Platform")
     DEBUG: bool = Field(default=False)
-    ALLOWED_ORIGINS: List[str] = Field(default=["http://localhost:3000", "http://localhost:5173"])
+    ALLOWED_ORIGINS: List[str] = Field(
+        default=[
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://*.railway.app",
+            "https://*.up.railway.app",
+        ]
+    )
 
     # Database
     DATABASE_URL: str = Field(

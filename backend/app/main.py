@@ -11,6 +11,7 @@ from app.analytics.router import router as analytics_router
 from app.dashboard.router import router as dashboard_router
 from app.database import close_db, init_db
 from app.notifications.router import router as notifications_router
+from app.erp.router import router as erp_router
 from app.exceptions import register_exception_handlers
 from app.middleware.cors import setup_cors
 from app.middleware.rate_limit import RateLimitMiddleware
@@ -57,3 +58,4 @@ app.include_router(branches_router, prefix="/api/v2/branches", tags=["Branches"]
 app.include_router(dashboard_router, prefix="/api/v2/dashboard", tags=["Dashboard"])
 app.include_router(analytics_router, prefix="/api/v2/analytics", tags=["Analytics"])
 app.include_router(notifications_router, prefix="/api/v2/notifications", tags=["Notifications"])
+app.include_router(erp_router, prefix="/api/v2/erp", tags=["ERP Integration"])
