@@ -7,6 +7,7 @@ from fastapi import FastAPI
 from app.auth.router import router as auth_router
 from app.branches.router import router as branches_router
 from app.companies.router import health_router, router as companies_router
+from app.dashboard.router import router as dashboard_router
 from app.database import close_db, init_db
 from app.exceptions import register_exception_handlers
 from app.middleware.cors import setup_cors
@@ -51,3 +52,4 @@ app.include_router(health_router)
 app.include_router(auth_router, prefix="/api/v2/auth", tags=["Authentication"])
 app.include_router(companies_router, prefix="/api/v2/companies", tags=["Companies"])
 app.include_router(branches_router, prefix="/api/v2/branches", tags=["Branches"])
+app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["Dashboard"])
