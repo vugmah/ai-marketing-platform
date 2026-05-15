@@ -22,6 +22,18 @@ from app.database import Base  # noqa: E402
 # Import all models so Base.metadata contains all tables
 from app.companies.models import Company  # noqa: E402, F401
 from app.branches.models import Branch  # noqa: E402, F401
+from app.erp.models import (  # noqa: E402, F401
+    ERPConnection,
+    ERPCustomer,
+    ERPFieldMapping,
+    ERPInventory,
+    ERPInvoice,
+    ERPPayment,
+    ERPProduct,
+    ERPSalesOrder,
+    ERPSyncJob,
+    ERPSyncLog,
+)
 
 # -- Alembic Config object --
 config = context.config

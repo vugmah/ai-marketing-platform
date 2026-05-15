@@ -15,6 +15,18 @@ from app.config import settings
 from app.auth.models import User  # noqa: F401
 from app.companies.models import Company  # noqa: F401
 from app.branches.models import Branch  # noqa: F401
+from app.erp.models import (  # noqa: F401
+    ERPConnection,
+    ERPCustomer,
+    ERPFieldMapping,
+    ERPInventory,
+    ERPInvoice,
+    ERPPayment,
+    ERPProduct,
+    ERPSalesOrder,
+    ERPSyncJob,
+    ERPSyncLog,
+)
 
 engine = create_async_engine(
     settings.DATABASE_URL,
