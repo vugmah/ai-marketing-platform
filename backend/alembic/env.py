@@ -20,6 +20,7 @@ from app.config import settings  # noqa: E402
 from app.database import Base  # noqa: E402
 
 # Import all models so Base.metadata contains all tables
+from app.auth.models import User  # noqa: E402, F401
 from app.companies.models import Company  # noqa: E402, F401
 from app.branches.models import Branch  # noqa: E402, F401
 from app.erp.models import (  # noqa: E402, F401
