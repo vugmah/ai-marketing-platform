@@ -4,7 +4,7 @@ All thresholds and scoring parameters are centralized here for easy tuning.
 """
 
 import enum
-from typing import Dict, Final
+from typing import Dict, Final, Any
 
 
 # =============================================================================

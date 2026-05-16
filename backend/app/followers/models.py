@@ -74,25 +74,24 @@ class FollowerSnapshot(Base):
             "company_id",
             "platform",
         ),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -160,25 +159,24 @@ class BotPattern(Base):
         Index("ix_bot_patterns_company_risk", "company_id", "risk_level"),
         Index("ix_bot_patterns_account", "account_id", "detected_at"),
         Index("ix_bot_patterns_score", "bot_score"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -270,25 +268,24 @@ class SuspiciousActivity(Base):
         Index("ix_suspicious_activity_company", "company_id", "alert_type"),
         Index("ix_suspicious_activity_account", "account_id", "start_date"),
         Index("ix_suspicious_activity_severity", "severity"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -366,25 +363,24 @@ class AudienceDemographics(Base):
     __table_args__ = (
         Index("ix_audience_demo_account", "account_id", "analysis_date"),
         Index("ix_audience_demo_company", "company_id", "platform"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -479,25 +475,24 @@ class EngagementQuality(Base):
     __table_args__ = (
         Index("ix_engagement_quality_account_period", "account_id", "period_start"),
         Index("ix_engagement_quality_post", "post_id"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -508,7 +503,7 @@ class EngagementQuality(Base):
     )
     post_id = Column(
         Integer,
-        ForeignKey("public.social_posts.id", ondelete="CASCADE"),
+        ForeignKey("social_posts.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
     )
@@ -586,25 +581,24 @@ class FollowerHealthScore(Base):
     __table_args__ = (
         Index("ix_follower_health_account_date", "account_id", "score_date"),
         Index("ix_follower_health_company_status", "company_id", "status"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -687,25 +681,24 @@ class FollowerInsight(Base):
         Index("ix_follower_insights_account", "account_id", "analyzed_at"),
         Index("ix_follower_insights_bot", "bot_score"),
         Index("ix_follower_insights_flagged", "is_flagged"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -789,25 +782,24 @@ class AIAudienceRecommendation(Base):
     __table_args__ = (
         Index("ix_ai_rec_company", "company_id", "recommendation_type"),
         Index("ix_ai_rec_account", "account_id", "generated_at"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -886,25 +878,24 @@ class FollowerDeltaEvent(Base):
         Index("ix_delta_event_account_date", "account_id", "event_date"),
         Index("ix_delta_event_company_type", "company_id", "event_type"),
         Index("ix_delta_event_platform", "company_id", "platform", "event_date"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -955,25 +946,24 @@ class EngagementEvent(Base):
         Index("ix_engagement_event_account_date", "account_id", "event_date"),
         Index("ix_engagement_event_type", "company_id", "event_type", "event_date"),
         Index("ix_engagement_event_follower", "follower_account_id", "event_date"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -1031,25 +1021,24 @@ class ReengagementRecommendation(Base):
         Index("ix_reengagement_account", "account_id", "created_at"),
         Index("ix_reengagement_company_type", "company_id", "reengagement_type"),
         Index("ix_reengagement_status", "approval_status"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -1078,7 +1067,7 @@ class ReengagementRecommendation(Base):
         default="pending",
         nullable=False,
     )
-    approved_by = Column(Integer, ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True)
+    approved_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     approved_at = Column(DateTime, nullable=True)
     rejection_reason = Column(String(255), nullable=True)
     sent_at = Column(DateTime, nullable=True)
@@ -1115,19 +1104,18 @@ class SafeMessageTemplate(Base):
     __table_args__ = (
         Index("ix_safe_template_company_platform", "company_id", "platform"),
         Index("ix_safe_template_type", "template_type", "platform"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -1156,7 +1144,7 @@ class SafeMessageTemplate(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     use_count = Column(Integer, default=0, nullable=False)
     avg_response_rate = Column(Numeric(5, 2), default=0.0, nullable=False)
-    created_by = Column(Integer, ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True)
+    created_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(
         DateTime,
@@ -1189,25 +1177,24 @@ class OutreachApprovalRequest(Base):
         Index("ix_outreach_approval_company", "company_id", "status"),
         Index("ix_outreach_approval_requester", "requested_by", "created_at"),
         Index("ix_outreach_approval_platform", "platform", "status"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     reengagement_id = Column(
         Integer,
-        ForeignKey("public.reengagement_recommendations.id", ondelete="SET NULL"),
+        ForeignKey("reengagement_recommendations.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -1239,13 +1226,13 @@ class OutreachApprovalRequest(Base):
         nullable=False,
     )
     policy_check_details = Column(Text, nullable=True)
-    requested_by = Column(Integer, ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True)
+    requested_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     requested_at = Column(DateTime, server_default=func.now(), nullable=False)
-    reviewed_by = Column(Integer, ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True)
+    reviewed_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     reviewed_at = Column(DateTime, nullable=True)
     review_notes = Column(String(500), nullable=True)
     sent_at = Column(DateTime, nullable=True)
-    sent_by = Column(Integer, ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True)
+    sent_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     send_result = Column(String(255), nullable=True)
     rate_limit_applied = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
@@ -1280,25 +1267,24 @@ class AudienceLossEstimate(Base):
     __table_args__ = (
         Index("ix_audience_loss_account_date", "account_id", "estimate_date"),
         Index("ix_audience_loss_company_type", "company_id", "loss_type"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -1349,25 +1335,24 @@ class FollowerRetentionMetric(Base):
     __table_args__ = (
         Index("ix_retention_account_period", "account_id", "period_start"),
         Index("ix_retention_company_platform", "company_id", "platform", "period_start"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -1419,25 +1404,24 @@ class FollowerValueScore(Base):
     __table_args__ = (
         Index("ix_value_score_account", "account_id", "value_tier"),
         Index("ix_value_score_follower", "follower_account_id", "scored_at"),
-        {"schema": "public"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
