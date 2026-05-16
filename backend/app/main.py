@@ -11,6 +11,8 @@ from contextlib import asynccontextmanager
 import logging
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from app.database import close_db, init_db
 from app.redis_client import close_redis, get_redis_client
@@ -178,6 +180,13 @@ app = FastAPI(
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
 )
+
+# Serve frontend static files
+static_dir = "/app/static"
+if os.path.exists(static_dir):
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+else:
+    logger.warning(f"[STATIC] Static directory not found: {static_dir}")
 
 # Root path - prevents 500 on browser access to /
 @app.get("/", tags=["Root"])

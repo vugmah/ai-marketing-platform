@@ -11,6 +11,7 @@ COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/ .
+COPY dist/ /app/static/
 
 RUN groupadd --gid 1000 aimp && \
     useradd --uid 1000 --gid aimp --shell /bin/false --create-home aimp
