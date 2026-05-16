@@ -3,6 +3,7 @@
 Includes SoftDeleteMixin for GDPR/KVKK compliant data governance.
 """
 
+import logging
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -15,39 +16,77 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.orm import declarative_base
 
-from app.config import settings
+logger = logging.getLogger(__name__)
 
-# Railway MySQL fix: try env var directly if settings.DATABASE_URL is empty
-_raw_db_url = settings.DATABASE_URL or os.environ.get("DATABASE_URL", "")
-# Also try Railway individual MySQL env vars
-if not _raw_db_url:
-    mysqlhost = os.environ.get("MYSQLHOST", "")
-    if mysqlhost:
-        mysqlport = os.environ.get("MYSQLPORT", "3306")
-        mysqluser = os.environ.get("MYSQLUSER", "")
-        mysqlpassword = os.environ.get("MYSQLPASSWORD", "")
-        mysqldatabase = os.environ.get("MYSQLDATABASE", "")
-        _raw_db_url = f"mysql+aiomysql://{mysqluser}:{mysqlpassword}@{mysqlhost}:{mysqlport}/{mysqldatabase}"
 
-# Convert sync mysql:// to async mysql+aiomysql://
-if _raw_db_url and _raw_db_url.startswith("mysql://") and not _raw_db_url.startswith("mysql+aiomysql://"):
-    _raw_db_url = _raw_db_url.replace("mysql://", "mysql+aiomysql://", 1)
+# =============================================================================
+# Railway MySQL Fix - Bypass pydantic settings, read env vars directly
+# =============================================================================
 
-# Ensure we have a DB URL
-if not _raw_db_url:
-    _raw_db_url = "sqlite+aiosqlite:///./aimarketing.db"
+def _get_database_url() -> str:
+    """Build database URL from Railway environment variables.
+
+    Order of precedence:
+    1. DATABASE_URL env var (Railway auto-provides this for MySQL addon)
+    2. MYSQL_URL env var
+    3. Individual Railway MySQL env vars (MYSQLHOST, MYSQLPORT, etc.)
+    4. Fallback to SQLite (for local dev only)
+    """
+    # 1. DATABASE_URL (Railway sets this when MySQL addon is connected)
+    db_url = os.environ.get("DATABASE_URL", "")
+    if db_url:
+        # Convert sync mysql:// to async mysql+aiomysql://
+        if db_url.startswith("mysql://") and not db_url.startswith("mysql+aiomysql://"):
+            db_url = db_url.replace("mysql://", "mysql+aiomysql://", 1)
+        return db_url
+
+    # 2. MYSQL_URL
+    mysql_url = os.environ.get("MYSQL_URL", "")
+    if mysql_url:
+        if mysql_url.startswith("mysql://") and not mysql_url.startswith("mysql+aiomysql://"):
+            mysql_url = mysql_url.replace("mysql://", "mysql+aiomysql://", 1)
+        return mysql_url
+
+    # 3. Individual Railway MySQL env vars
+    host = os.environ.get("MYSQLHOST", "")
+    if host:
+        port = os.environ.get("MYSQLPORT", "3306")
+        user = os.environ.get("MYSQLUSER", "")
+        password = os.environ.get("MYSQLPASSWORD", "")
+        database = os.environ.get("MYSQLDATABASE", "")
+        if user and password and database:
+            return f"mysql+aiomysql://{user}:{password}@{host}:{port}/{database}"
+
+    # 4. Fallback to SQLite (local dev)
+    return "sqlite+aiosqlite:///./aimarketing.db"
+
+
+# Get DB URL at module load time
+DATABASE_URL = _get_database_url()
+
+# Debug: log DB URL with masked password
+if DATABASE_URL:
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(DATABASE_URL)
+        masked_url = DATABASE_URL.replace(f":{parsed.password}@", ":****@") if parsed.password else DATABASE_URL
+    except Exception:
+        masked_url = DATABASE_URL
+    logger.warning(f"[DB] Database URL: {masked_url}")
+else:
+    logger.error("[DB] No DATABASE_URL configured!")
 
 # SQLite doesn't support pool_size/max_overflow
-_is_sqlite = "sqlite" in _raw_db_url.lower()
+_is_sqlite = "sqlite" in DATABASE_URL.lower()
 _engine_kwargs = {
-    "echo": settings.DEBUG,
+    "echo": False,
     "pool_pre_ping": True,
 }
 if not _is_sqlite:
     _engine_kwargs.update(pool_size=20, max_overflow=30)
 
 engine = create_async_engine(
-    _raw_db_url,
+    DATABASE_URL,
     **_engine_kwargs,
 )
 
