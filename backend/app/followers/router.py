@@ -6,7 +6,7 @@ health scoring, and AI recommendation endpoints.
 """
 
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -94,7 +94,7 @@ async def create_snapshot(
     data: FollowerSnapshotCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Create a new follower snapshot."""
     service = FollowerSyncService(db)
     snapshot = await service.create_snapshot(
@@ -118,7 +118,7 @@ async def list_snapshots(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List follower snapshots."""
     service = FollowerSyncService(db)
     result = await service.list_snapshots(
@@ -140,7 +140,7 @@ async def get_snapshot(
     snapshot_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get a follower snapshot by ID."""
     # Implementation uses the service to fetch by ID
     from sqlalchemy import select
@@ -174,7 +174,7 @@ async def sync_followers(
     current_posts: int = Query(0, ge=0, description="Current post count"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Sync current follower count and return change summary."""
     service = FollowerSyncService(db)
     summary = await service.sync_follower_count(
@@ -192,7 +192,7 @@ async def sync_followers(
 
 @router.get(
     "/growth-trend/{account_id}",
-    response_model=List[Dict[str, Any]],
+    response_model=List[dict[str, object]],
     summary="Get follower growth trend",
     description="Get daily follower growth trend for an account.",
 )
@@ -201,7 +201,7 @@ async def get_growth_trend(
     days: int = Query(30, ge=7, le=365, description="Days to analyze"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get follower growth trend."""
     service = FollowerSyncService(db)
     trend = await service.calculate_growth_trend(
@@ -238,7 +238,7 @@ async def detect_bot_single(
     is_verified: bool = Query(False, description="Is verified"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Run bot detection on a single account."""
     service = BotDetectionService(db)
     result = await service.detect_bot(
@@ -266,10 +266,10 @@ async def detect_bot_single(
     description="Run bot detection on a batch of follower profiles.",
 )
 async def detect_bot_batch(
-    data: Dict[str, Any],
+    data: dict[str, object],
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Run batch bot detection.
 
     Request body:
@@ -305,7 +305,7 @@ async def list_bot_patterns(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List bot detection patterns."""
     service = BotDetectionService(db)
     result = await service.list_bot_patterns(
@@ -337,7 +337,7 @@ async def list_suspicious_activities(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List suspicious activities."""
     service = SuspiciousActivityService(db)
     result = await service.list_activities(
@@ -361,7 +361,7 @@ async def resolve_activity(
     activity_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Mark a suspicious activity as resolved."""
     service = SuspiciousActivityService(db)
     activity = await service.resolve_activity(activity_id, user.company_id)
@@ -381,10 +381,10 @@ async def resolve_activity(
     description="Analyze audience demographics from follower profiles.",
 )
 async def analyze_demographics(
-    data: Dict[str, Any],
+    data: dict[str, object],
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Analyze audience demographics.
 
     Request body:
@@ -420,7 +420,7 @@ async def list_demographics(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List audience demographics."""
     from sqlalchemy import select, func, desc
     from .models import AudienceDemographics
@@ -465,7 +465,7 @@ async def get_latest_demographics(
     account_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get latest audience demographics."""
     service = AudienceAnalysisService(db)
     demo = await service.get_latest_demographics(account_id, user.company_id)
@@ -488,7 +488,7 @@ async def create_engagement_quality(
     data: EngagementQualityCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Create engagement quality record."""
     service = EngagementQualityService(db)
     record = await service.create_quality_record(
@@ -513,7 +513,7 @@ async def list_engagement_quality(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List engagement quality records."""
     service = EngagementQualityService(db)
     result = await service.list_quality_records(
@@ -536,7 +536,7 @@ async def get_engagement_summary(
     days: int = Query(30, ge=7, le=365, description="Days to analyze"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get engagement quality summary."""
     service = EngagementQualityService(db)
     summary = await service.get_quality_summary(account_id, user.company_id, days=days)
@@ -556,10 +556,10 @@ async def get_engagement_summary(
     description="Calculate composite follower health score for an account.",
 )
 async def calculate_health_score(
-    data: Dict[str, Any],
+    data: dict[str, object],
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Calculate follower health score.
 
     Request body:
@@ -600,7 +600,7 @@ async def list_health_scores(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List health scores."""
     service = FollowerHealthService(db)
     result = await service.list_health_scores(
@@ -622,7 +622,7 @@ async def get_latest_health_score(
     account_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get latest health score."""
     service = FollowerHealthService(db)
     health = await service.get_latest_health_score(account_id, user.company_id)
@@ -642,10 +642,10 @@ async def get_latest_health_score(
     description="Generate AI-powered audience recommendations for an account.",
 )
 async def generate_ai_recommendations(
-    data: Dict[str, Any],
+    data: dict[str, object],
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Generate AI audience recommendations.
 
     Request body:
@@ -696,7 +696,7 @@ async def list_ai_recommendations(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List AI recommendations."""
     service = AIAudienceService(db)
     result = await service.list_recommendations(
@@ -721,7 +721,7 @@ async def implement_recommendation(
     result_notes: Optional[str] = None,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Mark an AI recommendation as implemented."""
     service = AIAudienceService(db)
     rec = await service.mark_implemented(rec_id, user.company_id, result_notes)
@@ -744,7 +744,7 @@ async def get_dashboard(
     platform: str = Query(..., description="Social platform"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get comprehensive follower intelligence dashboard."""
     import time
 
@@ -861,7 +861,7 @@ async def run_comprehensive_analysis(
     data: FollowerAnalysisRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Run comprehensive follower analysis.
 
     Performs bot detection, demographics analysis, engagement quality scoring,
@@ -879,7 +879,7 @@ async def run_comprehensive_analysis(
     ai_service = AIAudienceService(db)
     activity_service = SuspiciousActivityService(db)
 
-    response: Dict[str, Any] = {
+    response: dict[str, object] = {
         "account_id": data.account_id,
         "platform": data.platform,
         "analysis_date": datetime.now(timezone.utc),
@@ -996,7 +996,7 @@ async def get_new_followers(
     page_size: int = Query(20, ge=1, le=100),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get new follower delta events."""
     service = FollowerDeltaService(db)
     return await service.list_delta_events(
@@ -1025,7 +1025,7 @@ async def get_estimated_unfollows(
     page_size: int = Query(20, ge=1, le=100),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get estimated unfollow events with confidence scores."""
     service = FollowerDeltaService(db)
     return await service.list_delta_events(
@@ -1052,7 +1052,7 @@ async def get_delta_summary(
     days: int = Query(30, ge=1, le=365, description="Lookback period in days"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get follower delta summary with estimated changes."""
     service = FollowerDeltaService(db)
     return await service.get_delta_summary(
@@ -1074,7 +1074,7 @@ async def get_inactive_followers(
     page_size: int = Query(20, ge=1, le=100),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get inactive/ghost followers."""
     service = FollowerValueService(db)
     return await service.list_value_scores(
@@ -1109,7 +1109,7 @@ async def get_new_engagements(
     page_size: int = Query(20, ge=1, le=100),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get new engagement events across all platforms."""
     service = EngagementEventService(db)
     return await service.list_events(
@@ -1136,7 +1136,7 @@ async def record_engagement(
     platform: str = Query(..., description="Platform (instagram, facebook, tiktok, whatsapp, telegram)"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Record a new engagement event."""
     service = EngagementEventService(db)
     return await service.record_event(
@@ -1180,7 +1180,7 @@ async def get_reengagement_recommendations(
     page_size: int = Query(20, ge=1, le=100),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get re-engagement recommendations."""
     service = ReengagementService(db)
     return await service.list_recommendations(
@@ -1207,7 +1207,7 @@ async def generate_reengagement_message(
     data: GenerateReengagementRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Generate a re-engagement message suggestion."""
     service = ReengagementService(db)
     return await service.generate_recommendation(
@@ -1235,7 +1235,7 @@ async def request_approval(
     reengagement_id: int = Query(..., description="Re-engagement recommendation ID"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Request approval for a re-engagement message."""
     service = ReengagementService(db)
     return await service.request_approval(
@@ -1256,7 +1256,7 @@ async def review_approval(
     data: ReviewApprovalRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Review an approval request (approve or reject)."""
     service = ReengagementService(db)
     return await service.review_approval(
@@ -1282,7 +1282,7 @@ async def send_approved_message(
     approval_id: int = Query(..., description="Approval request ID"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Send an approved message (records send intent)."""
     service = ReengagementService(db)
     return await service.send_approved_message(
@@ -1309,7 +1309,7 @@ async def get_approval_queue(
     page_size: int = Query(20, ge=1, le=100),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get outreach approval queue."""
     service = ReengagementService(db)
     return await service.list_approvals(
@@ -1339,7 +1339,7 @@ async def get_value_scores(
     page_size: int = Query(20, ge=1, le=100),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get follower value scores."""
     service = FollowerValueService(db)
     return await service.list_value_scores(
@@ -1359,7 +1359,7 @@ async def get_value_scores(
 
 @router.get(
     "/dashboard",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Follower intelligence dashboard",
     description=(
         "Combined dashboard with new followers, estimated unfollows, "
@@ -1372,7 +1372,7 @@ async def get_dashboard(
     platform: Optional[str] = Query(None, description="Filter by platform"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get combined follower intelligence dashboard."""
     delta_service = FollowerDeltaService(db)
     engagement_service = EngagementEventService(db)
