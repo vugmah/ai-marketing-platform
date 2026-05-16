@@ -8,7 +8,7 @@ competitors, and webhook handling.
 import json
 import logging
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
 from sqlalchemy import select
 
@@ -116,7 +116,7 @@ async def create_account(
     data: SocialAccountCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Connect a new social media account.
 
     Encrypts and stores OAuth credentials. Validates tokens with the platform API.
@@ -143,7 +143,7 @@ async def list_accounts(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List connected social media accounts."""
     service = SocialAccountService(db)
     result = await service.list_accounts(
@@ -166,7 +166,7 @@ async def get_account(
     account_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get a social account by ID."""
     service = SocialAccountService(db)
     account = await service.get_account(account_id, user.company_id)
@@ -184,7 +184,7 @@ async def update_account(
     data: SocialAccountUpdate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Update a social account."""
     service = SocialAccountService(db)
     account = await service.update_account(account_id, user.company_id, data)
@@ -218,7 +218,7 @@ async def refresh_account_token(
     request_data: TokenRefreshRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Refresh an account's access token."""
     service = SocialAccountService(db)
     result = await service.refresh_account_token(
@@ -235,7 +235,7 @@ async def refresh_account_token(
 
 @router.get(
     "/accounts/{account_id}/analytics",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Get account-specific analytics",
     description="Fetch and sync analytics for a specific connected account.",
 )
@@ -243,7 +243,7 @@ async def get_account_analytics(
     account_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get analytics for a specific account."""
     service = AnalyticsService(db)
     result = await service.sync_account_analytics(user.company_id, account_id)
@@ -266,7 +266,7 @@ async def create_post(
     data: SocialPostCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Create a new social post."""
     service = PostService(db)
     post = await service.create_post(
@@ -291,7 +291,7 @@ async def list_posts(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List social posts."""
     service = PostService(db)
     result = await service.list_posts(
@@ -315,7 +315,7 @@ async def get_post(
     post_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get a social post by ID."""
     service = PostService(db)
     post = await service.get_post(post_id, user.company_id)
@@ -333,7 +333,7 @@ async def update_post(
     data: SocialPostUpdate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Update a social post."""
     service = PostService(db)
     post = await service.update_post(post_id, user.company_id, data)
@@ -367,7 +367,7 @@ async def publish_now(
     request_data: PublishNowRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Publish a post immediately."""
     service = PostService(db)
     result = await service.publish_now(post_id, user.company_id)
@@ -397,7 +397,7 @@ async def list_comments(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List social media comments."""
     service = CommentService(db)
     result = await service.list_comments(
@@ -421,7 +421,7 @@ async def get_comment(
     comment_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get a comment by ID."""
     service = CommentService(db)
     comment = await service.get_comment(comment_id, user.company_id)
@@ -439,7 +439,7 @@ async def update_comment(
     data: SocialCommentUpdate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Update a comment."""
     service = CommentService(db)
     comment = await service.update_comment(comment_id, user.company_id, data)
@@ -457,7 +457,7 @@ async def reply_to_comment(
     data: CommentReplyRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Reply to a comment via the platform API."""
     service = CommentService(db)
     result = await service.reply_to_comment(
@@ -482,7 +482,7 @@ async def mark_comment_read(
     comment_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Mark a comment as read."""
     service = CommentService(db)
     result = await service.mark_as_read(comment_id, user.company_id)
@@ -502,7 +502,7 @@ async def analyze_comment_sentiment(
     comment_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Analyze comment sentiment."""
     service = CommentService(db)
     result = await service.analyze_sentiment(comment_id, user.company_id)
@@ -520,7 +520,7 @@ async def sync_comments(
     post_id: Optional[int] = Query(None, description="Specific post to sync"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Sync comments from a platform."""
     service = CommentService(db)
     result = await service.sync_comments(
@@ -550,7 +550,7 @@ async def list_messages(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List messages."""
     service = MessageService(db)
     result = await service.list_messages(
@@ -576,7 +576,7 @@ async def list_conversations(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List conversation summaries."""
     service = MessageService(db)
     result = await service.list_conversations(
@@ -598,7 +598,7 @@ async def get_message(
     message_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get a message by ID."""
     service = MessageService(db)
     message = await service.get_message(message_id, user.company_id)
@@ -616,7 +616,7 @@ async def reply_to_conversation(
     data: MessageReplyRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Reply to a conversation."""
     service = MessageService(db)
     result = await service.reply_to_conversation(
@@ -641,7 +641,7 @@ async def mark_conversation_read(
     message_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Mark a conversation as read."""
     service = MessageService(db)
     message = await service.get_message(message_id, user.company_id)
@@ -663,7 +663,7 @@ async def analyze_message_sentiment_endpoint(
     message_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Analyze sentiment of a message."""
     service = MessageService(db)
     result = await service.analyze_message_sentiment(message_id, user.company_id)
@@ -684,7 +684,7 @@ async def generate_ai_reply_suggestion_endpoint(
     tone: str = Query("professional", description="Reply tone: professional, friendly, formal"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Generate AI reply suggestion (auto-send OFF by default)."""
     service = MessageService(db)
     result = await service.generate_ai_reply_suggestion(
@@ -706,7 +706,7 @@ async def sync_conversations(
     limit: int = Query(25, ge=1, le=100),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Sync conversations from a platform account."""
     service = MessageService(db)
     result = await service.sync_conversations(
@@ -719,14 +719,14 @@ async def sync_conversations(
 
 @router.get(
     "/messages/unread/counts",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Unread message counts",
     description="Get unread message counts per platform and total.",
 )
 async def get_unread_counts(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get unread message counts."""
     service = MessageService(db)
     result = await service.get_unread_counts(user.company_id)
@@ -735,7 +735,7 @@ async def get_unread_counts(
 
 @router.post(
     "/webhooks/queue/process",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Process queued messages",
     description="Process pending messages from the conversation queue.",
 )
@@ -743,7 +743,7 @@ async def process_queued_messages_endpoint(
     batch_size: int = Query(50, ge=1, le=200),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Process queued incoming messages."""
     service = MessageService(db)
     result = await service.process_queued_messages(user.company_id, batch_size=batch_size)
@@ -764,7 +764,7 @@ async def process_queued_messages_endpoint(
 async def get_analytics_dashboard(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get the social analytics dashboard."""
     service = AnalyticsService(db)
     dashboard = await service.get_dashboard(user.company_id)
@@ -786,7 +786,7 @@ async def list_analytics_snapshots(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List analytics snapshots."""
     service = AnalyticsService(db)
     result = await service.list_analytics(
@@ -803,7 +803,7 @@ async def list_analytics_snapshots(
 
 @router.post(
     "/analytics/snapshots",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     status_code=status.HTTP_201_CREATED,
     summary="Create analytics snapshot",
     description="Manually create an analytics snapshot.",
@@ -812,7 +812,7 @@ async def create_analytics_snapshot(
     data: SocialAnalyticsCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Create an analytics snapshot."""
     service = AnalyticsService(db)
     snapshot = await service.create_snapshot(
@@ -840,7 +840,7 @@ async def list_competitors(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List tracked competitors."""
     service = CompetitorService(db)
     result = await service.list_competitors(
@@ -862,7 +862,7 @@ async def get_competitor(
     competitor_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get a competitor by ID."""
     service = CompetitorService(db)
     competitor = await service.get_competitor(competitor_id, user.company_id)
@@ -880,7 +880,7 @@ async def create_competitor(
     data: SocialCompetitorCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Add a competitor to track."""
     service = CompetitorService(db)
     competitor = await service.create_competitor(
@@ -902,7 +902,7 @@ async def update_competitor(
     data: SocialCompetitorUpdate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Update a competitor."""
     service = CompetitorService(db)
     competitor = await service.update_competitor(
@@ -929,7 +929,7 @@ async def delete_competitor(
 
 @router.post(
     "/competitors/{competitor_id}/analyze",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Analyze a competitor",
     description="Fetch and update metrics for a competitor.",
 )
@@ -937,7 +937,7 @@ async def analyze_competitor(
     competitor_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Analyze a competitor."""
     service = CompetitorService(db)
     result = await service.analyze_competitor(competitor_id, user.company_id)
@@ -962,7 +962,7 @@ async def verify_webhook(
     hub_mode: Optional[str] = Query(None, alias="hub.mode"),
     hub_verify_token: Optional[str] = Query(None, alias="hub.verify_token"),
     hub_challenge: Optional[str] = Query(None, alias="hub.challenge"),
-) -> Any:
+) -> dict:
     """Handle webhook verification from Facebook/Instagram."""
     service = WebhookService(None)  # No DB needed for verification
     result = await service.handle_subscription_verification(
@@ -979,7 +979,7 @@ async def verify_webhook(
 
 @router.post(
     "/webhooks/{platform}",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Receive webhook events",
     description="Receive and process webhook events from WhatsApp and Telegram. "
                 "Validates signatures, parses inbound messages, creates tickets.",
@@ -991,7 +991,7 @@ async def receive_webhook(
     x_hub_signature_256: Optional[str] = Header(None),
     x_telegram_bot_api_secret_token: Optional[str] = Header(None),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Receive webhook events from social platforms.
 
     Handles webhooks from Facebook, Instagram, WhatsApp, TikTok, Telegram.
@@ -1206,7 +1206,7 @@ async def list_webhook_events(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List webhook events."""
     service = WebhookService(db)
     result = await service.list_events(
@@ -1228,7 +1228,7 @@ async def list_webhook_events(
 async def webhook_status(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get webhook processing status."""
     from sqlalchemy import func, select
 
@@ -1272,7 +1272,7 @@ async def webhook_status(
 
 @router.post(
     "/webhooks/events/{event_id}/process",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Process a webhook event",
     description="Manually re-process a webhook event.",
 )
@@ -1280,7 +1280,7 @@ async def process_webhook_event(
     event_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Manually process a webhook event."""
     service = WebhookService(db)
     result = await service.process_event(event_id, user.company_id)
@@ -1303,7 +1303,7 @@ async def create_queue_item(
     data: PublishingQueueCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Add a post to the publishing queue."""
     service = PublishingQueueService(db)
     item = await service.add_to_queue(
@@ -1332,7 +1332,7 @@ async def list_queue_items(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List publishing queue items."""
     service = PublishingQueueService(db)
     result = await service.list_queue(
@@ -1354,7 +1354,7 @@ async def list_queue_items(
 async def process_publishing_queue(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Process the publishing queue sequentially."""
     service = PublishingQueueService(db)
     result = await service.process_queue(user.company_id)
@@ -1393,7 +1393,7 @@ async def create_listening(
     data: SocialListeningCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Create a social listening entry."""
     service = SocialListeningService(db)
     entry = await service.create_listening(
@@ -1417,7 +1417,7 @@ async def list_listening(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List social listening entries."""
     service = SocialListeningService(db)
     result = await service.list_listening(
@@ -1440,7 +1440,7 @@ async def get_listening(
     listening_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get a listening entry."""
     service = SocialListeningService(db)
     entry = await service.get_listening(listening_id, user.company_id)
@@ -1458,7 +1458,7 @@ async def update_listening(
     data: SocialListeningUpdate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Update a listening entry."""
     service = SocialListeningService(db)
     entry = await service.update_listening(
@@ -1493,7 +1493,7 @@ async def check_listening(
     listening_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Check a listening entry."""
     service = SocialListeningService(db)
     result = await service.check_listening(listening_id, user.company_id)
@@ -1516,7 +1516,7 @@ async def create_hashtag_intelligence(
     data: HashtagIntelligenceCreate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Create a hashtag intelligence entry."""
     service = HashtagIntelligenceService(db)
     entry = await service.create_entry(
@@ -1540,7 +1540,7 @@ async def list_hashtag_intelligence(
     page_size: int = Query(20, ge=1, le=100, description="Items per page"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """List hashtag intelligence entries."""
     service = HashtagIntelligenceService(db)
     result = await service.list_entries(
@@ -1563,7 +1563,7 @@ async def get_hashtag_intelligence(
     entry_id: int,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get a hashtag intelligence entry."""
     service = HashtagIntelligenceService(db)
     entry = await service.get_entry(entry_id, user.company_id)
@@ -1581,7 +1581,7 @@ async def update_hashtag_intelligence(
     data: HashtagIntelligenceUpdate,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Update a hashtag intelligence entry."""
     service = HashtagIntelligenceService(db)
     entry = await service.update_entry(entry_id, user.company_id, data.model_dump(exclude_unset=True))
@@ -1606,7 +1606,7 @@ async def delete_hashtag_intelligence(
 
 @router.post(
     "/hashtags/analyze",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Analyze hashtags for a platform",
     description="Fetch and analyze hashtags from connected account's recent posts.",
 )
@@ -1614,7 +1614,7 @@ async def analyze_hashtags(
     platform: str,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Analyze hashtags for a platform."""
     service = HashtagIntelligenceService(db)
     result = await service.analyze_hashtags(user.company_id, platform)
@@ -1631,7 +1631,7 @@ async def suggest_hashtags(
     data: HashtagSuggestionRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Get hashtag suggestions for a topic."""
     service = HashtagIntelligenceService(db)
     result = await service.suggest_hashtags(
@@ -1654,7 +1654,7 @@ async def suggest_hashtags(
 async def verify_webhook_signature(
     data: WebhookSignatureVerifyRequest,
     user: User = Depends(get_current_user),
-) -> Any:
+) -> dict:
     """Verify a webhook signature manually.
 
     Supports Facebook/Instagram (x-hub-signature-256 sha256=...),
@@ -1690,7 +1690,7 @@ async def verify_webhook_signature(
 
 @router.post(
     "/messages/{ticket_id}/send",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Send outbound reply via WhatsApp/Telegram",
     description="Send a reply to the customer's original channel.",
 )
@@ -1700,7 +1700,7 @@ async def send_outbound_reply(
     ai_generated: bool = False,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Send an outbound reply to the original messaging channel."""
     service = OutboundMessageService(db)
     result = await service.send_reply(
@@ -1715,7 +1715,7 @@ async def send_outbound_reply(
 
 @router.post(
     "/whatsapp/send",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Send WhatsApp message directly",
     description="Send a message via a connected WhatsApp Business account.",
 )
@@ -1726,7 +1726,7 @@ async def send_whatsapp_message(
     message_type: str = "text",
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Send a WhatsApp message directly via API."""
     service = OutboundMessageService(db)
     result = await service.send_whatsapp_reply(
@@ -1741,7 +1741,7 @@ async def send_whatsapp_message(
 
 @router.post(
     "/telegram/send",
-    response_model=Dict[str, Any],
+    response_model=dict[str, object],
     summary="Send Telegram message directly",
     description="Send a message via a connected Telegram Bot account.",
 )
@@ -1752,7 +1752,7 @@ async def send_telegram_message(
     use_inline_keyboard: bool = False,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> dict:
     """Send a Telegram message directly via Bot API."""
     service = OutboundMessageService(db)
     result = await service.send_telegram_reply(
