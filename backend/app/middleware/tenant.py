@@ -12,9 +12,8 @@ import logging
 from typing import Any, Dict
 
 from fastapi import Request, Response
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-
-from app.exceptions import TenantError
 
 logger = logging.getLogger(__name__)
 
@@ -77,18 +76,24 @@ class TenantMiddleware(BaseHTTPMiddleware):
         company_id = request.headers.get("X-Company-ID")
 
         if not company_id:
-            raise TenantError(detail="X-Company-ID header is required")
+            return JSONResponse(
+                status_code=403,
+                content={"detail": "X-Company-ID header is required"},
+                headers={"X-Tenant-Required": "true"},
+            )
 
         # Validate company_id is a valid integer
         try:
             company_id_int = int(company_id)
             if company_id_int <= 0:
-                raise TenantError(
-                    detail=f"X-Company-ID must be a positive integer, got: {company_id}"
+                return JSONResponse(
+                    status_code=400,
+                    content={"detail": f"X-Company-ID must be a positive integer, got: {company_id}"},
                 )
         except ValueError:
-            raise TenantError(
-                detail=f"X-Company-ID must be a valid integer, got: {company_id}"
+            return JSONResponse(
+                status_code=400,
+                content={"detail": f"X-Company-ID must be a valid integer, got: {company_id}"},
             )
 
         request.state.company_id = company_id_int
