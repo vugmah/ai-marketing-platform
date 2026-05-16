@@ -188,16 +188,6 @@ if os.path.exists(static_dir):
 else:
     logger.warning(f"[STATIC] Static directory not found: {static_dir}")
 
-# Root path - prevents 500 on browser access to /
-@app.get("/", tags=["Root"])
-async def root():
-    return {
-        "name": "AI Marketing Platform API",
-        "version": "2.0.0",
-        "status": "running",
-        "health": "/api/v2/health/live",
-    }
-
 # CORS
 setup_cors(app)
 

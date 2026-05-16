@@ -14,7 +14,8 @@ COPY backend/ .
 COPY dist/ /app/static/
 
 RUN groupadd --gid 1000 aimp && \
-    useradd --uid 1000 --gid aimp --shell /bin/false --create-home aimp
+    useradd --uid 1000 --gid aimp --shell /bin/false --create-home aimp && \
+    chown -R aimp:aimp /app/static
 USER aimp
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
