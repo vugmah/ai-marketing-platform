@@ -5,6 +5,7 @@ Only enabled modules are imported at startup.
 Disabled modules are skipped without errors.
 """
 
+import importlib
 import os
 from contextlib import asynccontextmanager
 import logging
@@ -57,6 +58,7 @@ MODULE_FLAGS = {
 def load_router(module_name: str, app: FastAPI, import_path: str, router_name: str, prefix: str, tags: list):
     """Safely load a router module. Skip if disabled or import fails.
 
+    Uses importlib.import_module for reliable import resolution.
     Args:
         module_name: Feature flag key
         app: FastAPI app
@@ -70,12 +72,12 @@ def load_router(module_name: str, app: FastAPI, import_path: str, router_name: s
         return
 
     try:
-        module = __import__(import_path, fromlist=[router_name])
+        module = importlib.import_module(import_path)
         router = getattr(module, router_name)
         app.include_router(router, prefix=prefix, tags=tags)
         logger.info(f"[FEATURE FLAG] {module_name}: ENABLED, router loaded at {prefix}")
     except Exception as e:
-        logger.warning(f"[FEATURE FLAG] {module_name}: ENABLED but import failed: {e}")
+        logger.warning(f"[FEATURE FLAG] {module_name}: ENABLED but import failed: {type(e).__name__}: {e}")
         # Don't crash - just skip this module
 
 

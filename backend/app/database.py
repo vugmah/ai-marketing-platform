@@ -31,33 +31,41 @@ def _get_database_url() -> str:
     2. MYSQL_URL env var
     3. Individual Railway MySQL env vars (MYSQLHOST, MYSQLPORT, etc.)
     4. Fallback to SQLite (for local dev only)
+
+    IMPORTANT: If DATABASE_URL contains 'localhost', it means Railway
+    MySQL addon env var is stale. Use individual MYSQLHOST instead.
     """
-    # 1. DATABASE_URL (Railway sets this when MySQL addon is connected)
-    db_url = os.environ.get("DATABASE_URL", "")
-    if db_url:
-        # Convert sync mysql:// to async mysql+aiomysql://
-        if db_url.startswith("mysql://") and not db_url.startswith("mysql+aiomysql://"):
-            db_url = db_url.replace("mysql://", "mysql+aiomysql://", 1)
-        return db_url
-
-    # 2. MYSQL_URL
-    mysql_url = os.environ.get("MYSQL_URL", "")
-    if mysql_url:
-        if mysql_url.startswith("mysql://") and not mysql_url.startswith("mysql+aiomysql://"):
-            mysql_url = mysql_url.replace("mysql://", "mysql+aiomysql://", 1)
-        return mysql_url
-
-    # 3. Individual Railway MySQL env vars
+    # 3. Individual Railway MySQL env vars (CHECK FIRST - Railway DATABASE_URL is stale)
     host = os.environ.get("MYSQLHOST", "")
-    if host:
+    if host and host != "localhost":
         port = os.environ.get("MYSQLPORT", "3306")
         user = os.environ.get("MYSQLUSER", "")
         password = os.environ.get("MYSQLPASSWORD", "")
         database = os.environ.get("MYSQLDATABASE", "")
         if user and password and database:
-            return f"mysql+aiomysql://{user}:{password}@{host}:{port}/{database}"
+            db_url = f"mysql+aiomysql://{user}:{password}@{host}:{port}/{database}"
+            logger.warning(f"[DB] Using individual MYSQLHOST env var: {host}")
+            return db_url
+
+    # 1. DATABASE_URL (Railway sets this when MySQL addon is connected)
+    db_url = os.environ.get("DATABASE_URL", "")
+    if db_url and "localhost" not in db_url:
+        # Convert sync mysql:// to async mysql+aiomysql://
+        if db_url.startswith("mysql://") and not db_url.startswith("mysql+aiomysql://"):
+            db_url = db_url.replace("mysql://", "mysql+aiomysql://", 1)
+        return db_url
+    elif db_url and "localhost" in db_url:
+        logger.warning(f"[DB] DATABASE_URL has localhost, ignoring: {db_url[:40]}...")
+
+    # 2. MYSQL_URL
+    mysql_url = os.environ.get("MYSQL_URL", "")
+    if mysql_url and "localhost" not in mysql_url:
+        if mysql_url.startswith("mysql://") and not mysql_url.startswith("mysql+aiomysql://"):
+            mysql_url = mysql_url.replace("mysql://", "mysql+aiomysql://", 1)
+        return mysql_url
 
     # 4. Fallback to SQLite (local dev)
+    logger.warning("[DB] No Railway MySQL env vars found, using SQLite fallback")
     return "sqlite+aiosqlite:///./aimarketing.db"
 
 
