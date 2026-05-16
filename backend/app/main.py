@@ -116,13 +116,20 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Logging config failed: {e}")
 
     # Pre-register base models in SQLAlchemy metadata before create_all
-    # This ensures FK references (branches.id, companies.id) resolve correctly
+    # This ensures FK references (branches.id, companies.id, social_accounts.id) resolve correctly
     try:
         from app.companies import models as _companies_models
         from app.branches import models as _branches_models
         logger.info("[INIT] Base models (companies, branches) pre-registered in metadata")
     except Exception as e:
         logger.warning(f"[INIT] Base model pre-registration failed: {e}")
+
+    # Pre-register social_accounts model for followers FK reference
+    try:
+        from app.social import models as _social_models
+        logger.info("[INIT] Social models pre-registered in metadata")
+    except Exception as e:
+        logger.warning(f"[INIT] Social model pre-registration failed: {e}")
 
     try:
         await init_db()
