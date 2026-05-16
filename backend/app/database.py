@@ -8,7 +8,7 @@ import os
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, select
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, select, text as sa_text
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -140,25 +140,25 @@ async def get_db_context() -> AsyncSession:
 async def init_db() -> None:
     """Create all database tables with error handling.
 
-    Uses checkfirst=True to skip existing tables.
-    Logs but does not fail on FK constraint errors (tables may reference
-    other tables not yet created).
+    For MySQL: temporarily disables FK checks to allow tables with
+    cross-references to be created in any order.
     """
-    import sqlalchemy.exc as sa_exc
-
     try:
         async with engine.begin() as conn:
+            # MySQL: disable FK checks during table creation
+            if "mysql" in DATABASE_URL.lower():
+                await conn.execute(sa_text("SET FOREIGN_KEY_CHECKS = 0"))
+
             await conn.run_sync(
                 Base.metadata.create_all,
                 checkfirst=True,
             )
+
+            # Re-enable FK checks
+            if "mysql" in DATABASE_URL.lower():
+                await conn.execute(sa_text("SET FOREIGN_KEY_CHECKS = 1"))
+
         logger.info("[DB] All tables created/verified successfully")
-    except sa_exc.OperationalError as e:
-        # FK errors are expected when tables reference others not yet created
-        if "foreign key" in str(e).lower() or "cannot add foreign key" in str(e).lower():
-            logger.warning(f"[DB] FK constraint during table creation (expected): {e}")
-        else:
-            logger.warning(f"[DB] Operational error during table creation: {e}")
     except Exception as e:
         logger.warning(f"[DB] Table creation error: {type(e).__name__}: {e}")
 
