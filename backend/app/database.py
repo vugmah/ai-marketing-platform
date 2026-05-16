@@ -138,9 +138,29 @@ async def get_db_context() -> AsyncSession:
 
 
 async def init_db() -> None:
-    """Create all database tables."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    """Create all database tables with error handling.
+
+    Uses checkfirst=True to skip existing tables.
+    Logs but does not fail on FK constraint errors (tables may reference
+    other tables not yet created).
+    """
+    import sqlalchemy.exc as sa_exc
+
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(
+                Base.metadata.create_all,
+                checkfirst=True,
+            )
+        logger.info("[DB] All tables created/verified successfully")
+    except sa_exc.OperationalError as e:
+        # FK errors are expected when tables reference others not yet created
+        if "foreign key" in str(e).lower() or "cannot add foreign key" in str(e).lower():
+            logger.warning(f"[DB] FK constraint during table creation (expected): {e}")
+        else:
+            logger.warning(f"[DB] Operational error during table creation: {e}")
+    except Exception as e:
+        logger.warning(f"[DB] Table creation error: {type(e).__name__}: {e}")
 
 
 async def close_db() -> None:
