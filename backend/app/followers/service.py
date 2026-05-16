@@ -18,7 +18,7 @@ import random
 import re
 import statistics
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from sqlalchemy import and_, desc, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -172,7 +172,7 @@ class FollowerSyncService:
         platform: Optional[str] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List follower snapshots with pagination.
 
         Args:
@@ -224,7 +224,7 @@ class FollowerSyncService:
         current_following: int = 0,
         current_posts: int = 0,
         branch_id: Optional[int] = None,
-        raw_data: Optional[Dict[str, Any]] = None,
+        raw_data: Optional[Dict[str, object]] = None,
     ) -> FollowerSyncSummary:
         """Sync current follower count and create a snapshot.
 
@@ -277,7 +277,7 @@ class FollowerSyncService:
 
     async def calculate_growth_trend(
         self, account_id: int, company_id: int, days: int = 30
-    ) -> List[Dict[str, Any]]:
+    ) -> List[Dict[str, object]]:
         """Calculate daily follower growth trend.
 
         Args:
@@ -348,7 +348,7 @@ class BotDetectionService:
         account_age_days: Optional[int] = None,
         last_post_days: Optional[int] = None,
         has_default_avatar: bool = False,
-    ) -> Tuple[float, Dict[str, Any]]:
+    ) -> Tuple[float, Dict[str, object]]:
         """Calculate bot probability score from account signals.
 
         Args:
@@ -562,7 +562,7 @@ class BotDetectionService:
         company_id: int,
         account_id: int,
         platform: str,
-        follower_profiles: List[Dict[str, Any]],
+        follower_profiles: List[Dict[str, object]],
         branch_id: Optional[int] = None,
     ) -> BotDetectionResult:
         """Run bot detection on a batch of follower profiles.
@@ -668,7 +668,7 @@ class BotDetectionService:
         risk_level: Optional[str] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List bot detection results with pagination.
 
         Args:
@@ -885,7 +885,7 @@ class SuspiciousActivityService:
         resolved: Optional[bool] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List suspicious activities with pagination.
 
         Args:
@@ -1232,7 +1232,7 @@ class EngagementQualityService:
         account_id: Optional[int] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List engagement quality records with pagination.
 
         Args:
@@ -1353,7 +1353,7 @@ class AudienceAnalysisService:
         company_id: int,
         account_id: int,
         platform: str,
-        follower_profiles: List[Dict[str, Any]],
+        follower_profiles: List[Dict[str, object]],
         branch_id: Optional[int] = None,
     ) -> AudienceDemographics:
         """Analyze audience demographics from follower profiles.
@@ -1673,7 +1673,7 @@ class FollowerHealthService:
         account_id: Optional[int] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List health scores with pagination.
 
         Args:
@@ -1739,7 +1739,7 @@ class AIAudienceService:
         top_interests: List[str],
         engagement_rate: float,
         demographics: Optional[AudienceDemographics] = None,
-    ) -> List[Dict[str, Any]]:
+    ) -> List[Dict[str, object]]:
         """Generate content suggestions based on audience analysis.
 
         Args:
@@ -1827,7 +1827,7 @@ class AIAudienceService:
 
     def _generate_optimal_posting_times(
         self, demographics: Optional[AudienceDemographics] = None
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """Generate optimal posting time recommendations.
 
         Args:
@@ -2080,7 +2080,7 @@ class AIAudienceService:
         implemented: Optional[bool] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List AI recommendations with pagination.
 
         Args:
@@ -2335,7 +2335,7 @@ class FollowerDeltaService:
         event_type: Optional[str] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List follower delta events with pagination."""
         query = select(FollowerDeltaEvent).where(FollowerDeltaEvent.company_id == company_id)
 
@@ -2359,7 +2359,7 @@ class FollowerDeltaService:
 
         return {"total": total, "page": page, "page_size": page_size, "items": items}
 
-    async def get_delta_summary(self, company_id: int, account_id: int, days: int = 30) -> Dict[str, Any]:
+    async def get_delta_summary(self, company_id: int, account_id: int, days: int = 30) -> Dict[str, object]:
         """Get delta summary for an account."""
         end_date = datetime.now(timezone.utc)
         start_date = end_date - timedelta(days=days)
@@ -2417,7 +2417,7 @@ class EngagementEventService:
         lead_score: float = 0.0,
         campaign_id: Optional[str] = None,
         event_date: Optional[datetime] = None,
-        raw_data: Optional[Dict[str, Any]] = None,
+        raw_data: Optional[Dict[str, object]] = None,
         branch_id: Optional[int] = None,
     ) -> EngagementEvent:
         """Record a new engagement event."""
@@ -2452,7 +2452,7 @@ class EngagementEventService:
         is_new_lead: Optional[bool] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List engagement events with pagination."""
         query = select(EngagementEvent).where(EngagementEvent.company_id == company_id)
 
@@ -2482,7 +2482,7 @@ class EngagementEventService:
 
     async def get_new_engagement_summary(
         self, company_id: int, account_id: int, days: int = 7
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """Get summary of new engagements."""
         end_date = datetime.now(timezone.utc)
         start_date = end_date - timedelta(days=days)
@@ -2813,7 +2813,7 @@ class ReengagementService:
         status: Optional[str] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List re-engagement recommendations with pagination."""
         query = select(ReengagementRecommendation).where(
             ReengagementRecommendation.company_id == company_id
@@ -2856,7 +2856,7 @@ class ReengagementService:
         status: Optional[str] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List outreach approval requests with pagination."""
         query = select(OutreachApprovalRequest).where(
             OutreachApprovalRequest.company_id == company_id
@@ -2998,7 +2998,7 @@ class FollowerValueService:
 
     async def get_value_summary(
         self, company_id: int, account_id: int
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """Get follower value summary for an account."""
         result = await self.db.execute(
             select(FollowerValueScore)
@@ -3042,7 +3042,7 @@ class FollowerValueService:
         is_inactive: Optional[bool] = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, object]:
         """List follower value scores with pagination."""
         query = select(FollowerValueScore).where(
             FollowerValueScore.company_id == company_id
