@@ -91,7 +91,8 @@ class FollowerSnapshot(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -176,7 +177,8 @@ class BotPattern(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -285,7 +287,8 @@ class SuspiciousActivity(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -380,7 +383,8 @@ class AudienceDemographics(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -492,7 +496,8 @@ class EngagementQuality(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -598,7 +603,8 @@ class FollowerHealthScore(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -698,7 +704,8 @@ class FollowerInsight(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -799,7 +806,8 @@ class AIAudienceRecommendation(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -895,7 +903,8 @@ class FollowerDeltaEvent(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -963,7 +972,8 @@ class EngagementEvent(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -1038,7 +1048,8 @@ class ReengagementRecommendation(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -1284,7 +1295,8 @@ class AudienceLossEstimate(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -1352,7 +1364,8 @@ class FollowerRetentionMetric(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -1421,7 +1434,8 @@ class FollowerValueScore(Base):
     )
     account_id = Column(
         Integer,
-        ForeignKey("social_accounts.id", ondelete="CASCADE"),
+        # FK disabled: social_accounts table not yet created
+        # ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
