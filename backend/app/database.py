@@ -152,6 +152,8 @@ async def init_db() -> None:
 
             # Get tables sorted by FK dependency order
             tables = list(Base.metadata.sorted_tables)
+            table_names = [t.name for t in tables]
+            logger.info(f"[DB] Tables in metadata ({len(tables)}): {table_names[:15]}...")
             
             for table in tables:
                 try:
