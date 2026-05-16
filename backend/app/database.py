@@ -140,6 +140,7 @@ async def get_db_context() -> AsyncSession:
 async def init_db() -> None:
     """Create all database tables with error handling.
 
+    Uses sorted_tables to create tables in FK dependency order.
     For MySQL: temporarily disables FK checks to allow tables with
     cross-references to be created in any order.
     """
@@ -149,16 +150,23 @@ async def init_db() -> None:
             if "mysql" in DATABASE_URL.lower():
                 await conn.execute(sa_text("SET FOREIGN_KEY_CHECKS = 0"))
 
-            await conn.run_sync(
-                Base.metadata.create_all,
-                checkfirst=True,
-            )
+            # Get tables sorted by FK dependency order
+            tables = list(Base.metadata.sorted_tables)
+            
+            for table in tables:
+                try:
+                    await conn.run_sync(
+                        lambda conn, t=table: t.create(conn, checkfirst=True)
+                    )
+                    logger.info(f"[DB] Table '{table.name}' OK")
+                except Exception as te:
+                    logger.warning(f"[DB] Table '{table.name}' skipped: {type(te).__name__}")
 
             # Re-enable FK checks
             if "mysql" in DATABASE_URL.lower():
                 await conn.execute(sa_text("SET FOREIGN_KEY_CHECKS = 1"))
 
-        logger.info("[DB] All tables created/verified successfully")
+        logger.info(f"[DB] {len(tables)} tables processed")
     except Exception as e:
         logger.warning(f"[DB] Table creation error: {type(e).__name__}: {e}")
 
