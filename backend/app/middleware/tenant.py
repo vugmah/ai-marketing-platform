@@ -28,19 +28,27 @@ class TenantMiddleware(BaseHTTPMiddleware):
     belonging to a different tenant than the requesting one.
     """
 
-    # Paths to skip tenant check entirely
-    SKIP_PATHS = [
-        "/api/health",
-        "/api/v2/health",
+    # Exact paths to skip tenant check entirely (must match exactly)
+    SKIP_PATHS_EXACT = {
+        "/",
         "/api/v2/health/live",
         "/api/v2/health/ready",
         "/api/v2/health/db",
+        "/api/v2/health/redis",
         "/api/docs",
+        "/docs",
         "/api/redoc",
+        "/redoc",
         "/api/openapi.json",
+        "/openapi.json",
+        "/favicon.ico",
+    }
+
+    # Prefix paths to skip (startswith match)
+    SKIP_PATHS_PREFIX = [
+        "/api/v2/health",
         "/api/v2/auth",
         "/static",
-        "/favicon.ico",
     ]
 
     # Response body fields that indicate tenant ID
@@ -59,18 +67,14 @@ class TenantMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         path = request.url.path
 
-        # Skip tenant check for health endpoints, docs, and auth endpoints
-        if any(path.startswith(sp) for sp in self.SKIP_PATHS):
+        # Skip tenant check for public endpoints
+        if path in self.SKIP_PATHS_EXACT:
+            return await call_next(request)
+        if any(path.startswith(sp) for sp in self.SKIP_PATHS_PREFIX):
             return await call_next(request)
 
         # Extract company ID from header
         company_id = request.headers.get("X-Company-ID")
-
-        # Allow auth and health endpoints to pass without company ID
-        if path.startswith("/api/v2/auth") or path.startswith("/api/v2/health"):
-            request.state.company_id = None
-            response = await call_next(request)
-            return response
 
         if not company_id:
             raise TenantError(detail="X-Company-ID header is required")
