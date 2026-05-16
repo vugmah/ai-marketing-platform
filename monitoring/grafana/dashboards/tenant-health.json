@@ -1,0 +1,72 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Tenant Health - Pilot Monitoring",
+    "tags": ["tenant", "health", "pilot"],
+    "timezone": "Europe/Istanbul",
+    "schemaVersion": 36,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Tenant Trust Scores",
+        "type": "graph",
+        "gridPos": {"h": 10, "w": 24, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "aimp_tenant_trust_score{job=\"aimp-backend\"}",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Spam Risk by Tenant",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 10},
+        "targets": [
+          {
+            "expr": "aimp_tenant_spam_risk{job=\"aimp-backend\"}",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Fatigue Score Distribution",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 10},
+        "targets": [
+          {
+            "expr": "aimp_tenant_fatigue_avg{job=\"aimp-backend\"}",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "API Usage by Tenant",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 18},
+        "targets": [
+          {
+            "expr": "rate(aimp_tenant_api_requests_total{job=\"aimp-backend\"}[5m]) * 60",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "AI Requests by Tenant",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 18},
+        "targets": [
+          {
+            "expr": "rate(aimp_tenant_ai_requests_total{job=\"aimp-backend\"}[5m]) * 60",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ]
+      }
+    ]
+  }
+}

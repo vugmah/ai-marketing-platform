@@ -1,0 +1,257 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "aimp-api-perf",
+    "title": "AIMP - API Performance",
+    "tags": ["aimp", "api", "performance"],
+    "timezone": "UTC",
+    "schemaVersion": 36,
+    "refresh": "15s",
+    "time": { "from": "now-1h", "to": "now" },
+    "templating": {
+      "list": [
+        {
+          "name": "endpoint",
+          "type": "query",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "query": "label_values(aimp_http_requests_total, endpoint)",
+          "multi": true,
+          "includeAll": true,
+          "current": { "text": ["All"], "value": ["$__all"] }
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Requests Per Second",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(aimp_http_requests_total[5m]))",
+            "legendFormat": "RPS"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 100 },
+                { "color": "red", "value": 500 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "P95 Latency",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(aimp_http_request_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p95"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 0.5 },
+                { "color": "red", "value": 2 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "Active Connections",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "aimp_http_active_connections",
+            "legendFormat": "Active"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 50 },
+                { "color": "red", "value": 100 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 }
+      },
+      {
+        "id": 4,
+        "title": "Error Rate (5xx)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(aimp_http_requests_total{status=~\"5..\"}[5m])) / sum(rate(aimp_http_requests_total[5m])) * 100",
+            "legendFormat": "Error %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 1 },
+                { "color": "red", "value": 5 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 }
+      },
+      {
+        "id": 5,
+        "title": "Request Rate by Endpoint",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (endpoint) (rate(aimp_http_requests_total[5m]))",
+            "legendFormat": "{{endpoint}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "fillOpacity": 10,
+              "spanNulls": false
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
+      },
+      {
+        "id": 6,
+        "title": "P95 Latency by Endpoint",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(aimp_http_request_duration_seconds_bucket[5m])) by (endpoint, le))",
+            "legendFormat": "{{endpoint}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "fillOpacity": 5
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
+      },
+      {
+        "id": 7,
+        "title": "HTTP Status Distribution",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (status) (rate(aimp_http_requests_total[5m]))",
+            "legendFormat": "HTTP {{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "custom": {
+              "drawStyle": "bars",
+              "stacking": { "mode": "normal" },
+              "fillOpacity": 50
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
+      },
+      {
+        "id": 8,
+        "title": "Top 10 Slowest Endpoints (p95)",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "topk(10, histogram_quantile(0.95, sum(rate(aimp_http_request_duration_seconds_bucket[5m])) by (method, endpoint, le)))",
+            "format": "table",
+            "instant": true
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 1 },
+                { "color": "red", "value": 5 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+      },
+      {
+        "id": 9,
+        "title": "Request Duration Distribution",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "sum(rate(aimp_http_request_duration_seconds_bucket[5m])) by (le)",
+            "format": "heatmap"
+          }
+        ],
+        "dataFormat": "tsbuckets",
+        "yAxis": { "unit": "s", "min": 0, "max": 10 },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
+      },
+      {
+        "id": 10,
+        "title": "Uptime / Process",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "time() - process_start_time_seconds{job=\"aimp-backend\"}",
+            "legendFormat": "Uptime"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "dtdurations"
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 20 }
+      },
+      {
+        "id": 11,
+        "title": "Version Info",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "aimp_app_info",
+            "legendFormat": "{{version}}"
+          }
+        ],
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 20 }
+      }
+    ]
+  }
+}

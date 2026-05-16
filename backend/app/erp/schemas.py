@@ -5,6 +5,7 @@ Request and response models for:
 - Sync operations (trigger, status, logs)
 - Field mapping CRUD
 - Webhook payload handling
+- Health checks and sync statistics
 """
 
 from datetime import datetime
@@ -74,9 +75,10 @@ class ERPConnectionResponse(BaseModel):
 
     id: int = Field(..., description="Connection ID")
     company_id: int = Field(..., description="Owning company ID")
+    branch_id: Optional[int] = Field(default=None, description="Branch ID")
     name: str = Field(..., description="Display name")
     provider_type: str = Field(..., description="ERP provider type")
-    base_url: str = Field(..., description="Base URL of the ERP API")
+    base_url: Optional[str] = Field(default=None, description="Base URL of the ERP API")
     sync_enabled: bool = Field(..., description="Whether auto-sync is enabled")
     auto_sync_interval_minutes: int = Field(..., description="Auto-sync interval in minutes")
     last_sync_status: str = Field(default="never", description="Status of the last sync")
@@ -199,6 +201,7 @@ class FieldMappingResponse(BaseModel):
 
     id: int = Field(..., description="Mapping ID")
     connection_id: int = Field(..., description="ERP connection ID")
+    company_id: int = Field(..., description="Company ID")
     entity_type: str = Field(..., description="Entity type")
     erp_field: str = Field(..., description="ERP field name")
     internal_field: str = Field(..., description="Internal field name")
@@ -207,6 +210,107 @@ class FieldMappingResponse(BaseModel):
     default_value: Optional[str] = Field(default=None, description="Default value")
     created_at: str = Field(..., description="ISO timestamp")
     updated_at: str = Field(..., description="ISO timestamp")
+
+    class Config:
+        from_attributes = True
+
+
+# ---------------------------------------------------------------------------
+# Sync health check schemas
+# ---------------------------------------------------------------------------
+
+class SyncHealthCheckResponse(BaseModel):
+    """Schema for sync health check response."""
+
+    connection_id: int = Field(..., description="ERP connection ID")
+    connection_name: str = Field(..., description="Connection display name")
+    provider_type: str = Field(..., description="ERP provider type")
+    status: str = Field(..., description="Overall health status: healthy, degraded, unhealthy")
+    connection_status: str = Field(..., description="ERP API connection status: ok, error, timeout")
+    last_sync_status: str = Field(..., description="Last sync operation status")
+    last_sync_at: Optional[str] = Field(default=None, description="ISO timestamp of last sync")
+    pending_jobs: int = Field(default=0, description="Number of pending/running sync jobs")
+    failed_jobs_last_24h: int = Field(default=0, description="Failed jobs in last 24 hours")
+    message: str = Field(default="", description="Human-readable status message")
+
+    class Config:
+        from_attributes = True
+
+
+class SyncStatsResponse(BaseModel):
+    """Schema for sync statistics response."""
+
+    connection_id: int = Field(..., description="ERP connection ID")
+    connection_name: str = Field(..., description="Connection display name")
+
+    # Overall counts
+    total_jobs: int = Field(default=0, description="Total sync jobs")
+    completed_jobs: int = Field(default=0, description="Completed jobs")
+    failed_jobs: int = Field(default=0, description="Failed jobs")
+    cancelled_jobs: int = Field(default=0, description="Cancelled jobs")
+
+    # Record counts
+    total_records_processed: int = Field(default=0, description="Total records processed")
+    total_records_failed: int = Field(default=0, description="Total records failed")
+
+    # Per-entity breakdown
+    entity_breakdown: Dict[str, Dict[str, int]] = Field(
+        default_factory=dict,
+        description="Per-entity stats: {entity_type: {processed, failed, total}}"
+    )
+
+    # Time window
+    period_hours: int = Field(default=24, description="Statistics period in hours")
+
+    # Sync latency
+    last_sync_duration_seconds: Optional[float] = Field(
+        default=None, description="Duration of last sync in seconds"
+    )
+    average_sync_duration_seconds: Optional[float] = Field(
+        default=None, description="Average sync duration in seconds"
+    )
+
+    class Config:
+        from_attributes = True
+
+
+class SyncConflictResolutionRequest(BaseModel):
+    """Schema for requesting conflict resolution for a sync operation."""
+
+    entity_type: EntityType = Field(..., description="Entity type in conflict")
+    conflict_strategy: Literal[
+        "last_write_wins", "erp_wins", "local_wins", "merge", "manual_review"
+    ] = Field(default="last_write_wins", description="Conflict resolution strategy")
+    external_ids: Optional[List[str]] = Field(
+        default=None, description="Specific external IDs to resolve (None = all conflicts)"
+    )
+
+
+class SyncConflictResolutionResponse(BaseModel):
+    """Schema for conflict resolution response."""
+
+    resolved_count: int = Field(default=0, description="Number of conflicts resolved")
+    skipped_count: int = Field(default=0, description="Number of conflicts skipped")
+    failed_count: int = Field(default=0, description="Number of conflicts that failed to resolve")
+    details: List[Dict[str, Any]] = Field(default_factory=list, description="Resolution details")
+
+
+# ---------------------------------------------------------------------------
+# Audit log schemas
+# ---------------------------------------------------------------------------
+
+class AuditLogResponse(BaseModel):
+    """Schema for ERP audit log entry."""
+
+    id: int = Field(..., description="Audit log ID")
+    connection_id: int = Field(..., description="ERP connection ID")
+    company_id: int = Field(..., description="Company ID")
+    action: str = Field(..., description="Action performed")
+    entity_type: str = Field(..., description="Entity type affected")
+    entity_id: Optional[int] = Field(default=None, description="Entity ID")
+    performed_by: Optional[int] = Field(default=None, description="User ID who performed the action")
+    details: Optional[Dict[str, Any]] = Field(default=None, description="Additional details")
+    created_at: str = Field(..., description="ISO timestamp")
 
     class Config:
         from_attributes = True

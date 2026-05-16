@@ -1,0 +1,245 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "aimp-ai-usage",
+    "title": "AIMP - AI Usage & Cost",
+    "tags": ["aimp", "ai", "cost", "llm"],
+    "timezone": "UTC",
+    "schemaVersion": 36,
+    "refresh": "15s",
+    "time": { "from": "now-24h", "to": "now" },
+    "templating": {
+      "list": [
+        {
+          "name": "model",
+          "type": "query",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "query": "label_values(aimp_ai_requests_total, model)",
+          "multi": true,
+          "includeAll": true,
+          "current": { "text": ["All"], "value": ["$__all"] }
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "AI Requests (last 24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(aimp_ai_requests_total[24h]))",
+            "legendFormat": "Total"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 10000 },
+                { "color": "red", "value": 50000 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "Tokens Used (last 24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(aimp_ai_tokens_used_total[24h]))",
+            "legendFormat": "Tokens"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 500000 },
+                { "color": "red", "value": 2000000 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "AI P95 Latency",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(aimp_ai_request_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p95"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 10 },
+                { "color": "red", "value": 30 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 }
+      },
+      {
+        "id": 4,
+        "title": "AI Error Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(aimp_ai_requests_total{status=\"error\"}[5m])) / sum(rate(aimp_ai_requests_total[5m])) * 100",
+            "legendFormat": "Error %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                { "color": "green", "value": null },
+                { "color": "yellow", "value": 5 },
+                { "color": "red", "value": 20 }
+              ]
+            }
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 }
+      },
+      {
+        "id": 5,
+        "title": "AI Requests by Model (RPM)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (model) (rate(aimp_ai_requests_total[5m]) * 60)",
+            "legendFormat": "{{model}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "fillOpacity": 10
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
+      },
+      {
+        "id": 6,
+        "title": "Token Usage by Type",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (token_type) (rate(aimp_ai_tokens_used_total[5m]) * 60)",
+            "legendFormat": "{{token_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "custom": {
+              "drawStyle": "line",
+              "stacking": { "mode": "normal" },
+              "fillOpacity": 20
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
+      },
+      {
+        "id": 7,
+        "title": "AI Request Duration Distribution",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "sum(rate(aimp_ai_request_duration_seconds_bucket[5m])) by (le)",
+            "format": "heatmap"
+          }
+        ],
+        "dataFormat": "tsbuckets",
+        "yAxis": { "unit": "s", "min": 0, "max": 60 },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
+      },
+      {
+        "id": 8,
+        "title": "AI Errors by Model",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "sum by (model) (rate(aimp_ai_requests_total{status=\"error\"}[5m]) * 60)",
+            "legendFormat": "{{model}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "custom": {
+              "drawStyle": "bars",
+              "fillOpacity": 50
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
+      },
+      {
+        "id": 9,
+        "title": "Estimated AI Cost ($/hour)",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "(sum(increase(aimp_ai_tokens_used_total{token_type=\"prompt\"}[1h])) * 0.00003) + (sum(increase(aimp_ai_tokens_used_total{token_type=\"completion\"}[1h])) * 0.00006)",
+            "legendFormat": "Estimated Cost"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "custom": {
+              "drawStyle": "line",
+              "fillOpacity": 10
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
+      },
+      {
+        "id": 10,
+        "title": "AI Request Status Distribution",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (status) (increase(aimp_ai_requests_total[1h]))",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "options": {
+          "pieType": "donut"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
+      }
+    ]
+  }
+}

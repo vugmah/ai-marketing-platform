@@ -1,0 +1,88 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Follower Governance - Pilot Monitoring",
+    "tags": ["followers", "governance", "pilot"],
+    "timezone": "Europe/Istanbul",
+    "schemaVersion": 36,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Platform Reputation Scores",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "aimp_platform_reputation_score{job=\"aimp-backend\"}",
+            "legendFormat": "{{platform}}"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Outreach Rate (messages/min)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(aimp_outreach_messages_total{job=\"aimp-backend\"}[5m]) * 60",
+            "legendFormat": "{{platform}}"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Approval Queue Depth",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "aimp_approval_queue_pending{job=\"aimp-backend\"}",
+            "legendFormat": "Pending"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Rate Limit Hits",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(aimp_rate_limit_hits_total{job=\"aimp-backend\"}[5m]) * 60",
+            "legendFormat": "{{platform}}"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Response Rate by Platform",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "aimp_outreach_response_rate{job=\"aimp-backend\"} * 100",
+            "legendFormat": "{{platform}}"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Block/Report Rate",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "aimp_outreach_block_rate{job=\"aimp-backend\"} * 100",
+            "legendFormat": "Block %"
+          },
+          {
+            "expr": "aimp_outreach_report_rate{job=\"aimp-backend\"} * 100",
+            "legendFormat": "Report %"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -13,6 +13,8 @@ import {
   Settings,
   LogOut,
   User,
+  Loader2,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
@@ -28,20 +30,22 @@ interface AlertData {
   timestamp: string;
 }
 
+interface Branch {
+  id: string;
+  name: string;
+  icon?: typeof Building2;
+}
+
+interface Company {
+  id: string;
+  name: string;
+}
+
 interface HeaderProps {
   pageTitle: string;
   pageSubtitle?: string;
   onMenuToggle: () => void;
 }
-
-// ─── Branch Data ─────────────────────────────────────────
-
-const branches = [
-  { id: "all", name: "Tüm Şubeler", icon: Building2 },
-  { id: "nizami", name: "Nizami Şubesi", icon: Building2 },
-  { id: "gencik", name: "Gənclik Şubesi", icon: Building2 },
-  { id: "28may", name: "28 May Şubesi", icon: Building2 },
-];
 
 // ─── Alert Icon Map ──────────────────────────────────────
 
@@ -101,8 +105,16 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
   const [searchQuery, setSearchQuery] = useState("");
   const [notifOpen, setNotifOpen] = useState(false);
   const [branchOpen, setBranchOpen] = useState(false);
+  const [companyOpen, setCompanyOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState(branches[0]);
+
+  // Branch & Company state from API
+  const [branches, setBranches] = useState<Branch[]>([{ id: "all", name: "Tüm Şubeler" }]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [selectedBranch, setSelectedBranch] = useState<Branch>(branches[0]);
+  const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
+  const [branchesLoading, setBranchesLoading] = useState(false);
+  const [companiesLoading, setCompaniesLoading] = useState(false);
 
   // Notification state from API
   const [notifications, setNotifications] = useState<AlertData[]>([]);
@@ -111,7 +123,69 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
   const searchRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const branchRef = useRef<HTMLDivElement>(null);
+  const companyRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+
+  // Fetch branches from API
+  useEffect(() => {
+    async function fetchBranches() {
+      setBranchesLoading(true);
+      try {
+        const res = await api.branches.list();
+        if (res.success && res.data && res.data.length > 0) {
+          const mapped = res.data.map((b: any) => ({
+            id: String(b.id),
+            name: b.name || b.title || "Bilinmeyen Şube",
+          }));
+          const withAll = [{ id: "all", name: "Tüm Şubeler" }, ...mapped];
+          setBranches(withAll);
+          // Set localStorage selected branch if exists
+          const saved = localStorage.getItem("selected-branch-id");
+          if (saved) {
+            const found = withAll.find((b) => b.id === saved);
+            if (found) setSelectedBranch(found);
+          } else {
+            setSelectedBranch(withAll[0]);
+          }
+        }
+      } catch (err) {
+        console.error("Şubeler yüklenemedi:", err);
+      } finally {
+        setBranchesLoading(false);
+      }
+    }
+    fetchBranches();
+  }, []);
+
+  // Fetch companies from API
+  useEffect(() => {
+    async function fetchCompanies() {
+      setCompaniesLoading(true);
+      try {
+        const res = await api.companies.list();
+        if (res.success && res.data && res.data.length > 0) {
+          const mapped = res.data.map((c: any) => ({
+            id: String(c.id),
+            name: c.name || c.title || "Bilinmeyen Şirket",
+          }));
+          setCompanies(mapped);
+          // Set localStorage selected company if exists
+          const saved = localStorage.getItem("selected-company-id");
+          if (saved) {
+            const found = mapped.find((c) => c.id === saved);
+            if (found) setSelectedCompany(found);
+          } else {
+            setSelectedCompany(mapped[0]);
+          }
+        }
+      } catch (err) {
+        console.error("Şirketler yüklenemedi:", err);
+      } finally {
+        setCompaniesLoading(false);
+      }
+    }
+    fetchCompanies();
+  }, []);
 
   // Fetch notifications from API
   useEffect(() => {
@@ -130,6 +204,23 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
     fetchNotifications();
   }, []);
 
+  // Persist selected branch & company
+  const handleSelectBranch = (branch: Branch) => {
+    setSelectedBranch(branch);
+    localStorage.setItem("selected-branch-id", branch.id);
+    setBranchOpen(false);
+    // Trigger a custom event so pages can react
+    window.dispatchEvent(new CustomEvent("branch-changed", { detail: branch }));
+  };
+
+  const handleSelectCompany = (company: Company) => {
+    setSelectedCompany(company);
+    localStorage.setItem("selected-company-id", company.id);
+    setCompanyOpen(false);
+    // Refresh branches for the new company
+    window.dispatchEvent(new CustomEvent("company-changed", { detail: company }));
+  };
+
   // Close dropdowns on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -141,6 +232,9 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
       }
       if (branchRef.current && !branchRef.current.contains(event.target as Node)) {
         setBranchOpen(false);
+      }
+      if (companyRef.current && !companyRef.current.contains(event.target as Node)) {
+        setCompanyOpen(false);
       }
       if (userRef.current && !userRef.current.contains(event.target as Node)) {
         setUserOpen(false);
@@ -161,7 +255,7 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
     <header
       className={cn(
         "fixed top-0 right-0 z-30 h-16 bg-white border-b border-[#E2E8F0]",
-        "flex items-center justify-between px-6 transition-all duration-300"
+        "flex items-center justify-between px-3 sm:px-4 md:px-6 transition-all duration-300"
       )}
       style={{
         left: "var(--sidebar-offset, 260px)",
@@ -238,28 +332,34 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
                 <button className="text-xs text-[#2563EB] hover:underline">Tümünü Okundu İşaretle</button>
               </div>
               <div className="max-h-[320px] overflow-y-auto">
-                {notifications.map((alert: AlertData) => {
-                  const Icon = alertIconMap[alert.type];
-                  return (
-                    <div
-                      key={alert.id}
-                      className={cn(
-                        "flex gap-3 px-4 py-3 border-l-[3px] hover:bg-[#F8FAFC] transition-colors cursor-pointer",
-                        alertBorderMap[alert.type]
-                      )}
-                    >
-                      <Icon className={cn("w-5 h-5 shrink-0 mt-0.5", alertColorMap[alert.type])} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#0F172A]">{alert.title}</p>
-                        <p className="text-xs text-[#475569] mt-0.5 line-clamp-2">{alert.description}</p>
-                        <div className="flex items-center justify-between mt-1.5">
-                          <span className="text-[11px] text-[#94A3B8]">{alert.meta}</span>
-                          <span className="text-[11px] text-[#94A3B8]">{alert.timestamp}</span>
+                {notifications.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-[#94A3B8] text-sm">
+                    Henüz bildirim yok
+                  </div>
+                ) : (
+                  notifications.map((alert: AlertData) => {
+                    const Icon = alertIconMap[alert.type];
+                    return (
+                      <div
+                        key={alert.id}
+                        className={cn(
+                          "flex gap-3 px-4 py-3 border-l-[3px] hover:bg-[#F8FAFC] transition-colors cursor-pointer",
+                          alertBorderMap[alert.type]
+                        )}
+                      >
+                        <Icon className={cn("w-5 h-5 shrink-0 mt-0.5", alertColorMap[alert.type])} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-[#0F172A]">{alert.title}</p>
+                          <p className="text-xs text-[#475569] mt-0.5 line-clamp-2">{alert.description}</p>
+                          <div className="flex items-center justify-between mt-1.5">
+                            <span className="text-[11px] text-[#94A3B8]">{alert.meta}</span>
+                            <span className="text-[11px] text-[#94A3B8]">{alert.timestamp}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
               <div className="px-4 py-2.5 border-t border-[#E2E8F0]">
                 <button className="text-xs text-[#2563EB] font-medium hover:underline">
@@ -270,15 +370,68 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
           )}
         </div>
 
+        {/* Company Selector */}
+        {companies.length > 0 && (
+          <div ref={companyRef} className="relative hidden md:block">
+            <button
+              onClick={() => setCompanyOpen(!companyOpen)}
+              className="flex items-center gap-2 px-3 h-9 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
+            >
+              {companiesLoading ? (
+                <Loader2 className="w-4 h-4 text-[#94A3B8] animate-spin" />
+              ) : (
+                <Briefcase className="w-4 h-4 text-[#475569]" />
+              )}
+              <span className="text-sm text-[#0F172A] max-w-[140px] truncate">
+                {selectedCompany?.name || "Şirket Seç"}
+              </span>
+              <ChevronDown
+                className={cn(
+                  "w-4 h-4 text-[#94A3B8] transition-transform",
+                  companyOpen && "rotate-180"
+                )}
+              />
+            </button>
+
+            {companyOpen && (
+              <div className="absolute right-0 top-12 w-[220px] bg-white rounded-xl border border-[#E2E8F0] shadow-lg z-50 overflow-hidden">
+                <div className="px-4 py-2 border-b border-[#E2E8F0]">
+                  <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Şirketler</p>
+                </div>
+                {companies.map((company) => (
+                  <button
+                    key={company.id}
+                    onClick={() => handleSelectCompany(company)}
+                    className={cn(
+                      "flex items-center gap-2 w-full px-4 py-2.5 text-sm hover:bg-[#F8FAFC] transition-colors",
+                      selectedCompany?.id === company.id && "bg-[#F1F5F9] text-[#2563EB] font-medium"
+                    )}
+                  >
+                    <Briefcase className="w-4 h-4" />
+                    {company.name}
+                    {selectedCompany?.id === company.id && (
+                      <Check className="w-4 h-4 ml-auto" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Branch Selector */}
         <div ref={branchRef} className="relative hidden md:block">
           <button
             onClick={() => setBranchOpen(!branchOpen)}
             className="flex items-center gap-2 px-3 h-9 rounded-lg border border-[#E2E8F0] hover:bg-[#F8FAFC] transition-colors"
           >
-            <Building2 className="w-4 h-4 text-[#475569]" />
+            {branchesLoading ? (
+              <Loader2 className="w-4 h-4 text-[#94A3B8] animate-spin" />
+            ) : (
+              <Building2 className="w-4 h-4 text-[#475569]" />
+            )}
             <span className="text-sm text-[#0F172A] max-w-[140px] truncate">
-              {selectedBranch.name}
+              {selectedBranch?.name || "Şube Seç"}
             </span>
             <ChevronDown
               className={cn(
@@ -290,18 +443,21 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
 
           {branchOpen && (
             <div className="absolute right-0 top-12 w-[200px] bg-white rounded-xl border border-[#E2E8F0] shadow-lg z-50 overflow-hidden">
+              <div className="px-4 py-2 border-b border-[#E2E8F0]">
+                <p className="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Şubeler</p>
+              </div>
               {branches.map((branch) => (
                 <button
                   key={branch.id}
-                  onClick={() => { setSelectedBranch(branch); setBranchOpen(false); }}
+                  onClick={() => handleSelectBranch(branch)}
                   className={cn(
                     "flex items-center gap-2 w-full px-4 py-2.5 text-sm hover:bg-[#F8FAFC] transition-colors",
-                    selectedBranch.id === branch.id && "bg-[#F1F5F9] text-[#2563EB] font-medium"
+                    selectedBranch?.id === branch.id && "bg-[#F1F5F9] text-[#2563EB] font-medium"
                   )}
                 >
-                  <branch.icon className="w-4 h-4" />
+                  <Building2 className="w-4 h-4" />
                   {branch.name}
-                  {selectedBranch.id === branch.id && (
+                  {selectedBranch?.id === branch.id && (
                     <Check className="w-4 h-4 ml-auto" />
                   )}
                 </button>
@@ -331,7 +487,7 @@ export default function Header({ pageTitle, pageSubtitle, onMenuToggle }: Header
             <div className="absolute right-0 top-12 w-[220px] bg-white rounded-xl border border-[#E2E8F0] shadow-lg z-50 overflow-hidden">
               <div className="px-4 py-3 border-b border-[#E2E8F0]">
                 <p className="text-sm font-semibold text-[#0F172A]">{userName}</p>
-                <p className="text-xs text-[#94A3B8]">FoodFlow Azerbaijan</p>
+                <p className="text-xs text-[#94A3B8]">{selectedCompany?.name || "FoodFlow Azerbaijan"}</p>
               </div>
               <div className="py-1">
                 <button className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-[#475569] hover:bg-[#F8FAFC] transition-colors">

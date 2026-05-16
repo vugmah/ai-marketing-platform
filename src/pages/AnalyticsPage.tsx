@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Eye,
   Clock,
@@ -39,6 +39,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -214,6 +215,41 @@ function ExportDropdown() {
 
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [kpis, setKpis] = useState({
+    totalViews: "45.230",
+    avgSession: "3dk 42sn",
+    bounceRate: "%38.2",
+    uniqueVisitors: "12.450",
+  });
+  const [kpisLoading, setKpisLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // Load KPI data from API
+  useEffect(() => {
+    let mounted = true;
+    async function loadKpis() {
+      try {
+        setKpisLoading(true);
+        setApiError(null);
+        const res = await api.analytics.overview();
+        if (mounted && res.success && res.data) {
+          const d = res.data;
+          setKpis({
+            totalViews: d.total_views?.toLocaleString() || kpis.totalViews,
+            avgSession: d.avg_session || kpis.avgSession,
+            bounceRate: `%${d.bounce_rate || 38.2}`,
+            uniqueVisitors: d.unique_visitors?.toLocaleString() || kpis.uniqueVisitors,
+          });
+        }
+      } catch (err) {
+        if (mounted) console.error("Analytics KPI yüklenemedi:", err);
+      } finally {
+        if (mounted) setKpisLoading(false);
+      }
+    }
+    loadKpis();
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -228,10 +264,10 @@ export default function AnalyticsPage() {
 
       {/* ═══ KPI Cards ══════════════════════════════════════ */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
-        <KPICard title="Toplam Görüntüleme" value="45.230" change="+18.5%" changeType="up" icon={Eye} iconBg="bg-[#DBEAFE]" iconColor="#2563EB" delay={0} />
-        <KPICard title="Ortalama Oturum" value="3dk 42sn" change="+5.2%" changeType="up" icon={Clock} iconBg="bg-[#FEF3C7]" iconColor="#D97706" delay={80} />
-        <KPICard title="Hemen Çıkma Oranı" value="%38.2" change="-2.1%" changeType="down" icon={LogOut} iconBg="bg-[#D1FAE5]" iconColor="#059669" delay={160} />
-        <KPICard title="Tekil Ziyaretçi" value="12.450" change="+22.1%" changeType="up" icon={Users} iconBg="bg-[#EDE9FE]" iconColor="#7C3AED" delay={240} />
+        <KPICard title="Toplam Görüntüleme" value={kpisLoading ? "..." : kpis.totalViews} change="+18.5%" changeType="up" icon={Eye} iconBg="bg-[#DBEAFE]" iconColor="#2563EB" delay={0} />
+        <KPICard title="Ortalama Oturum" value={kpisLoading ? "..." : kpis.avgSession} change="+5.2%" changeType="up" icon={Clock} iconBg="bg-[#FEF3C7]" iconColor="#D97706" delay={80} />
+        <KPICard title="Hemen Çıkma Oranı" value={kpisLoading ? "..." : kpis.bounceRate} change="-2.1%" changeType="down" icon={LogOut} iconBg="bg-[#D1FAE5]" iconColor="#059669" delay={160} />
+        <KPICard title="Tekil Ziyaretçi" value={kpisLoading ? "..." : kpis.uniqueVisitors} change="+22.1%" changeType="up" icon={Users} iconBg="bg-[#EDE9FE]" iconColor="#7C3AED" delay={240} />
       </div>
 
       {/* ═══ Tabs ═══════════════════════════════════════════ */}

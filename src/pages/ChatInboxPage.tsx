@@ -38,6 +38,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -171,7 +172,67 @@ export default function ChatInboxPage() {
   const [aiAutoReply, setAiAutoReply] = useState(true);
   const [messageInput, setMessageInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [messagesData, setMessagesData] = useState<Record<string, Message[]>>({});
+  const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Load conversations from API
+  useEffect(() => {
+    let mounted = true;
+    async function loadConversations() {
+      try {
+        setLoading(true);
+        const res = await api.support.conversations();
+        if (mounted && res.success && res.data) {
+          const list = (res.data as any[]).map((c: any) => ({
+            id: String(c.id),
+            name: c.name || c.customer_name || "Müşteri",
+            avatar: c.avatar || (c.customer_name || "M").split(" ").map((n: string) => n[0]).join("").slice(0, 2),
+            channel: (c.channel || "Web") as Conversation["channel"],
+            lastMessage: c.last_message || c.message || "",
+            time: c.last_message_time || "Bilinmiyor",
+            unread: c.unread_count || 0,
+            status: (c.status || "open") as "open" | "closed" | "pending",
+            email: c.email || "",
+            phone: c.phone || "",
+            tags: c.tags || [],
+          }));
+          setConversations(list);
+          if (list.length > 0 && !selectedConv) {
+            setSelectedConv(list[0].id);
+          }
+        }
+      } catch (err) {
+        if (mounted) console.error("Konuşmalar yüklenemedi:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    loadConversations();
+    return () => { mounted = false; };
+  }, []);
+
+  // Load messages for selected conversation
+  useEffect(() => {
+    if (!selectedConv) return;
+    let mounted = true;
+    async function loadMessages() {
+      try {
+        const res = await api.support.messages(selectedConv);
+        if (mounted && res.success && res.data) {
+          setMessagesData((prev) => ({
+            ...prev,
+            [selectedConv]: res.data as Message[],
+          }));
+        }
+      } catch (err) {
+        if (mounted) console.error("Mesajlar yüklenemedi:", err);
+      }
+    }
+    loadMessages();
+    return () => { mounted = false; };
+  }, [selectedConv]);
 
   const selectedConversation = conversations.find((c) => c.id === selectedConv);
   const currentMessages = messagesData[selectedConv] || [];

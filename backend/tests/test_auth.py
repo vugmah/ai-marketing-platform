@@ -167,10 +167,11 @@ async def test_me_invalid_token(client: AsyncClient):
 @pytest.mark.asyncio
 async def test_me_revoked_token(client: AsyncClient, test_user, user_tokens):
     """Fetching /me with a revoked token should return 401."""
-    from app.auth.service import _revoked_tokens
-    # Revoke the access token
-    _revoked_tokens.add(user_tokens["access_token"])
+    # Revoke the access token via the logout endpoint
     headers = {"Authorization": f"Bearer {user_tokens['access_token']}"}
+    # Logout to revoke the token
+    await client.post("/api/v2/auth/logout", headers=headers)
+    # Try to access /me with the revoked token
     resp = await client.get("/api/v2/auth/me", headers=headers)
     assert resp.status_code == 401
     assert "revoked" in resp.json()["detail"].lower()

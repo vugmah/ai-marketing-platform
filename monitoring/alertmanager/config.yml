@@ -1,0 +1,113 @@
+# =============================================================================
+# Alertmanager Configuration for AI Marketing Platform
+# =============================================================================
+# Routes alerts to different notification channels based on severity.
+#
+# Routing:
+#   critical  -> PagerDuty + Slack #alerts-critical + Email
+#   warning   -> Slack #alerts + Email
+#   info      -> Slack #monitoring (no page, no email)
+# =============================================================================
+
+global:
+  slack_api_url: '${SLACK_WEBHOOK_URL}'
+  smtp_smarthost: '${SMTP_HOST:-localhost:587}'
+  smtp_from: '${ALERT_FROM:-alerts@aimp.local}'
+  smtp_auth_username: '${SMTP_USER}'
+  smtp_auth_password: '${SMTP_PASS}'
+
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+route:
+  group_by: ['alertname', 'component', 'severity']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  receiver: 'default'
+  routes:
+    # Critical alerts -> PagerDuty + Slack + Email
+    - match:
+        severity: critical
+      receiver: 'critical-pagerduty'
+      continue: true
+      group_wait: 0s
+      repeat_interval: 30m
+
+    # Warning alerts -> Slack + Email
+    - match:
+        severity: warning
+      receiver: 'warning-slack'
+      continue: true
+      repeat_interval: 2h
+
+    # Info alerts -> Slack only
+    - match:
+        severity: info
+      receiver: 'info-slack'
+      continue: false
+      repeat_interval: 6h
+
+receivers:
+  - name: 'default'
+    slack_configs:
+      - channel: '#monitoring'
+        title: '{{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+
+  - name: 'critical-pagerduty'
+    pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+        description: '{{ .GroupLabels.alertname }}'
+        severity: critical
+    slack_configs:
+      - channel: '#alerts-critical'
+        title: ':rotating_light: CRITICAL: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Component:* {{ .Labels.component }}
+          *Severity:* {{ .Labels.severity }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ if .Annotations.runbook_url }}*Runbook:* {{ .Annotations.runbook_url }}{{ end }}
+          {{ end }}
+        send_resolved: true
+    email_configs:
+      - to: '${ALERT_EMAIL:-ops@aimp.local}'
+        subject: '[CRITICAL] AIMP Alert: {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          Component: {{ .Labels.component }}
+          Instance:  {{ .Labels.instance }}
+          Severity:  {{ .Labels.severity }}
+          Summary:   {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Started:   {{ .StartsAt }}
+          {{ end }}
+
+  - name: 'warning-slack'
+    slack_configs:
+      - channel: '#alerts'
+        title: ':warning: WARNING: {{ .GroupLabels.alertname }}'
+        text: |
+          {{ range .Alerts }}
+          *Component:* {{ .Labels.component }}
+          *Summary:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          {{ end }}
+        send_resolved: true
+
+  - name: 'info-slack'
+    slack_configs:
+      - channel: '#monitoring'
+        title: ':information_source: {{ .GroupLabels.alertname }}'
+        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+        send_resolved: false
+
+inhibit_rules:
+  # If a critical alert fires, suppress warnings for the same component
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['component']

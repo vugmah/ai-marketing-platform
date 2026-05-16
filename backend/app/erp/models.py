@@ -161,6 +161,7 @@ class ERPConnection(Base):
         default=SyncStatus.NEVER,
         nullable=False,
     )
+    last_sync_error = Column(Text, nullable=True)
 
     # Webhook config
     webhook_secret = Column(String(255), nullable=True)

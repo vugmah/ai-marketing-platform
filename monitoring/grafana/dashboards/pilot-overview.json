@@ -1,0 +1,138 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Pilot Overview - AI Marketing Platform",
+    "tags": ["pilot", "overview"],
+    "timezone": "Europe/Istanbul",
+    "schemaVersion": 36,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Governance Health Score",
+        "type": "gauge",
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "aimp_governance_score{job=\"aimp-backend\"}",
+            "legendFormat": "Score"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 50, "color": "yellow"},
+                {"value": 75, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Active Tenants",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0},
+        "targets": [
+          {
+            "expr": "aimp_active_tenants{job=\"aimp-backend\"}",
+            "legendFormat": "Tenants"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Queue Depth",
+        "type": "stat",
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0},
+        "targets": [
+          {
+            "expr": "celery_queue_length{job=\"aimp-backend\"}",
+            "legendFormat": "Tasks"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "API Request Rate (rpm)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(aimp_http_requests_total{job=\"aimp-backend\"}[5m]) * 60",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "API Error Rate (%)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+        "targets": [
+          {
+            "expr": "rate(aimp_http_errors_total{job=\"aimp-backend\"}[5m]) / rate(aimp_http_requests_total{job=\"aimp-backend\"}[5m]) * 100",
+            "legendFormat": "Error %"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Database Connection Pool",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16},
+        "targets": [
+          {
+            "expr": "aimp_db_pool_active{job=\"aimp-backend\"}",
+            "legendFormat": "Active"
+          },
+          {
+            "expr": "aimp_db_pool_idle{job=\"aimp-backend\"}",
+            "legendFormat": "Idle"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Redis Memory Usage",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+        "targets": [
+          {
+            "expr": "redis_memory_used_bytes{job=\"aimp-backend\"} / 1024 / 1024",
+            "legendFormat": "MB"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "AI Cost (USD/hour)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+        "targets": [
+          {
+            "expr": "rate(aimp_ai_cost_usd_total{job=\"aimp-backend\"}[1h])",
+            "legendFormat": "USD/hour"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "AI Approval Rate (%)",
+        "type": "graph",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+        "targets": [
+          {
+            "expr": "rate(aimp_ai_approved_total{job=\"aimp-backend\"}[5m]) / rate(aimp_ai_requests_total{job=\"aimp-backend\"}[5m]) * 100",
+            "legendFormat": "Approval %"
+          }
+        ]
+      }
+    ]
+  }
+}

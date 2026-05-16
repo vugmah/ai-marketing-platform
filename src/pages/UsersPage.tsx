@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Users,
   Shield,
@@ -27,6 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 // ─── Inline Mock Data ────────────────────────────────────
 
@@ -120,14 +121,47 @@ export default function UsersPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("branch_manager");
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+
+  // Load users from API
+  useEffect(() => {
+    let mounted = true;
+    async function loadUsers() {
+      try {
+        setUsersLoading(true);
+        const res = await api.users.list();
+        if (mounted && res.success && res.data) {
+          const mapped = (res.data as any[]).map((u: any) => ({
+            id: String(u.id),
+            name: u.name || u.full_name || "Bilinmeyen",
+            email: u.email || "",
+            role: u.role || "analyst",
+            branch: u.branch || "Tüm Şubeler",
+            status: (u.status || "active") as "active" | "inactive",
+            lastActive: u.last_active || u.lastActive || "Bilinmiyor",
+            avatar: u.avatar || null,
+          }));
+          setAllUsers(mapped);
+        }
+      } catch (err) {
+        if (mounted) console.error("Kullanıcılar yüklenemedi:", err);
+      } finally {
+        if (mounted) setUsersLoading(false);
+      }
+    }
+    loadUsers();
+    return () => { mounted = false; };
+  }, []);
 
   const filteredUsers = useMemo(() => {
+    if (usersLoading) return [];
     return allUsers.filter((u) => {
-      const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
+      const matchSearch = !search || u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase());
       const matchRole = roleFilter === "Tümü" || roleConfig[u.role]?.label === roleFilter;
       return matchSearch && matchRole;
     });
-  }, [search, roleFilter]);
+  }, [search, roleFilter, allUsers, usersLoading]);
 
   const roleCounts = useMemo(() => {
     const counts: Record<string, number> = {};

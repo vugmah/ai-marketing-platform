@@ -1,0 +1,167 @@
+{
+  "blueprint_version": "2.0.0",
+  "generated_by": "ai",
+  "generation_prompt": "İstanbul Beşiktaş'ta aile restoranı web sitesi",
+  "confidence_score": 0.95,
+  "industry": "restaurant",
+  "business_size": "small",
+  "business_name": "Lezzet Sofrası",
+  "business_description": "2005 yılından beri İstanbul Beşiktaş'ta hizmet veren aile restoranı. Geleneksel Türk mutfağı ve modern sunumlar.",
+  "target_audience": "Aileler, iş insanları, yemekseverler",
+  "tone_of_voice": "professional",
+  "color_scheme": "warm_neutral",
+  "custom_colors": {
+    "primary": "#8B4513",
+    "secondary": "#D2691E",
+    "accent": "#E67E22"
+  },
+  "font_pair": "classic_serif",
+  "animation_level": "subtle",
+  "device_target": "all_devices",
+  "pages": [
+    {
+      "page_id": "home",
+      "page_name": "Ana Sayfa",
+      "slug": "/",
+      "is_homepage": true,
+      "meta_title": "Lezzet Sofrası - Lezzetin Adresi",
+      "meta_description": "İstanbul Beşiktaş'ta geleneksel Türk mutfağı ve modern sunumlar. Taze malzemeler, unutulmaz tatlar.",
+      "purpose": "Ana karşılama sayfası",
+      "sections": [
+        {
+          "section_type": "hero",
+          "name": "Hero",
+          "purpose": "Restoranın atmosferini yansıtan ana karşılama",
+          "position": 0,
+          "layout_variant": "default",
+          "content_guidelines": "Sıcak ve davetkar bir hero bölümü. Restoranın imza yemeklerinden bahset."
+        },
+        {
+          "section_type": "about",
+          "name": "Hakkımızda",
+          "purpose": "Restoran hikayesi ve değerleri",
+          "position": 1,
+          "layout_variant": "split",
+          "content_guidelines": "2005'ten beri olan hikayeyi anlat. Aile işletmesi olmanın değerini vurgula."
+        },
+        {
+          "section_type": "menu",
+          "name": "Menü",
+          "purpose": "Kategorize edilmiş yemek menüsü",
+          "position": 2,
+          "layout_variant": "tabs",
+          "content_guidelines": "Başlangıçlar, Ana Yemekler, Tatlılar ve İçecekler kategorileri oluştur."
+        },
+        {
+          "section_type": "gallery",
+          "name": "Galeri",
+          "purpose": "Mekan ve yemek fotoğrafları",
+          "position": 3,
+          "layout_variant": "masonry",
+          "content_guidelines": "Mekan atmosferi, imza yemekler ve etkinlik fotoğrafları."
+        },
+        {
+          "section_type": "testimonials",
+          "name": "Yorumlar",
+          "purpose": "Misafir değerlendirmeleri",
+          "position": 4,
+          "layout_variant": "carousel",
+          "content_guidelines": "Gerçekçi müşteri yorumları oluştur. Çeşitli deneyimleri yansıt."
+        },
+        {
+          "section_type": "cta",
+          "name": "Rezervasyon CTA",
+          "purpose": "Rezervasyon çağrısı",
+          "position": 5,
+          "layout_variant": "default",
+          "content_guidelines": "Aciliyet hissi veren CTA metni."
+        },
+        {
+          "section_type": "location",
+          "name": "Konum",
+          "purpose": "Adres ve harita",
+          "position": 6,
+          "layout_variant": "with_map",
+          "content_guidelines": "Beşiktaş adresi, çalışma saatleri ve ulaşım bilgileri."
+        }
+      ]
+    },
+    {
+      "page_id": "menu",
+      "page_name": "Menü",
+      "slug": "/menu",
+      "is_homepage": false,
+      "meta_title": "Menümüz - Lezzet Sofrası",
+      "meta_description": "Geleneksel Türk mutfağının en lezzetli örnekleri. Başlangıçlar, ana yemekler, tatlılar.",
+      "purpose": "Tüm menü detayları",
+      "sections": [
+        {
+          "section_type": "menu",
+          "name": "Tüm Menü",
+          "purpose": "Detaylı menü listesi",
+          "position": 0,
+          "layout_variant": "default",
+          "content_guidelines": "Tüm kategorilerin detaylı içerikleri ve fiyatlar."
+        }
+      ]
+    },
+    {
+      "page_id": "reservation",
+      "page_name": "Rezervasyon",
+      "slug": "/reservation",
+      "is_homepage": false,
+      "meta_title": "Rezervasyon - Lezzet Sofrası",
+      "meta_description": "Online rezervasyon yapın. Özel günler için masa ayırtın.",
+      "purpose": "Online rezervasyon",
+      "sections": [
+        {
+          "section_type": "reservation",
+          "name": "Rezervasyon Formu",
+          "purpose": "Rezervasyon alma formu",
+          "position": 0,
+          "layout_variant": "default",
+          "content_guidelines": "Kişi sayısı, tarih, saat ve özel istek alanları."
+        }
+      ]
+    }
+  ],
+  "global_header": {
+    "section_type": "navbar",
+    "name": "Navigasyon",
+    "layout_variant": "default"
+  },
+  "global_footer": {
+    "section_type": "footer",
+    "name": "Footer",
+    "layout_variant": "default"
+  },
+  "primary_cta": "Rezervasyon Yap",
+  "primary_cta_link": "#reservation",
+  "secondary_cta": "Menüyü Gör",
+  "cta_locations": ["hero", "after_about", "before_footer"],
+  "recommendations": [
+    {
+      "category": "conversion",
+      "priority": "high",
+      "title": "Online Rezervasyon Sistemi",
+      "description": "Online rezervasyon özelliği dönüşüm oranını %40-60 artırır.",
+      "actionable_steps": ["Rezervasyon formu ekle", "Takvim entegrasyonu yap"],
+      "expected_impact": "Dönüşüm oranında %40-60 artış",
+      "auto_applicable": false
+    }
+  ],
+  "features": {
+    "contact_form": true,
+    "appointment_booking": false,
+    "ecommerce": false,
+    "blog": false,
+    "multilingual": false,
+    "dark_mode": false,
+    "live_chat": false,
+    "newsletter": true,
+    "social_feed": false,
+    "search": false,
+    "reservations": true,
+    "reviews": true
+  }
+}

@@ -55,8 +55,8 @@ services:
       REDIS_URL: redis://redis:6379/0
       RABBITMQ_URL: amqp://aimp:aimp123@rabbitmq:5672/
       JWT_SECRET_KEY: aimp-secret-key-change-in-production
-      CELERY_BROKER_URL: amqp://aimp:aimp123@rabbitmq:5672/
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
     depends_on:
       mysql:
         condition: service_healthy
@@ -72,30 +72,63 @@ services:
 
   celery_worker:
     build: ./backend
-    container_name: aimp_celery
+    container_name: aimp_celery_worker
     environment:
       DATABASE_URL: mysql+aiomysql://aimp:aimp123@mysql:3306/aimp
       REDIS_URL: redis://redis:6379/0
-      RABBITMQ_URL: amqp://aimp:aimp123@rabbitmq:5672/
-      CELERY_BROKER_URL: amqp://aimp:aimp123@rabbitmq:5672/
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
     depends_on:
-      - mysql
-      - redis
-      - rabbitmq
-    command: celery -A celeryconfig worker --loglevel=info
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+    command: >
+      celery -A celeryconfig worker
+      --loglevel=info
+      --queues=celery,erp,social,media,ai,events,dead_letter
+      --hostname=worker@%h
+      --prefetch-multiplier=1
+      --concurrency=4
 
   celery_beat:
     build: ./backend
     container_name: aimp_celery_beat
     environment:
-      CELERY_BROKER_URL: amqp://aimp:aimp123@rabbitmq:5672/
-      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      DATABASE_URL: mysql+aiomysql://aimp:aimp123@mysql:3306/aimp
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+    command: >
+      celery -A celeryconfig beat
+      --loglevel=info
+      --scheduler=celery.beat.PersistentScheduler
+      --schedule=/tmp/celerybeat-schedule
+
+  celery_flower:
+    build: ./backend
+    container_name: aimp_celery_flower
+    ports:
+      - "5555:5555"
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+    depends_on:
       - redis
-      - rabbitmq
-    command: celery -A celeryconfig beat --loglevel=info
+    command: >
+      celery -A celeryconfig flower
+      --port=5555
+      --broker=redis://redis:6379/1
+      --url_prefix=flower
 
   frontend:
     build:
@@ -124,7 +157,126 @@ services:
       - backend
       - frontend
 
+  # ---------------------------------------------------------------------------
+  # Monitoring Stack
+  # ---------------------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v2.55.0
+    container_name: aimp_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./backend/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./backend/monitoring/rules:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    depends_on:
+      - backend
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: aimp_grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3001}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.65.0
+    container_name: aimp_redis_exporter
+    environment:
+      REDIS_ADDR: redis://redis:6379
+    depends_on:
+      - redis
+
+  mysql-exporter:
+    image: prom/mysqld-exporter:v0.16.0
+    container_name: aimp_mysql_exporter
+    environment:
+      DATA_SOURCE_NAME: root:rootpass@(mysql:3306)/
+    depends_on:
+      - mysql
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.0
+    container_name: aimp_node_exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+
+  # --- Blackbox exporter for external API probing ---
+  blackbox-exporter:
+    image: prom/blackbox-exporter:v0.25.0
+    container_name: aimp_blackbox
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./backend/monitoring/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    command:
+      - '--config.file=/etc/blackbox_exporter/config.yml'
+
+  # --- Loki for log aggregation ---
+  loki:
+    image: grafana/loki:3.2.0
+    container_name: aimp_loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+
+  # --- Promtail for log shipping ---
+  promtail:
+    image: grafana/promtail:3.2.0
+    container_name: aimp_promtail
+    volumes:
+      - /var/log:/var/log:ro
+      - ./monitoring/promtail:/etc/promtail:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+
+  # --- Alertmanager for alert routing ---
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: aimp_alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager:/etc/alertmanager:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+
 volumes:
   mysql_data:
   redis_data:
   qdrant_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+  alertmanager_data:

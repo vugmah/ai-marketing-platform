@@ -8,3 +8,6 @@ Supported providers: custom, odoo, sap, netsuite, dynamics, logo, mikro, parasut
 """
 
 from app.erp.router import router as erp_router
+
+# Import Celery tasks for autodiscovery
+from app.erp import tasks as erp_tasks

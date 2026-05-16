@@ -1,0 +1,273 @@
+# =============================================================================
+# Prometheus Recording Rules for AI Marketing Platform
+# =============================================================================
+# Pre-aggregated queries for fast dashboard rendering.
+# These rules compute commonly-used metrics at scrape time so Grafana
+# dashboards load instantly.
+#
+# Recording rules are evaluated every 15s (evaluation_interval in prometheus.yml).
+# All recorded metrics use the "aimp:recorded:" prefix for easy discovery.
+# =============================================================================
+
+groups:
+  # ---------------------------------------------------------------------------
+  # Group 1: HTTP API Performance (per-endpoint aggregates)
+  # ---------------------------------------------------------------------------
+  - name: aimp_http_api
+    interval: 15s
+    rules:
+      # Request rate per endpoint (requests per minute)
+      - record: aimp:recorded:http_request_rate_5m
+        expr: |
+          rate(aimp_http_requests_total[5m]) * 60
+
+      # Request rate per endpoint (requests per minute)
+      - record: aimp:recorded:http_request_rate_per_endpoint_5m
+        expr: |
+          sum by (method, endpoint) (
+            rate(aimp_http_requests_total[5m]) * 60
+          )
+
+      # 95th percentile request duration per endpoint
+      - record: aimp:recorded:http_request_duration_p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (method, endpoint, le) (
+              rate(aimp_http_request_duration_seconds_bucket[5m])
+            )
+          )
+
+      # Average request duration per endpoint
+      - record: aimp:recorded:http_request_duration_avg_5m
+        expr: |
+          sum by (method, endpoint) (
+            rate(aimp_http_request_duration_seconds_sum[5m])
+          )
+          /
+          sum by (method, endpoint) (
+            rate(aimp_http_request_duration_seconds_count[5m])
+          )
+
+      # Error rate per endpoint (5xx + 4xx errors / total)
+      - record: aimp:recorded:http_error_rate_5m
+        expr: |
+          sum by (method, endpoint) (
+            rate(aimp_http_requests_total{status=~"4..|5.."}[5m])
+          )
+          /
+          sum by (method, endpoint) (
+            rate(aimp_http_requests_total[5m])
+          )
+
+      # 5xx error rate only
+      - record: aimp:recorded:http_5xx_rate_5m
+        expr: |
+          sum by (method, endpoint) (
+            rate(aimp_http_requests_total{status=~"5.."}[5m])
+          )
+          /
+          sum by (method, endpoint) (
+            rate(aimp_http_requests_total[5m])
+          )
+
+      # Top 10 slowest endpoints by p95
+      - record: aimp:recorded:slowest_endpoints_p95
+        expr: |
+          topk(10,
+            histogram_quantile(0.95,
+              sum by (method, endpoint, le) (
+                rate(aimp_http_request_duration_seconds_bucket[5m])
+              )
+            )
+          )
+
+  # ---------------------------------------------------------------------------
+  # Group 2: Overall API Health
+  # ---------------------------------------------------------------------------
+  - name: aimp_api_health
+    interval: 15s
+    rules:
+      # Total requests per second (all endpoints)
+      - record: aimp:recorded:total_rps
+        expr: |
+          sum(rate(aimp_http_requests_total[1m]))
+
+      # Overall error percentage
+      - record: aimp:recorded:overall_error_percent
+        expr: |
+          100 * (
+            sum(rate(aimp_http_requests_total{status=~"5.."}[5m]))
+            /
+            sum(rate(aimp_http_requests_total[5m]))
+          )
+
+      # Overall 4xx percentage
+      - record: aimp:recorded:overall_4xx_percent
+        expr: |
+          100 * (
+            sum(rate(aimp_http_requests_total{status=~"4.."}[5m]))
+            /
+            sum(rate(aimp_http_requests_total[5m]))
+          )
+
+      # Active connections
+      - record: aimp:recorded:active_connections
+        expr: |
+          aimp_http_active_connections{}
+
+  # ---------------------------------------------------------------------------
+  # Group 3: AI Usage & Cost
+  # ---------------------------------------------------------------------------
+  - name: aimp_ai_usage
+    interval: 15s
+    rules:
+      # AI requests per minute by model
+      - record: aimp:recorded:ai_request_rate_5m
+        expr: |
+          sum by (model) (
+            rate(aimp_ai_requests_total[5m]) * 60
+          )
+
+      # AI token usage per minute
+      - record: aimp:recorded:ai_token_rate_5m
+        expr: |
+          sum by (model, token_type) (
+            rate(aimp_ai_tokens_used_total[5m]) * 60
+          )
+
+      # AI request duration p95
+      - record: aimp:recorded:ai_duration_p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (model, le) (
+              rate(aimp_ai_request_duration_seconds_bucket[5m])
+            )
+          )
+
+      # AI error rate
+      - record: aimp:recorded:ai_error_rate_5m
+        expr: |
+          sum by (model) (
+            rate(aimp_ai_requests_total{status="error"}[5m])
+          )
+          /
+          sum by (model) (
+            rate(aimp_ai_requests_total[5m])
+          )
+
+      # Estimated AI cost per hour (assuming $0.03 per 1K prompt tokens, $0.06 per 1K completion)
+      - record: aimp:recorded:ai_cost_per_hour
+        expr: |
+          (
+            sum by (model) (
+              increase(aimp_ai_tokens_used_total{token_type="prompt"}[1h])
+            ) * 0.00003
+            +
+            sum by (model) (
+              increase(aimp_ai_tokens_used_total{token_type="completion"}[1h])
+            ) * 0.00006
+          )
+
+  # ---------------------------------------------------------------------------
+  # Group 4: Database Performance
+  # ---------------------------------------------------------------------------
+  - name: aimp_database
+    interval: 15s
+    rules:
+      # DB query rate per query type
+      - record: aimp:recorded:db_query_rate_5m
+        expr: |
+          sum by (query_type) (
+            rate(aimp_db_query_duration_seconds_count[5m]) * 60
+          )
+
+      # DB query p95 duration
+      - record: aimp:recorded:db_query_p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (query_type, le) (
+              rate(aimp_db_query_duration_seconds_bucket[5m])
+            )
+          )
+
+      # Connection pool utilization
+      - record: aimp:recorded:db_pool_utilization
+        expr: |
+          aimp_db_connection_pool_size{state="checkedout"}
+          /
+          aimp_db_connection_pool_size{state="size"}
+
+  # ---------------------------------------------------------------------------
+  # Group 5: Redis Performance
+  # ---------------------------------------------------------------------------
+  - name: aimp_redis
+    interval: 15s
+    rules:
+      # Redis operation rate
+      - record: aimp:recorded:redis_op_rate_5m
+        expr: |
+          sum by (operation) (
+            rate(aimp_redis_operation_duration_seconds_count[5m]) * 60
+          )
+
+      # Redis operation p95
+      - record: aimp:recorded:redis_op_p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (operation, le) (
+              rate(aimp_redis_operation_duration_seconds_bucket[5m])
+            )
+          )
+
+  # ---------------------------------------------------------------------------
+  # Group 6: ERP & Social Integration
+  # ---------------------------------------------------------------------------
+  - name: aimp_integrations
+    interval: 15s
+    rules:
+      # ERP sync rate
+      - record: aimp:recorded:erp_sync_rate_5m
+        expr: |
+          sum by (status) (
+            rate(aimp_erp_sync_total[5m]) * 60
+          )
+
+      # Social API rate
+      - record: aimp:recorded:social_api_rate_5m
+        expr: |
+          sum by (platform) (
+            rate(aimp_social_api_requests_total[5m]) * 60
+          )
+
+      # Social API error rate
+      - record: aimp:recorded:social_api_error_rate_5m
+        expr: |
+          sum by (platform) (
+            rate(aimp_social_api_requests_total{status!="success"}[5m])
+          )
+          /
+          sum by (platform) (
+            rate(aimp_social_api_requests_total[5m])
+          )
+
+  # ---------------------------------------------------------------------------
+  # Group 7: Background Jobs
+  # ---------------------------------------------------------------------------
+  - name: aimp_background_jobs
+    interval: 15s
+    rules:
+      # Job rate per status
+      - record: aimp:recorded:bg_job_rate_5m
+        expr: |
+          sum by (status) (
+            rate(aimp_background_jobs[5m])
+          )
+
+      # Job duration p95
+      - record: aimp:recorded:bg_job_duration_p95_5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (job_type, le) (
+              rate(aimp_background_job_duration_seconds_bucket[5m])
+            )
+          )

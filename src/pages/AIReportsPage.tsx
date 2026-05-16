@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Brain,
   TrendingUp,
   Target,
   Sparkles,
   Check,
+  X,
   ArrowUpRight,
   BarChart3,
   Sun,
@@ -20,6 +21,7 @@ import {
   Star,
   AlertTriangle,
   Lightbulb,
+  RefreshCw,
 } from "lucide-react";
 import {
   AreaChart,
@@ -36,6 +38,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -183,6 +187,65 @@ function PurpleKPICard({ title, value, change, icon: Icon, delay }: PurpleKPICar
 
 export default function AIReportsPage() {
   const [activeTab, setActiveTab] = useState("overview");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [appliedRecs, setAppliedRecs] = useState<Set<string>>(new Set());
+  const [rejectedRecs, setRejectedRecs] = useState<Set<string>>(new Set());
+
+  // Load AI reports data from API
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function loadData() {
+    setLoading(true);
+    setError(null);
+    try {
+      await Promise.all([
+        api.aiReports.overview(),
+        api.aiReports.trends(),
+        api.aiReports.recommendations(),
+        api.aiReports.forecast(),
+        api.aiReports.history(),
+      ]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "AI raporları yüklenemedi");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  }
+
+  function handleApply(recId: string) {
+    setAppliedRecs((prev) => new Set(prev).add(recId));
+  }
+
+  function handleReject(recId: string) {
+    setRejectedRecs((prev) => new Set(prev).add(recId));
+  }
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-500 font-medium">{error}</p>
+        <Button onClick={handleRefresh} variant="outline" size="sm">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Tekrar Dene
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -192,10 +255,20 @@ export default function AIReportsPage() {
           <h1 className="text-[28px] font-bold text-[#0F172A] tracking-tight">AI Raporları</h1>
           <p className="text-sm text-[#475569] mt-0.5">Yapay zeka destekli öngörüler ve öneriler</p>
         </div>
-        <Button className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white h-10 px-4 gap-2">
-          <Sparkles className="w-4 h-4" />
-          Yeni AI Raporu
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="h-10 gap-2" onClick={handleRefresh}>
+            <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
+            Yenile
+          </Button>
+          <Button variant="outline" size="sm" className="h-10 gap-2">
+            <Download className="w-4 h-4" />
+            Dışa Aktar
+          </Button>
+          <Button className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white h-10 px-4 gap-2">
+            <Sparkles className="w-4 h-4" />
+            Yeni AI Raporu
+          </Button>
+        </div>
       </div>
 
       {/* ═══ Purple KPI Cards ═══════════════════════════════ */}
@@ -333,10 +406,28 @@ export default function AIReportsPage() {
                       <p className="text-sm font-semibold text-[#0F172A]">%{rec.confidence}</p>
                     </div>
                   </div>
-                  <Button size="sm" className="w-full mt-3 bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-8">
-                    <Check className="w-4 h-4 mr-1" />
-                    Uygula
-                  </Button>
+                  {!appliedRecs.has(rec.id) && !rejectedRecs.has(rec.id) ? (
+                    <div className="flex gap-2 mt-3">
+                      <Button size="sm" className="flex-1 bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-8" onClick={() => handleApply(rec.id)}>
+                        <Check className="w-4 h-4 mr-1" />
+                        Uygula
+                      </Button>
+                      <Button size="sm" variant="outline" className="flex-1 h-8 border-[#FEE2E2] text-[#DC2626] hover:bg-[#FEE2E2] hover:text-[#DC2626]" onClick={() => handleReject(rec.id)}>
+                        <X className="w-4 h-4 mr-1" />
+                        Reddet
+                      </Button>
+                    </div>
+                  ) : appliedRecs.has(rec.id) ? (
+                    <Badge className="w-full mt-3 justify-center h-8 bg-[#D1FAE5] text-[#059669] hover:bg-[#D1FAE5]">
+                      <Check className="w-4 h-4 mr-1" />
+                      Uygulandı
+                    </Badge>
+                  ) : (
+                    <Badge className="w-full mt-3 justify-center h-8 bg-[#FEE2E2] text-[#DC2626] hover:bg-[#FEE2E2]">
+                      <X className="w-4 h-4 mr-1" />
+                      Reddedildi
+                    </Badge>
+                  )}
                 </CardContent>
               </Card>
             );

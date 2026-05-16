@@ -80,6 +80,7 @@ class ERPConnectorBase(ABC):
     async def get_sales_orders(
         self,
         page: int = 1,
+        page_size: int = 100,
         since: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Fetch sales orders."""

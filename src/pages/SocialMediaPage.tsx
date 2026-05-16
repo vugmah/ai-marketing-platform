@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Instagram,
   Facebook,
@@ -23,6 +23,9 @@ import {
   Play,
   Pause,
   Globe,
+  RefreshCw,
+  Download,
+  Users,
 } from "lucide-react";
 import {
   AreaChart,
@@ -32,12 +35,17 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  LineChart,
+  Line,
+  Legend,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import { KPICardsSkeleton, ChartSkeleton } from "@/components/LoadingSkeleton";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -328,6 +336,17 @@ const mockEngagementData: EngagementDataPoint[] = [
   { day: "13 Haz", likes: 3200, comments: 210, shares: 150 },
   { day: "14 Haz", likes: 7200, comments: 580, shares: 560 },
   { day: "15 Haz", likes: 5400, comments: 450, shares: 320 },
+];
+
+// ─── Mock Data: Follower Growth Chart ────────────────────
+
+const mockFollowerGrowthData = [
+  { month: "Oca", instagram: 8200, facebook: 6100, tiktok: 2800, twitter: 3100 },
+  { month: "Şub", instagram: 8900, facebook: 6500, tiktok: 3200, twitter: 3200 },
+  { month: "Mar", instagram: 9600, facebook: 7000, tiktok: 3800, twitter: 3400 },
+  { month: "Nis", instagram: 10200, facebook: 7400, tiktok: 4300, twitter: 3500 },
+  { month: "May", instagram: 11300, facebook: 7800, tiktok: 4700, twitter: 3700 },
+  { month: "Haz", instagram: 12450, facebook: 8230, tiktok: 5100, twitter: 3800 },
 ];
 
 // ─── Mock Data: Competitors ──────────────────────────────
@@ -623,6 +642,74 @@ function CompetitorRow({ competitor, index }: { competitor: Competitor; index: n
 
 export default function SocialMediaPage() {
   const [activeTab, setActiveTab] = useState("published");
+  const [socialAccounts, setSocialAccounts] = useState(mockSocialAccounts);
+  const [competitors, setCompetitors] = useState(mockCompetitors);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Load social data from API
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function loadData() {
+    setLoading(true);
+    setError(null);
+    try {
+      const [accountsRes, competitorsRes] = await Promise.all([
+        api.social.accounts(),
+        api.social.competitors(),
+      ]);
+      if (accountsRes.success && accountsRes.data) {
+        setSocialAccounts(accountsRes.data as any[]);
+      }
+      if (competitorsRes.success && competitorsRes.data) {
+        setCompetitors(competitorsRes.data as any[]);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sosyal medya verisi yüklenemedi");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-[28px] font-bold text-[#0F172A] tracking-tight">Sosyal Medya</h1>
+            <p className="text-sm text-[#475569] mt-0.5">Tüm sosyal medya hesaplarınızı tek yerden yönetin</p>
+          </div>
+        </div>
+        <KPICardsSkeleton count={4} />
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+          <div className="xl:col-span-2"><ChartSkeleton /></div>
+          <ChartSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-500 font-medium">{error}</p>
+        <Button onClick={handleRefresh} variant="outline" size="sm">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Tekrar Dene
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -634,10 +721,20 @@ export default function SocialMediaPage() {
             Tüm sosyal medya hesaplarınızı tek yerden yönetin
           </p>
         </div>
-        <Button className="h-9 px-4 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-medium">
-          <Plus className="w-4 h-4 mr-2" />
-          Yeni Gönderi
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="h-9 gap-2" onClick={handleRefresh}>
+            <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
+            Yenile
+          </Button>
+          <Button variant="outline" size="sm" className="h-9 gap-2">
+            <Download className="w-4 h-4" />
+            Dışa Aktar
+          </Button>
+          <Button className="h-9 px-4 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-sm font-medium">
+            <Plus className="w-4 h-4 mr-2" />
+            Yeni Gönderi
+          </Button>
+        </div>
       </div>
 
       {/* ═══ Platform Account Cards ════════════════════ */}
@@ -793,6 +890,60 @@ export default function SocialMediaPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ═══ Follower Growth Chart ═════════════════════ */}
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg font-bold text-[#0F172A] flex items-center gap-2">
+                <Users className="w-5 h-5 text-[#7C3AED]" />
+                Takipçi Büyümesi
+              </CardTitle>
+              <p className="text-xs text-[#94A3B8] mt-0.5">Aylık takipçi artışı - Tüm platformlar</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#E4405F]" />
+                <span className="text-xs text-[#475569]">Instagram</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1877F2]" />
+                <span className="text-xs text-[#475569]">Facebook</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#000000]" />
+                <span className="text-xs text-[#475569]">TikTok</span>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={mockFollowerGrowthData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+              <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={{ stroke: "#E2E8F0" }} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#FFFFFF",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.10)",
+                  padding: "12px",
+                }}
+                labelStyle={{ fontSize: 12, fontWeight: 600, color: "#0F172A", marginBottom: 4 }}
+                itemStyle={{ fontSize: 12 }}
+              />
+              <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+              <Line type="monotone" dataKey="instagram" name="Instagram" stroke="#E4405F" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="facebook" name="Facebook" stroke="#1877F2" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="tiktok" name="TikTok" stroke="#000000" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="twitter" name="Twitter" stroke="#1DA1F2" strokeWidth={2} dot={{ r: 3 }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
 
       {/* ═══ Competitor Tracking ═══════════════════════ */}
       <Card>

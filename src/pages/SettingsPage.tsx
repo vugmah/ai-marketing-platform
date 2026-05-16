@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Settings,
   Bell,
@@ -31,6 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 // ─── Inline Mock Data ────────────────────────────────────
 
@@ -106,6 +107,29 @@ const currencies = ["AZN", "USD", "EUR", "TRY"];
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
+  const [loading, setLoading] = useState(true);
+
+  // Load settings from API
+  useEffect(() => {
+    let mounted = true;
+    async function loadData() {
+      try {
+        setLoading(true);
+        await Promise.all([
+          api.settings.get(),
+          api.settings.integrations(),
+          api.settings.apiKeys(),
+          api.settings.sessions(),
+        ]);
+      } catch (err) {
+        if (mounted) console.error("Ayarlar yüklenemedi:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    loadData();
+    return () => { mounted = false; };
+  }, []);
   const [companyName, setCompanyName] = useState("FoodFlow Azerbaijan");
   const [language, setLanguage] = useState("Türkçe");
   const [timezone, setTimezone] = useState("UTC+04:00 (Bakü)");

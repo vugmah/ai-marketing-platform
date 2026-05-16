@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Wallet,
   Target,
@@ -20,6 +20,8 @@ import {
   Trash2,
   TrendingUp,
   BarChart3,
+  RefreshCw,
+  Download,
 } from "lucide-react";
 import {
   BarChart,
@@ -37,6 +39,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
+import { KPICardsSkeleton, ChartSkeleton, AlertListSkeleton } from "@/components/LoadingSkeleton";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -194,6 +198,83 @@ function KPICard({ title, value, change, icon: Icon, iconBg, iconColor, delay }:
 export default function AdsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [overviewData, setOverviewData] = useState({
+    total_spent: 54600,
+    avg_roas: 3.5,
+    total_impressions: 62600,
+    total_clicks: 4100,
+  });
+  const [campaigns, setCampaigns] = useState(mockCampaigns);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Load overview and campaigns from API
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function loadData() {
+    setLoading(true);
+    setError(null);
+    try {
+      const [overviewRes, campaignsRes] = await Promise.all([
+        api.ads.overview(),
+        api.ads.campaigns(),
+      ]);
+      if (overviewRes.success && overviewRes.data) {
+        setOverviewData(overviewRes.data as any);
+      }
+      if (campaignsRes.success && campaignsRes.data) {
+        setCampaigns(campaignsRes.data as any[]);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Veriler yüklenemedi");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  }
+
+  // Loading skeleton state
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-[28px] font-bold text-[#0F172A] tracking-tight">Reklam Yönetimi</h1>
+            <p className="text-sm text-[#475569] mt-0.5">Tüm reklam kampanyalarınızı tek yerden yönetin</p>
+          </div>
+          <Skeleton className="w-36 h-10 rounded-lg" />
+        </div>
+        <KPICardsSkeleton count={4} />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <ChartSkeleton />
+          <AlertListSkeleton count={4} />
+        </div>
+        <style>{`@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}.animate-fade-in{animation:fadeIn .5s ease-out}.animate-fade-in-up{animation:fadeInUp .5s cubic-bezier(.16,1,.3,1)}`}</style>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-500 font-medium">{error}</p>
+        <Button onClick={handleRefresh} variant="outline" size="sm">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Tekrar Dene
+        </Button>
+      </div>
+    );
+  }
 
   const filteredCampaigns = campaigns.filter((c) => {
     const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -214,10 +295,20 @@ export default function AdsPage() {
           <h1 className="text-[28px] font-bold text-[#0F172A] tracking-tight">Reklam Yönetimi</h1>
           <p className="text-sm text-[#475569] mt-0.5">Tüm reklam kampanyalarınızı tek yerden yönetin</p>
         </div>
-        <Button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-10 px-4 gap-2">
-          <Plus className="w-4 h-4" />
-          Kampanya Oluştur
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="h-10 gap-2" onClick={handleRefresh}>
+            <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
+            Yenile
+          </Button>
+          <Button variant="outline" size="sm" className="h-10 gap-2">
+            <Download className="w-4 h-4" />
+            Dışa Aktar
+          </Button>
+          <Button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-10 px-4 gap-2">
+            <Plus className="w-4 h-4" />
+            Kampanya Oluştur
+          </Button>
+        </div>
       </div>
 
       {/* ═══ KPI Cards ══════════════════════════════════════ */}

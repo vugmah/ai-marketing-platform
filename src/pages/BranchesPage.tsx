@@ -14,6 +14,8 @@ import {
   Eye,
   Power,
   Trash2,
+  RefreshCw,
+  Download,
 } from "lucide-react";
 import {
   BarChart,
@@ -28,6 +30,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { KPICardsSkeleton, ChartSkeleton, CardListSkeleton } from "@/components/LoadingSkeleton";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
 
@@ -130,35 +133,36 @@ export default function BranchesPage() {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   // Fetch branches from real API
-  useEffect(() => {
-    async function fetchBranches() {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await api.branches.list();
-        if (res.success && res.data) {
-          // Map backend branch format to frontend format
-          const mapped = res.data.map((b: any) => ({
-            id: b.id.toString(),
-            name: b.name,
-            city: b.city,
-            type: b.type === "restaurant" ? "Restoran" : b.type === "cafe" ? "Kafe" : b.type === "retail" ? "Perakende" : "Diğer",
-            revenue: b.monthly_revenue_target || 0,
-            orders: b.daily_order_target || 0,
-            rating: 4.0, // placeholder until backend has ratings
-            status: b.status as "active" | "inactive" | "pending",
-            manager: b.manager_name || "Belirtilmemiş",
-            phone: b.manager_phone || "-",
-          }));
-          setBranches(mapped);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Şubeler yüklenemedi");
-      } finally {
-        setLoading(false);
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await api.branches.list();
+      if (res.success && res.data) {
+        // Map backend branch format to frontend format
+        const mapped = res.data.map((b: any) => ({
+          id: b.id.toString(),
+          name: b.name,
+          city: b.city,
+          type: b.type === "restaurant" ? "Restoran" : b.type === "cafe" ? "Kafe" : b.type === "retail" ? "Perakende" : "Diğer",
+          revenue: b.monthly_revenue_target || 0,
+          orders: b.daily_order_target || 0,
+          rating: 4.0, // placeholder until backend has ratings
+          status: b.status as "active" | "inactive" | "pending",
+          manager: b.manager_name || "Belirtilmemiş",
+          phone: b.manager_phone || "-",
+        }));
+        setBranches(mapped);
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Şubeler yüklenemedi");
+    } finally {
+      setLoading(false);
     }
-    fetchBranches();
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   // Generate chart data dynamically from fetched branches
@@ -186,11 +190,19 @@ export default function BranchesPage() {
   const inactiveCount = branches.filter((b) => b.status === "inactive").length;
   const pendingCount = branches.filter((b) => b.status === "pending").length;
 
-  // Loading state
+  // Loading skeleton state
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin h-8 w-8 border-2 border-blue-500 border-t-transparent rounded-full" />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-[28px] font-bold text-[#0F172A] tracking-tight">Şube Yönetimi</h1>
+            <p className="text-sm text-[#475569] mt-0.5">Tüm şubelerinizi yönetin ve performanslarını izleyin</p>
+          </div>
+        </div>
+        <KPICardsSkeleton count={4} />
+        <ChartSkeleton />
+        <CardListSkeleton />
       </div>
     );
   }
@@ -198,8 +210,12 @@ export default function BranchesPage() {
   // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center h-64 text-red-500">
-        {error}
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <p className="text-red-500 font-medium">{error}</p>
+        <Button onClick={() => { loadData(); }} variant="outline" size="sm">
+          <RefreshCw className="w-4 h-4 mr-2" />
+          Tekrar Dene
+        </Button>
       </div>
     );
   }
@@ -212,10 +228,20 @@ export default function BranchesPage() {
           <h1 className="text-[28px] font-bold text-[#0F172A] tracking-tight">Şube Yönetimi</h1>
           <p className="text-sm text-[#475569] mt-0.5">Tüm şubelerinizi yönetin ve performanslarını izleyin</p>
         </div>
-        <Button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-9 gap-2">
-          <Store className="w-4 h-4" />
-          Yeni Şube Ekle
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="h-9 gap-2" onClick={() => { loadData(); }}>
+            <RefreshCw className="w-4 h-4" />
+            Yenile
+          </Button>
+          <Button variant="outline" size="sm" className="h-9 gap-2">
+            <Download className="w-4 h-4" />
+            Dışa Aktar
+          </Button>
+          <Button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-9 gap-2">
+            <Store className="w-4 h-4" />
+            Yeni Şube Ekle
+          </Button>
+        </div>
       </div>
 
       {/* ═══ KPI Cards ══════════════════════════════════ */}

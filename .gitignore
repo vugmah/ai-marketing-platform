@@ -6,4 +6,15 @@ dist
 .env.local
 __pycache__/
 *.pyc
-__pycache__/
+
+# === BETA AGENT 1 - Eklenen entry'ler ===
+.pytest_cache/
+*.egg-info/
+.coverage
+htmlcov/
+.mypy_cache/
+.tox/
+.hypothesis/
+*.log
+logs/
+*.sqlite3

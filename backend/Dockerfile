@@ -1,19 +1,24 @@
+# AI Marketing Platform v2.0 - Backend Dockerfile
 FROM python:3.12-slim
 
 WORKDIR /app
 
-# Install system dependencies for MySQL and build tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    default-libmysqlclient-dev \
-    pkg-config \
+    default-libmysqlclient-dev curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY backend/ .
+
+RUN groupadd --gid 1000 aimp && \
+    useradd --uid 1000 --gid aimp --shell /bin/false --create-home aimp
+USER aimp
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
+    CMD curl -fsS http://localhost:8000/api/v2/health/live || exit 1
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers 2

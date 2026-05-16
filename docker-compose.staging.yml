@@ -1,0 +1,175 @@
+# AI Marketing Platform v2.0 - Staging Environment
+# Usage: docker compose -f docker-compose.staging.yml up -d
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: aimp_staging_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-staging_root_2024}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-aimp_staging}
+      MYSQL_USER: ${MYSQL_USER:-aimp_staging}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-staging_db_pass_2024}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_staging_data:/var/lib/mysql
+      - ./backend/init-scripts:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - aimp_staging
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb_buffer_pool_size=256M
+      --max_connections=200
+
+  redis:
+    image: redis:7-alpine
+    container_name: aimp_staging_redis
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_staging_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - aimp_staging
+
+  minio:
+    image: minio/minio:latest
+    container_name: aimp_staging_minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-staging_minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-staging_minio_secret}
+    ports:
+      - "9001:9000"
+      - "9002:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_staging_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - aimp_staging
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aimp_staging_backend
+    env_file:
+      - .env.staging
+    ports:
+      - "8001:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v2/health/db"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - aimp_staging
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aimp_staging_celery
+    command: celery -A app.celery_app worker --loglevel=info --concurrency=2
+    env_file:
+      - .env.staging
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.celery_app inspect ping -d celery@aimp_staging_celery || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - aimp_staging
+
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aimp_staging_beat
+    command: celery -A app.celery_app beat --loglevel=info
+    env_file:
+      - .env.staging
+    depends_on:
+      - celery_worker
+    networks:
+      - aimp_staging
+
+  nginx:
+    image: nginx:alpine
+    container_name: aimp_staging_nginx
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx/staging.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - aimp_staging
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: aimp_staging_prometheus
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus-staging.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_staging_data:/prometheus
+    networks:
+      - aimp_staging
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: aimp_staging_grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRANA_ADMIN_PASSWORD:-staging_grafana}
+    volumes:
+      - grafana_staging_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - aimp_staging
+
+volumes:
+  mysql_staging_data:
+  redis_staging_data:
+  minio_staging_data:
+  prometheus_staging_data:
+  grafana_staging_data:
+
+networks:
+  aimp_staging:
+    driver: bridge

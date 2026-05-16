@@ -1,541 +1,980 @@
 /**
- * Real API Client - AI Marketing Platform v2.0
- * Connects to FastAPI backend with JWT auth, RBAC, tenant isolation
+ * Unified API client with interceptors, retry logic, and mock fallback.
+ * All endpoints target the real backend at /api/v2 by default.
+ * Set VITE_USE_MOCK=true to fall back to local mock data.
  */
 
-// ─── Configuration ────────────────────────────────────────────────
+import {
+  mockAuthUser,
+  mockBranchList,
+  mockStats,
+  mockChartData,
+  mockRecentOrders,
+  mockRevenueBreakdown,
+  mockBestProducts,
+  mockSalesComparison,
+  mockEmployeePerformance,
+  mockSystemHealth,
+  mockAuditLogs,
+  mockSavedReports,
+  mockExportHistory,
+  mockWeeklyRevenue,
+  mockMonthlyRevenue,
+  mockCustomerGrowth,
+  mockTopCustomers,
+  mockDigitalCampaigns,
+  mockSocialAccounts,
+  mockGoogleRankingData,
+  mockBacklinkData,
+  mockPageSpeedData,
+  mockBehaviorFlowData,
+  mockDemographicData,
+  mockCustomEventsData,
+  mockAlerts,
+  mockFinancialOverview,
+  mockInventoryStockData,
+  mockSupplierData,
+  mockInvoicesData,
+  mockCompanyList,
+} from "./mockApi";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true' || false;
+// ═══════════════════════════════════════════════════════════════════════════════
+// ENV CONFIG
+// ═══════════════════════════════════════════════════════════════════════════════
 
-// ─── Types ────────────────────────────────────────────────────────
+// Mock fallback: only enabled in development mode AND when VITE_USE_MOCK=true
+// Production builds always use the real API regardless of env vars
+const USE_MOCK = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v2";
 
-export interface ApiResponse<T> {
+// ═══════════════════════════════════════════════════════════════════════════════
+// RETRY + FETCH WITH TIMEOUT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const MAX_RETRIES = 3;
+const INITIAL_BACKOFF_MS = 300;
+const REQUEST_TIMEOUT_MS = 15000;
+
+interface RequestOptions {
+  method?: string;
+  headers?: Record<string, string>;
+  body?: string;
+}
+
+async function fetchWithTimeout(
+  url: string,
+  opts: RequestOptions,
+  timeoutMs: number
+): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      controller.abort();
+      reject(new Error("İstek zaman aşımına uğradı (15s)"));
+    }, timeoutMs);
+
+    fetch(url, { ...opts, signal: controller.signal })
+      .then((res) => {
+        clearTimeout(timer);
+        resolve(res);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
+async function requestWithRetry<T>(
+  endpoint: string,
+  opts: RequestOptions = {}
+): Promise<ApiResponse<T>> {
+  const url = `${API_BASE}${endpoint}`;
+  const method = opts.method || "GET";
+
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      // Exponential backoff
+      if (attempt > 0) {
+        const delay = INITIAL_BACKOFF_MS * Math.pow(2, attempt - 1);
+        await new Promise((r) => setTimeout(r, delay));
+        console.warn(`[API] Retry ${attempt + 1}/${MAX_RETRIES} for ${method} ${endpoint}`);
+      }
+
+      const token = localStorage.getItem("token");
+      const defaultHeaders: Record<string, string> = {
+        Accept: "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(opts.body ? { "Content-Type": "application/json" } : {}),
+        ...opts.headers,
+      };
+
+      const res = await fetchWithTimeout(url, { ...opts, headers: defaultHeaders }, REQUEST_TIMEOUT_MS);
+
+      // 401 Unauthorized → redirect to login
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+        return { success: false, message: "Oturum süresi doldu, lütfen tekrar giriş yapın." };
+      }
+
+      // 403 Forbidden
+      if (res.status === 403) {
+        return { success: false, message: "Bu işlem için yetkiniz yok." };
+      }
+
+      // 404 Not Found
+      if (res.status === 404) {
+        return { success: false, message: "İstenen kaynak bulunamadı." };
+      }
+
+      // 500+ errors → trigger retry
+      if (res.status >= 500) {
+        const text = await res.text().catch(() => "");
+        lastError = new Error(`HTTP ${res.status}: ${text}`);
+        continue; // retry
+      }
+
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        return {
+          success: false,
+          message: json.message || json.detail || `HTTP ${res.status}`,
+        };
+      }
+
+      return json as ApiResponse<T>;
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      // Network errors → retry; abort errors → don't retry
+      if (lastError.name === "AbortError") {
+        break;
+      }
+    }
+  }
+
+  const msg = lastError?.message || "Bağlantı hatası";
+  console.error(`[API] ${method} ${endpoint} failed after ${MAX_RETRIES} attempts:`, msg);
+  return { success: false, message: `Bağlantı hatası: ${msg}` };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RESPONSE TYPE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export interface ApiResponse<T = unknown> {
   success: boolean;
-  data: T;
+  data?: T;
   message?: string;
   total?: number;
-  page?: number;
-  page_size?: number;
+  unread_count?: number;
 }
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
+// ═══════════════════════════════════════════════════════════════════════════════
+// MOCK FALLBACK (DEV ONLY)
+// ═══════════════════════════════════════════════════════════════════════════════
 
-export interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  expires_in: number;
-  user: User;
-}
-
-export interface RefreshRequest {
-  refresh_token: string;
-}
-
-export interface User {
-  id: number;
-  email: string;
-  full_name: string;
-  role: 'super_admin' | 'company_admin' | 'branch_manager' | 'marketing_manager' | 'support_agent' | 'analyst';
-  status: 'active' | 'inactive' | 'pending';
-  company_id?: number;
-  branch_id?: number;
-  avatar_url?: string;
-  created_at: string;
-}
-
-export interface Company {
-  id: number;
-  name: string;
-  slug: string;
-  industry: string;
-  status: 'active' | 'inactive' | 'suspended';
-  subscription_tier: 'starter' | 'pro' | 'enterprise' | 'custom';
-  max_branches: number;
-  max_users: number;
-  contact_email: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Branch {
-  id: number;
-  name: string;
-  company_id: number;
-  city: string;
-  address: string;
-  phone: string;
-  status: 'active' | 'inactive';
-  manager_name: string;
-  created_at: string;
-  updated_at: string;
-}
-
-// ─── HTTP Client ──────────────────────────────────────────────────
-
-class ApiError extends Error {
-  constructor(
-    public status: number,
-    message: string,
-    public code?: string
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
-
-async function request<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
+/** Wraps real API call; falls back to mock in dev when USE_MOCK=true */
+async function withMockFallback<T>(
+  realCall: () => Promise<ApiResponse<T>>,
+  mockCall: () => Promise<ApiResponse<T>>
+): Promise<ApiResponse<T>> {
   if (USE_MOCK) {
-    console.warn(`[MOCK] ${options.method || 'GET'} ${endpoint}`);
-    return mockRequest<T>(endpoint, options);
+    console.log("[MOCK] Using mock data for", mockCall.name || "endpoint");
+    return mockCall();
   }
+  return realCall();
+}
 
-  const url = `${API_BASE_URL}${endpoint}`;
-  const token = localStorage.getItem('access_token');
+// ═══════════════════════════════════════════════════════════════════════════════
+// AUTH API
+// ═══════════════════════════════════════════════════════════════════════════════
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-    ...((options.headers as Record<string, string>) || {}),
-  };
-
-  const response = await fetch(url, {
-    ...options,
-    headers,
+async function loginReal(
+  email: string,
+  password: string
+): Promise<ApiResponse<{ token: string; user: any }>> {
+  return requestWithRetry("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new ApiError(
-      response.status,
-      error.detail || error.message || `HTTP ${response.status}`,
-      error.code
-    );
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return response.json() as T;
 }
 
-// ─── Mock Fallback ────────────────────────────────────────────────
-
-async function mockRequest<T>(endpoint: string, options: RequestInit): Promise<T> {
-  await new Promise((r) => setTimeout(r, 300));
-
-  const method = options.method || 'GET';
-  const body = options.body ? JSON.parse(options.body as string) : {};
-
-  // Auth endpoints
-  if (endpoint === '/api/v2/auth/login' && method === 'POST') {
-    return mockApi.login(body.email, body.password) as unknown as T;
-  }
-  if (endpoint === '/api/v2/auth/register' && method === 'POST') {
-    return mockApi.register(body) as unknown as T;
-  }
-  if (endpoint === '/api/v2/auth/refresh' && method === 'POST') {
-    return mockApi.refreshToken(body.refresh_token) as unknown as T;
-  }
-  if (endpoint === '/api/v2/auth/me' && method === 'GET') {
-    return mockApi.me() as unknown as T;
-  }
-  if (endpoint === '/api/v2/auth/logout' && method === 'POST') {
-    return mockApi.logout() as unknown as T;
-  }
-
-  // Company endpoints
-  if (endpoint === '/api/v2/companies' && method === 'GET') {
-    return mockApi.getCompanies() as unknown as T;
-  }
-  if (endpoint === '/api/v2/companies' && method === 'POST') {
-    return mockApi.createCompany(body) as unknown as T;
-  }
-  if (endpoint.match(/\/api\/v2\/companies\/\d+$/) && method === 'GET') {
-    const id = parseInt(endpoint.split('/').pop()!);
-    return mockApi.getCompany(id) as unknown as T;
-  }
-
-  // Branch endpoints
-  if (endpoint === '/api/v2/branches' && method === 'GET') {
-    return mockApi.getBranches() as unknown as T;
-  }
-  if (endpoint === '/api/v2/branches' && method === 'POST') {
-    return mockApi.createBranch(body) as unknown as T;
-  }
-
-  // Dashboard endpoints
-  if (endpoint === '/api/v2/dashboard/stats' && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        total_companies: 12,
-        total_branches: 8,
-        total_users: 45,
-        active_campaigns: 6,
-        revenue_this_month: 124580,
-        engagement_rate: 4.6,
-      },
-    } as unknown as T;
-  }
-  if (endpoint === '/api/v2/dashboard/chart' && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        labels: ['1 Oca', '5 Oca', '10 Oca', '15 Oca', '20 Oca', '25 Oca', '30 Oca'],
-        revenue: [32000, 28000, 35000, 42000, 38000, 45000, 48000],
-        orders: [120, 95, 140, 165, 130, 180, 195],
-        engagement: [3.2, 3.8, 4.1, 4.5, 4.2, 4.8, 5.1],
-        roas: [2.8, 3.0, 3.2, 3.5, 3.1, 3.4, 3.6],
-      },
-    } as unknown as T;
-  }
-  if (endpoint === '/api/v2/dashboard/alerts' && method === 'GET') {
-    return {
-      success: true,
-      data: [
-        { id: '1', type: 'error' as const, title: 'Bütçe Limiti Aşıldı', message: 'Günlük reklam bütçeniz %85 oranında kullanıldı.', created_at: '10 dk önce' },
-        { id: '2', type: 'warning' as const, title: 'Düşük Etkileşim', message: 'Son 3 paylaşımınız ortalamanın altında performans gösteriyor.', created_at: '35 dk önce' },
-        { id: '3', type: 'info' as const, title: 'Yeni Rapor Hazır', message: 'Aylık performans raporunuz oluşturuldu.', created_at: '2 saat önce' },
-        { id: '4', type: 'success' as const, title: 'Kampanya Tamamlandı', message: "Yılbaşı kampanyası başarıyla tamamlandı. ROAS: 4.2x", created_at: '5 saat önce' },
-      ],
-    } as unknown as T;
-  }
-
-  // Notifications endpoint
-  if (endpoint === '/api/v2/notifications' && method === 'GET') {
-    return {
-      success: true,
-      data: [
-        { id: '1', type: 'error' as const, title: 'Bütçe Limiti Aşıldı', message: 'Günlük reklam bütçeniz %85 oranında kullanıldı.', created_at: '10 dk önce' },
-        { id: '2', type: 'warning' as const, title: 'Düşük Etkileşim', message: 'Son 3 paylaşımınız ortalamanın altında performans gösteriyor.', created_at: '35 dk önce' },
-        { id: '3', type: 'info' as const, title: 'Yeni Rapor Hazır', message: 'Aylık performans raporunuz oluşturuldu.', created_at: '2 saat önce' },
-        { id: '4', type: 'success' as const, title: 'Kampanya Tamamlandı', message: "Yılbaşı kampanyası başarıyla tamamlandı. ROAS: 4.2x", created_at: '5 saat önce' },
-      ],
-      unread_count: 4,
-    } as unknown as T;
-  }
-
-  // Health endpoints
-  if (endpoint === '/api/health') {
-    return { status: 'ok', version: '2.0.0-mock' } as T;
-  }
-  if (endpoint === '/api/health/db') {
-    return { status: 'ok', db: 'connected (mock)' } as T;
-  }
-  if (endpoint === '/api/health/redis') {
-    return { status: 'ok', redis: 'connected (mock)' } as T;
-  }
-
-  // Dashboard endpoints
-  if (endpoint === '/api/v1/dashboard/stats' && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        total_companies: 12,
-        total_branches: 8,
-        total_users: 45,
-        active_campaigns: 6,
-        revenue_this_month: 124580,
-        engagement_rate: 4.6,
-      },
-    } as unknown as T;
-  }
-  if (endpoint === '/api/v1/dashboard/chart' && method === 'GET') {
-    return {
-      success: true,
-      data: {
-        labels: ['1 Oca', '5 Oca', '10 Oca', '15 Oca', '20 Oca', '25 Oca', '30 Oca'],
-        revenue: [32000, 28000, 35000, 42000, 38000, 45000, 48000],
-        orders: [120, 95, 140, 165, 130, 180, 195],
-        engagement: [3.2, 3.8, 4.1, 4.5, 4.2, 4.8, 5.1],
-        roas: [2.8, 3.0, 3.2, 3.5, 3.1, 3.4, 3.6],
-      },
-    } as unknown as T;
-  }
-  if (endpoint === '/api/v1/dashboard/alerts' && method === 'GET') {
-    return {
-      success: true,
-      data: [
-        { id: '1', type: 'error' as const, title: 'Bütçe Limiti Aşıldı', message: 'Günlük reklam bütçeniz %85 oranında kullanıldı.', created_at: '10 dk önce' },
-        { id: '2', type: 'warning' as const, title: 'Düşük Etkileşim', message: 'Son 3 paylaşımınız ortalamanın altında performans gösteriyor.', created_at: '35 dk önce' },
-        { id: '3', type: 'info' as const, title: 'Yeni Rapor Hazır', message: 'Aylık performans raporunuz oluşturuldu.', created_at: '2 saat önce' },
-        { id: '4', type: 'success' as const, title: 'Kampanya Tamamlandı', message: "Yılbaşı kampanyası başarıyla tamamlandı. ROAS: 4.2x", created_at: '5 saat önce' },
-      ],
-    } as unknown as T;
-  }
-
-  // Notifications endpoint
-  if (endpoint === '/api/v1/notifications' && method === 'GET') {
-    return {
-      success: true,
-      data: [
-        { id: '1', type: 'error' as const, title: 'Bütçe Limiti Aşıldı', message: 'Günlük reklam bütçeniz %85 oranında kullanıldı.', created_at: '10 dk önce' },
-        { id: '2', type: 'warning' as const, title: 'Düşük Etkileşim', message: 'Son 3 paylaşımınız ortalamanın altında performans gösteriyor.', created_at: '35 dk önce' },
-        { id: '3', type: 'info' as const, title: 'Yeni Rapor Hazır', message: 'Aylık performans raporunuz oluşturuldu.', created_at: '2 saat önce' },
-        { id: '4', type: 'success' as const, title: 'Kampanya Tamamlandı', message: "Yılbaşı kampanyası başarıyla tamamlandı. ROAS: 4.2x", created_at: '5 saat önce' },
-      ],
-      unread_count: 4,
-    } as unknown as T;
-  }
-
-  // Auth endpoints - simple mock responses
-  if (endpoint === '/api/v2/auth/login' && method === 'POST') {
-    return {
-      access_token: 'mock-token',
-      refresh_token: 'mock-refresh',
-      token_type: 'bearer',
-      expires_in: 3600,
-      user: { id: 1, email: 'admin@example.com', full_name: 'Admin User', role: 'super_admin', status: 'active', created_at: new Date().toISOString() },
-    } as unknown as T;
-  }
-  if (endpoint === '/api/v2/auth/me' && method === 'GET') {
-    return {
-      success: true,
-      data: { id: 1, email: 'admin@example.com', full_name: 'Admin User', role: 'super_admin', status: 'active', created_at: new Date().toISOString() },
-    } as unknown as T;
-  }
-  if (endpoint === '/api/v2/auth/logout' && method === 'POST') {
-    return undefined as T;
-  }
-
-  // Company endpoints
-  if (endpoint === '/api/v2/companies' && method === 'GET') {
-    return { success: true, data: [] } as unknown as T;
-  }
-
-  // Branch endpoints
-  if (endpoint === '/api/v2/branches' && method === 'GET') {
-    return { success: true, data: [] } as unknown as T;
-  }
-
-  throw new ApiError(404, `Mock endpoint not found: ${method} ${endpoint}`);
+async function meReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/auth/me");
 }
 
-// ─── API Methods ──────────────────────────────────────────────────
+async function registerReal(payload: { email: string; password: string; name: string; company_name: string }): Promise<ApiResponse<any>> {
+  return requestWithRetry("/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
 
-export const api = {
-  // ── Auth ──────────────────────────────────────────────────────
-  auth: {
-    login: (data: LoginRequest) =>
-      request<LoginResponse>('/api/v2/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+// ═══════════════════════════════════════════════════════════════════════════════
+// DASHBOARD API
+// ═══════════════════════════════════════════════════════════════════════════════
 
-    register: (data: {
-      email: string;
-      password: string;
-      full_name: string;
-      role?: string;
-      company_id?: number;
-      branch_id?: number;
-    }) =>
-      request<ApiResponse<User>>('/api/v2/auth/register', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+async function statsReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/dashboard/summary");
+}
 
-    refresh: (refresh_token: string) =>
-      request<LoginResponse>('/api/v2/auth/refresh', {
-        method: 'POST',
-        body: JSON.stringify({ refresh_token }),
-      }),
+async function chartReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/dashboard/chart");
+}
 
-    me: () => request<ApiResponse<User>>('/api/v2/auth/me'),
+async function alertsReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/dashboard/alerts");
+}
 
-    logout: () =>
-      request<void>('/api/v2/auth/logout', {
-        method: 'POST',
-      }),
-  },
+// ═══════════════════════════════════════════════════════════════════════════════
+// BRANCHES API
+// ═══════════════════════════════════════════════════════════════════════════════
 
-  // ── Companies ─────────────────────────────────────────────────
-  companies: {
-    list: (params?: { page?: number; page_size?: number; search?: string }) => {
-      const query = params
-        ? '?' +
-          Object.entries(params)
-            .filter(([, v]) => v !== undefined)
-            .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
-            .join('&')
-        : '';
-      return request<ApiResponse<Company[]>>(`/api/v2/companies${query}`);
-    },
+async function listBranchesReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/branches");
+}
 
-    get: (id: number) => request<ApiResponse<Company>>(`/api/v2/companies/${id}`),
+async function createBranchReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/branches", { method: "POST", body: JSON.stringify(payload) });
+}
 
-    create: (data: Partial<Company>) =>
-      request<ApiResponse<Company>>('/api/v2/companies', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+async function updateBranchReal(id: string, payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/branches/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+}
 
-    update: (id: number, data: Partial<Company>) =>
-      request<ApiResponse<Company>>(`/api/v2/companies/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      }),
+async function deleteBranchReal(id: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/branches/${id}`, { method: "DELETE" });
+}
 
-    delete: (id: number) =>
-      request<void>(`/api/v2/companies/${id}`, {
-        method: 'DELETE',
-      }),
-  },
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMPANIES API
+// ═══════════════════════════════════════════════════════════════════════════════
 
-  // ── Branches ──────────────────────────────────────────────────
-  branches: {
-    list: (params?: { company_id?: number; page?: number; page_size?: number }) => {
-      const query = params
-        ? '?' +
-          Object.entries(params)
-            .filter(([, v]) => v !== undefined)
-            .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
-            .join('&')
-        : '';
-      return request<ApiResponse<Branch[]>>(`/api/v2/branches${query}`);
-    },
+async function listCompaniesReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/companies");
+}
 
-    get: (id: number) => request<ApiResponse<Branch>>(`/api/v2/branches/${id}`),
+async function createCompanyReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/companies", { method: "POST", body: JSON.stringify(payload) });
+}
 
-    create: (data: Partial<Branch>) =>
-      request<ApiResponse<Branch>>('/api/v2/branches', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+async function updateCompanyReal(id: string, payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/companies/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+}
 
-    update: (id: number, data: Partial<Branch>) =>
-      request<ApiResponse<Branch>>(`/api/v2/branches/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      }),
+async function deleteCompanyReal(id: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/companies/${id}`, { method: "DELETE" });
+}
 
-    delete: (id: number) =>
-      request<void>(`/api/v2/branches/${id}`, {
-        method: 'DELETE',
-      }),
-  },
+// ═══════════════════════════════════════════════════════════════════════════════
+// NOTIFICATIONS API
+// ═══════════════════════════════════════════════════════════════════════════════
 
-  // ── Health ────────────────────────────────────────────────────
-  health: {
-    check: () => request<{ status: string; version?: string }>('/api/health'),
-    db: () => request<{ status: string; db?: string }>('/api/health/db'),
-    redis: () => request<{ status: string; redis?: string }>('/api/health/redis'),
-  },
+async function listNotificationsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/notifications");
+}
 
-  // ── Users ─────────────────────────────────────────────────────
-  users: {
-    list: (params?: { page?: number; page_size?: number; role?: string; status?: string }) => {
-      const query = params
-        ? '?' +
-          Object.entries(params)
-            .filter(([, v]) => v !== undefined)
-            .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
-            .join('&')
-        : '';
-      return request<ApiResponse<User[]>>(`/api/v2/users${query}`);
-    },
+async function markNotificationReadReal(id: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/notifications/${id}/read`, { method: "POST" });
+}
 
-    get: (id: number) => request<ApiResponse<User>>(`/api/v2/users/${id}`),
+// ═══════════════════════════════════════════════════════════════════════════════
+// ANALYTICS API
+// ═══════════════════════════════════════════════════════════════════════════════
 
-    create: (data: Partial<User> & { password: string }) =>
-      request<ApiResponse<User>>('/api/v2/users', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      }),
+async function analyticsOverviewReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/analytics/overview");
+}
 
-    update: (id: number, data: Partial<User>) =>
-      request<ApiResponse<User>>(`/api/v2/users/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      }),
+async function analyticsTrafficReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/analytics/traffic");
+}
 
-    updateRole: (id: number, role: string) =>
-      request<ApiResponse<User>>(`/api/v2/users/${id}/role`, {
-        method: 'PATCH',
-        body: JSON.stringify({ role }),
-      }),
+async function analyticsAudienceReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/analytics/audience");
+}
 
-    delete: (id: number) =>
-      request<void>(`/api/v2/users/${id}`, {
-        method: 'DELETE',
-      }),
-  },
+async function analyticsPagesReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/analytics/pages");
+}
 
-  // ── Dashboard ─────────────────────────────────────────────────
-  dashboard: {
-    stats: () =>
-      request<ApiResponse<{
-        total_companies: number;
-        total_branches: number;
-        total_users: number;
-        active_campaigns: number;
-        revenue_this_month: number;
-        engagement_rate: number;
-      }>>('/api/v2/dashboard/stats'),
+async function analyticsSourcesReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/analytics/sources");
+}
 
-    chart: () =>
-      request<ApiResponse<{
-        labels: string[];
-        revenue: number[];
-        orders: number[];
-        engagement: number[];
-        roas: number[];
-      }>>('/api/v2/dashboard/chart'),
+async function analyticsDevicesReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/analytics/devices");
+}
 
-    alerts: () =>
-      request<ApiResponse<Array<{
-        id: string;
-        type: 'warning' | 'error' | 'info' | 'success';
-        title: string;
-        message: string;
-        created_at: string;
-      }>>>('/api/v2/dashboard/alerts'),
-  },
+async function analyticsLocationsReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/analytics/locations");
+}
 
-  // ── Notifications ─────────────────────────────────────────────
-  notifications: {
-    list: () =>
-      request<ApiResponse<Array<{
-        id: string;
-        type: 'warning' | 'error' | 'info' | 'success';
-        title: string;
-        message: string;
-        created_at: string;
-      }>> & { unread_count?: number }>('/api/v1/notifications'),
-  },
-};
+async function generateCustomReportReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/analytics/custom-report", { method: "POST", body: JSON.stringify(payload) });
+}
 
-// ─── Token Helpers ────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADS API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function adsOverviewReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/ads/overview");
+}
+
+async function adsCampaignsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/ads/campaigns");
+}
+
+async function adsCreateCampaignReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/ads/campaigns", { method: "POST", body: JSON.stringify(payload) });
+}
+
+async function adsUpdateCampaignReal(id: string, payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/ads/campaigns/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+}
+
+async function adsDeleteCampaignReal(id: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/ads/campaigns/${id}`, { method: "DELETE" });
+}
+
+async function adsOptimizationTipsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/ads/optimization-tips");
+}
+
+async function adsSpendTrendReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/ads/spend-trend");
+}
+
+async function adsPlatformBreakdownReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/ads/platform-breakdown");
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SOCIAL MEDIA API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function socialAccountsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/social/accounts");
+}
+
+async function socialPostsReal(status?: string): Promise<ApiResponse<any[]>> {
+  const qs = status ? `?status=${status}` : "";
+  return requestWithRetry(`/social/posts${qs}`);
+}
+
+async function socialCreatePostReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/social/posts", { method: "POST", body: JSON.stringify(payload) });
+}
+
+async function socialEngagementReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/social/engagement");
+}
+
+async function socialCompetitorsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/social/competitors");
+}
+
+async function socialSchedulePostReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/social/schedule", { method: "POST", body: JSON.stringify(payload) });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// USERS API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function usersListReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/users");
+}
+
+async function usersCreateReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/users", { method: "POST", body: JSON.stringify(payload) });
+}
+
+async function usersUpdateReal(id: string, payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/users/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+}
+
+async function usersDeleteReal(id: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/users/${id}`, { method: "DELETE" });
+}
+
+async function usersInviteReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/users/invite", { method: "POST", body: JSON.stringify(payload) });
+}
+
+async function usersRolesReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/users/roles");
+}
+
+async function usersPermissionsReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/users/permissions");
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SUPPORT / CHAT INBOX API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function supportConversationsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/support/conversations");
+}
+
+async function supportMessagesReal(convId: string): Promise<ApiResponse<any[]>> {
+  return requestWithRetry(`/support/conversations/${convId}/messages`);
+}
+
+async function supportSendMessageReal(convId: string, payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/support/conversations/${convId}/messages`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+async function supportCloseConversationReal(convId: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/support/conversations/${convId}/close`, { method: "POST" });
+}
+
+async function supportAssignReal(convId: string, userId: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/support/conversations/${convId}/assign`, {
+    method: "POST",
+    body: JSON.stringify({ user_id: userId }),
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CREATIVE STUDIO API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function creativeFeaturesReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/creative/features");
+}
+
+async function creativeGeneratedContentReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/creative/generated-content");
+}
+
+async function creativeGenerateReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/creative/generate", { method: "POST", body: JSON.stringify(payload) });
+}
+
+async function creativeAuditReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/creative/audit");
+}
+
+async function creativeCalendarReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/creative/calendar");
+}
+
+async function creativeFormatsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/creative/formats");
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AI REPORTS API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function aiReportsOverviewReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/ai-reports/overview");
+}
+
+async function aiReportsTrendsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/ai-reports/trends");
+}
+
+async function aiReportsRecommendationsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/ai-reports/recommendations");
+}
+
+async function aiReportsForecastReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/ai-reports/revenue-forecast");
+}
+
+async function aiReportsHistoryReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/ai-reports/history");
+}
+
+async function aiReportsGenerateReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/ai-reports/generate", { method: "POST", body: JSON.stringify(payload) });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SETTINGS API
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function settingsGetReal(): Promise<ApiResponse<any>> {
+  return requestWithRetry("/settings");
+}
+
+async function settingsUpdateReal(payload: any): Promise<ApiResponse<any>> {
+  return requestWithRetry("/settings", { method: "PUT", body: JSON.stringify(payload) });
+}
+
+async function settingsIntegrationsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/settings/integrations");
+}
+
+async function settingsToggleIntegrationReal(id: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/settings/integrations/${id}/toggle`, { method: "POST" });
+}
+
+async function settingsApiKeysReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/settings/api-keys");
+}
+
+async function settingsSessionsReal(): Promise<ApiResponse<any[]>> {
+  return requestWithRetry("/settings/sessions");
+}
+
+async function settingsTerminateSessionReal(id: string): Promise<ApiResponse<any>> {
+  return requestWithRetry(`/settings/sessions/${id}/terminate`, { method: "POST" });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOKEN HELPER
+// ═══════════════════════════════════════════════════════════════════════════════
 
 export const token = {
-  get: () => localStorage.getItem('access_token'),
-  set: (t: string) => localStorage.setItem('access_token', t),
-  remove: () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-  },
-  isValid: () => {
-    const t = localStorage.getItem('access_token');
-    if (!t) return false;
-    try {
-      const payload = JSON.parse(atob(t.split('.')[1]));
-      return payload.exp * 1000 > Date.now();
-    } catch {
-      return false;
-    }
-  },
+  get: () => localStorage.getItem("token"),
+  set: (t: string) => localStorage.setItem("token", t),
+  remove: () => localStorage.removeItem("token"),
+  exists: () => !!localStorage.getItem("token"),
 };
 
-// ─── Export ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+// AUTH REFRESH
+// ═══════════════════════════════════════════════════════════════════════════════
 
-export default api;
+async function refreshTokenReal(refreshToken: string): Promise<ApiResponse<any>> {
+  return requestWithRetry("/auth/refresh", {
+    method: "POST",
+    body: JSON.stringify({ refresh_token: refreshToken }),
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// EXPORTED API OBJECT
+// ═══════════════════════════════════════════════════════════════════════════════
+
+export const api = {
+  // ── Auth ──────────────────────────────────────────────────────────────
+  auth: {
+    login: (email: string, password: string) =>
+      withMockFallback(() => loginReal(email, password), async () => ({
+        success: true,
+        data: { token: "mock-jwt-token", user: mockAuthUser },
+      })),
+    me: () =>
+      withMockFallback(() => meReal(), async () => ({
+        success: true,
+        data: mockAuthUser,
+      })),
+    register: (payload: { email: string; password: string; name: string; company_name: string }) =>
+      withMockFallback(() => registerReal(payload), async () => ({
+        success: true,
+        data: { token: "mock-jwt-token", user: mockAuthUser },
+      })),
+    refresh: (refreshToken: string) =>
+      withMockFallback(() => refreshTokenReal(refreshToken), async () => ({
+        success: true,
+        data: { access_token: "mock-jwt-token", refresh_token: "mock-refresh-token" },
+      })),
+  },
+
+  // ── Dashboard ─────────────────────────────────────────────────────────
+  dashboard: {
+    stats: () =>
+      withMockFallback(() => statsReal(), async () => ({
+        success: true,
+        data: mockStats,
+      })),
+    chart: () =>
+      withMockFallback(() => chartReal(), async () => ({
+        success: true,
+        data: mockChartData,
+      })),
+    alerts: () =>
+      withMockFallback(() => alertsReal(), async () => ({
+        success: true,
+        data: mockAlerts,
+      })),
+  },
+
+  // ── Branches ──────────────────────────────────────────────────────────
+  branches: {
+    list: () =>
+      withMockFallback(() => listBranchesReal(), async () => ({
+        success: true,
+        data: mockBranchList,
+      })),
+    create: (payload: any) =>
+      withMockFallback(() => createBranchReal(payload), async () => ({
+        success: true,
+        data: { id: Date.now(), ...payload },
+      })),
+    update: (id: string, payload: any) =>
+      withMockFallback(() => updateBranchReal(id, payload), async () => ({
+        success: true,
+        data: payload,
+      })),
+    delete: (id: string) =>
+      withMockFallback(() => deleteBranchReal(id), async () => ({
+        success: true,
+        data: { deleted: true },
+      })),
+  },
+
+  // ── Companies ─────────────────────────────────────────────────────────
+  companies: {
+    list: () =>
+      withMockFallback(() => listCompaniesReal(), async () => ({
+        success: true,
+        data: mockCompanyList,
+      })),
+    create: (payload: any) =>
+      withMockFallback(() => createCompanyReal(payload), async () => ({
+        success: true,
+        data: { id: Date.now(), ...payload },
+      })),
+    update: (id: string, payload: any) =>
+      withMockFallback(() => updateCompanyReal(id, payload), async () => ({
+        success: true,
+        data: payload,
+      })),
+    delete: (id: string) =>
+      withMockFallback(() => deleteCompanyReal(id), async () => ({
+        success: true,
+        data: { deleted: true },
+      })),
+  },
+
+  // ── Notifications ─────────────────────────────────────────────────────
+  notifications: {
+    list: () =>
+      withMockFallback(() => listNotificationsReal(), async () => ({
+        success: true,
+        data: mockAlerts,
+        unread_count: mockAlerts.length,
+      })),
+    markRead: (id: string) =>
+      withMockFallback(() => markNotificationReadReal(id), async () => ({
+        success: true,
+        data: { marked: true },
+      })),
+  },
+
+  // ── Analytics ─────────────────────────────────────────────────────────
+  analytics: {
+    overview: () =>
+      withMockFallback(() => analyticsOverviewReal(), async () => ({
+        success: true,
+        data: {
+          total_views: 45230,
+          avg_session: "3dk 42sn",
+          bounce_rate: 38.2,
+          unique_visitors: 12450,
+        },
+      })),
+    traffic: () =>
+      withMockFallback(() => analyticsTrafficReal(), async () => ({
+        success: true,
+        data: { visitorTrend: mockChartData, sources: mockRevenueBreakdown },
+      })),
+    audience: () =>
+      withMockFallback(() => analyticsAudienceReal(), async () => ({
+        success: true,
+        data: { devices: mockRevenueBreakdown, locations: mockBestProducts },
+      })),
+    pages: () =>
+      withMockFallback(() => analyticsPagesReal(), async () => ({
+        success: true,
+        data: mockBestProducts,
+      })),
+    sources: () =>
+      withMockFallback(() => analyticsSourcesReal(), async () => ({
+        success: true,
+        data: mockRevenueBreakdown,
+      })),
+    devices: () =>
+      withMockFallback(() => analyticsDevicesReal(), async () => ({
+        success: true,
+        data: mockRevenueBreakdown,
+      })),
+    locations: () =>
+      withMockFallback(() => analyticsLocationsReal(), async () => ({
+        success: true,
+        data: mockBestProducts,
+      })),
+    customReport: (payload: any) =>
+      withMockFallback(() => generateCustomReportReal(payload), async () => ({
+        success: true,
+        data: { report_id: Date.now() },
+      })),
+  },
+
+  // ── Ads ───────────────────────────────────────────────────────────────
+  ads: {
+    overview: () =>
+      withMockFallback(() => adsOverviewReal(), async () => ({
+        success: true,
+        data: {
+          total_spent: 54600,
+          avg_roas: 3.5,
+          total_impressions: 62600,
+          total_clicks: 4100,
+        },
+      })),
+    campaigns: () =>
+      withMockFallback(() => adsCampaignsReal(), async () => ({
+        success: true,
+        data: mockDigitalCampaigns,
+      })),
+    createCampaign: (payload: any) =>
+      withMockFallback(() => adsCreateCampaignReal(payload), async () => ({
+        success: true,
+        data: { id: Date.now(), ...payload },
+      })),
+    updateCampaign: (id: string, payload: any) =>
+      withMockFallback(() => adsUpdateCampaignReal(id, payload), async () => ({
+        success: true,
+        data: payload,
+      })),
+    deleteCampaign: (id: string) =>
+      withMockFallback(() => adsDeleteCampaignReal(id), async () => ({
+        success: true,
+        data: { deleted: true },
+      })),
+    optimizationTips: () =>
+      withMockFallback(() => adsOptimizationTipsReal(), async () => ({
+        success: true,
+        data: mockRecentOrders.slice(0, 4),
+      })),
+    spendTrend: () =>
+      withMockFallback(() => adsSpendTrendReal(), async () => ({
+        success: true,
+        data: mockChartData,
+      })),
+    platformBreakdown: () =>
+      withMockFallback(() => adsPlatformBreakdownReal(), async () => ({
+        success: true,
+        data: mockRevenueBreakdown,
+      })),
+  },
+
+  // ── Social Media ──────────────────────────────────────────────────────
+  social: {
+    accounts: () =>
+      withMockFallback(() => socialAccountsReal(), async () => ({
+        success: true,
+        data: mockSocialAccounts,
+      })),
+    posts: (status?: string) =>
+      withMockFallback(() => socialPostsReal(status), async () => ({
+        success: true,
+        data: mockRecentOrders,
+      })),
+    createPost: (payload: any) =>
+      withMockFallback(() => socialCreatePostReal(payload), async () => ({
+        success: true,
+        data: { id: Date.now(), ...payload },
+      })),
+    engagement: () =>
+      withMockFallback(() => socialEngagementReal(), async () => ({
+        success: true,
+        data: mockChartData,
+      })),
+    competitors: () =>
+      withMockFallback(() => socialCompetitorsReal(), async () => ({
+        success: true,
+        data: mockSocialAccounts,
+      })),
+    schedule: (payload: any) =>
+      withMockFallback(() => socialSchedulePostReal(payload), async () => ({
+        success: true,
+        data: { id: Date.now(), ...payload },
+      })),
+  },
+
+  // ── Users ─────────────────────────────────────────────────────────────
+  users: {
+    list: () =>
+      withMockFallback(() => usersListReal(), async () => ({
+        success: true,
+        data: mockEmployeePerformance,
+      })),
+    create: (payload: any) =>
+      withMockFallback(() => usersCreateReal(payload), async () => ({
+        success: true,
+        data: { id: Date.now(), ...payload },
+      })),
+    update: (id: string, payload: any) =>
+      withMockFallback(() => usersUpdateReal(id, payload), async () => ({
+        success: true,
+        data: payload,
+      })),
+    delete: (id: string) =>
+      withMockFallback(() => usersDeleteReal(id), async () => ({
+        success: true,
+        data: { deleted: true },
+      })),
+    invite: (payload: any) =>
+      withMockFallback(() => usersInviteReal(payload), async () => ({
+        success: true,
+        data: { invited: true },
+      })),
+    roles: () =>
+      withMockFallback(() => usersRolesReal(), async () => ({
+        success: true,
+        data: mockSystemHealth,
+      })),
+    permissions: () =>
+      withMockFallback(() => usersPermissionsReal(), async () => ({
+        success: true,
+        data: mockAuditLogs,
+      })),
+  },
+
+  // ── Support / Chat Inbox ──────────────────────────────────────────────
+  support: {
+    conversations: () =>
+      withMockFallback(() => supportConversationsReal(), async () => ({
+        success: true,
+        data: mockRecentOrders,
+      })),
+    messages: (convId: string) =>
+      withMockFallback(() => supportMessagesReal(convId), async () => ({
+        success: true,
+        data: mockRecentOrders,
+      })),
+    sendMessage: (convId: string, payload: any) =>
+      withMockFallback(() => supportSendMessageReal(convId, payload), async () => ({
+        success: true,
+        data: { id: Date.now(), ...payload },
+      })),
+    closeConversation: (convId: string) =>
+      withMockFallback(() => supportCloseConversationReal(convId), async () => ({
+        success: true,
+        data: { closed: true },
+      })),
+    assign: (convId: string, userId: string) =>
+      withMockFallback(() => supportAssignReal(convId, userId), async () => ({
+        success: true,
+        data: { assigned: true },
+      })),
+  },
+
+  // ── Creative Studio ───────────────────────────────────────────────────
+  creative: {
+    features: () =>
+      withMockFallback(() => creativeFeaturesReal(), async () => ({
+        success: true,
+        data: mockSystemHealth,
+      })),
+    generatedContent: () =>
+      withMockFallback(() => creativeGeneratedContentReal(), async () => ({
+        success: true,
+        data: mockRecentOrders,
+      })),
+    generate: (payload: any) =>
+      withMockFallback(() => creativeGenerateReal(payload), async () => ({
+        success: true,
+        data: { id: Date.now(), ...payload },
+      })),
+    audit: () =>
+      withMockFallback(() => creativeAuditReal(), async () => ({
+        success: true,
+        data: { score: 78 },
+      })),
+    calendar: () =>
+      withMockFallback(() => creativeCalendarReal(), async () => ({
+        success: true,
+        data: mockChartData,
+      })),
+    formats: () =>
+      withMockFallback(() => creativeFormatsReal(), async () => ({
+        success: true,
+        data: mockSystemHealth,
+      })),
+  },
+
+  // ── AI Reports ────────────────────────────────────────────────────────
+  aiReports: {
+    overview: () =>
+      withMockFallback(() => aiReportsOverviewReal(), async () => ({
+        success: true,
+        data: {
+          active_insights: 23,
+          revenue_forecast: "+18%",
+          forecast_roas: "3.2x",
+          pending_recommendations: 5,
+        },
+      })),
+    trends: () =>
+      withMockFallback(() => aiReportsTrendsReal(), async () => ({
+        success: true,
+        data: mockBestProducts,
+      })),
+    recommendations: () =>
+      withMockFallback(() => aiReportsRecommendationsReal(), async () => ({
+        success: true,
+        data: mockRecentOrders.slice(0, 3),
+      })),
+    forecast: () =>
+      withMockFallback(() => aiReportsForecastReal(), async () => ({
+        success: true,
+        data: mockChartData,
+      })),
+    history: () =>
+      withMockFallback(() => aiReportsHistoryReal(), async () => ({
+        success: true,
+        data: mockSavedReports,
+      })),
+    generate: (payload: any) =>
+      withMockFallback(() => aiReportsGenerateReal(payload), async () => ({
+        success: true,
+        data: { report_id: Date.now() },
+      })),
+  },
+
+  // ── Settings ──────────────────────────────────────────────────────────
+  settings: {
+    get: () =>
+      withMockFallback(() => settingsGetReal(), async () => ({
+        success: true,
+        data: mockSystemHealth,
+      })),
+    update: (payload: any) =>
+      withMockFallback(() => settingsUpdateReal(payload), async () => ({
+        success: true,
+        data: payload,
+      })),
+    integrations: () =>
+      withMockFallback(() => settingsIntegrationsReal(), async () => ({
+        success: true,
+        data: mockSystemHealth,
+      })),
+    toggleIntegration: (id: string) =>
+      withMockFallback(() => settingsToggleIntegrationReal(id), async () => ({
+        success: true,
+        data: { toggled: true },
+      })),
+    apiKeys: () =>
+      withMockFallback(() => settingsApiKeysReal(), async () => ({
+        success: true,
+        data: mockSystemHealth,
+      })),
+    sessions: () =>
+      withMockFallback(() => settingsSessionsReal(), async () => ({
+        success: true,
+        data: mockSystemHealth,
+      })),
+    terminateSession: (id: string) =>
+      withMockFallback(() => settingsTerminateSessionReal(id), async () => ({
+        success: true,
+        data: { terminated: true },
+      })),
+  },
+};

@@ -45,6 +45,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
+import { DashboardSkeleton } from "@/components/LoadingSkeleton";
 
 // ─── Local Types (previously from mockApi) ───────────────
 
@@ -571,13 +572,9 @@ export default function Dashboard() {
     []
   );
 
-  // Loading state
+  // Loading state: full skeleton layout
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="animate-spin h-8 w-8 text-gray-400" />
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   // Error state

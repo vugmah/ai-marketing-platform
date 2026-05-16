@@ -1,0 +1,134 @@
+# Prometheus configuration for AI Marketing Platform
+# Scrapes metrics from the backend API, infrastructure exporters, and
+# provides alerting rules for critical system conditions.
+#
+# Usage:
+#   docker run -p 9090:9090 -v $(pwd)/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml \
+#     -v $(pwd)/monitoring/rules:/etc/prometheus/rules \
+#     prom/prometheus
+#
+# Or via docker-compose:
+#   prometheus:
+#     image: prom/prometheus:latest
+#     volumes:
+#       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+#       - ./monitoring/rules:/etc/prometheus/rules:ro
+#       - prometheus_data:/prometheus
+#     ports:
+#       - "9090:9090"
+#     command:
+#       - '--config.file=/etc/prometheus/prometheus.yml'
+#       - '--storage.tsdb.path=/prometheus'
+#       - '--storage.tsdb.retention.time=15d'
+
+# ---------------------------------------------------------------------------
+# Global settings
+# ---------------------------------------------------------------------------
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'aimp-prod'
+    replica: '{{.ExternalURL}}'
+
+# ---------------------------------------------------------------------------
+# Alerting configuration
+# ---------------------------------------------------------------------------
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+      timeout: 10s
+      api_version: v2
+
+# ---------------------------------------------------------------------------
+# Recording rules (pre-aggregated queries for fast dashboards)
+# ---------------------------------------------------------------------------
+rule_files:
+  - /etc/prometheus/rules/recording_rules.yml
+  - /etc/prometheus/rules/alerting_rules.yml
+
+# ---------------------------------------------------------------------------
+# Scrape configurations
+# ---------------------------------------------------------------------------
+scrape_configs:
+
+  # --- Prometheus self-monitoring ---
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # --- AI Marketing Platform backend API ---
+  - job_name: "aimp-backend"
+    metrics_path: "/api/v2/health/metrics"
+    scheme: http
+    static_configs:
+      - targets:
+          - "backend:8000"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  # --- AI Marketing Platform Railway deployment ---
+  - job_name: "aimp-backend-railway"
+    metrics_path: "/api/v2/health/metrics"
+    scheme: https
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/railway-targets.json
+        refresh_interval: 5m
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+
+  # --- Redis exporter ---
+  - job_name: "redis"
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: "redis_(up|memory_used_bytes|connected_clients|commands_processed_total|keyspace_hits|keyspace_misses)"
+        action: keep
+
+  # --- MySQL exporter ---
+  - job_name: "mysql"
+    static_configs:
+      - targets: ["mysql-exporter:9104"]
+
+  # --- RabbitMQ built-in Prometheus plugin ---
+  - job_name: "rabbitmq"
+    static_configs:
+      - targets: ["rabbitmq:15692"]
+
+  # --- Node exporter (host metrics) ---
+  - job_name: "node"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+
+  # --- Celery exporter ---
+  - job_name: "celery"
+    static_configs:
+      - targets: ["celery-exporter:9808"]
+
+  # --- Blackbox exporter (HTTP probe for external APIs) ---
+  - job_name: "blackbox"
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+          - https://api.openai.com/v1/models
+          - https://graph.facebook.com/v18.0/me
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # --- Docker daemon metrics ---
+  - job_name: "docker"
+    static_configs:
+      - targets: ["host.docker.internal:9323"]

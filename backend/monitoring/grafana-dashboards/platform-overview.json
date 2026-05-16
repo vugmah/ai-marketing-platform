@@ -1,0 +1,471 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "aimp-platform-overview",
+    "title": "AI Marketing Platform - Overview",
+    "tags": ["aimp", "platform", "overview"],
+    "timezone": "utc",
+    "schemaVersion": 39,
+    "refresh": "15s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "templating": {
+      "list": [
+        {
+          "name": "environment",
+          "type": "custom",
+          "query": "production,staging,development",
+          "current": {
+            "text": "production",
+            "value": "production"
+          },
+          "hide": 0,
+          "includeAll": false
+        },
+        {
+          "name": "service",
+          "type": "custom",
+          "query": "aimp-backend",
+          "current": {
+            "text": "aimp-backend",
+            "value": "aimp-backend"
+          },
+          "hide": 2
+        }
+      ]
+    },
+    "annotations": {
+      "list": [
+        {
+          "name": "Deployments",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${prometheus}"
+          },
+          "expr": "changes(aimp_app_info{job=\"$service\"}[1m]) > 0",
+          "tagKeys": "deployment",
+          "textFormat": "Deployment",
+          "iconColor": "blue"
+        }
+      ]
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "API Uptime",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "(count_over_time(aimp_http_requests_total{job=\"$service\",status=~\"2..\"}[5m]) / count_over_time(aimp_http_requests_total{job=\"$service\"}[5m])) * 100",
+            "legendFormat": "Uptime %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "red", "value": null},
+                {"color": "yellow", "value": 95},
+                {"color": "green", "value": 99}
+              ]
+            }
+          }
+        },
+        "options": {
+          "graphMode": "none",
+          "colorMode": "value",
+          "justifyMode": "center"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Request Rate (req/s)",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "rate(aimp_http_requests_total{job=\"$service\"}[5m])",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        },
+        "options": {
+          "graphMode": "area",
+          "colorMode": "value"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Error Rate",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "rate(aimp_errors_total{job=\"$service\"}[5m])",
+            "legendFormat": "{{error_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.1},
+                {"color": "red", "value": 1.0}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "title": "P95 Response Time",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(aimp_http_request_duration_seconds_bucket{job=\"$service\"}[5m]))",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"color": "green", "value": null},
+                {"color": "yellow", "value": 0.5},
+                {"color": "red", "value": 2.0}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Active Connections",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "aimp_http_active_connections{job=\"$service\"}",
+            "legendFormat": "Active"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Active User Sessions",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 4, "x": 20, "y": 0},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "aimp_user_sessions_active{job=\"$service\"}",
+            "legendFormat": "Sessions"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Request Duration Distribution",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(aimp_http_request_duration_seconds_bucket{job=\"$service\"}[5m]))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(aimp_http_request_duration_seconds_bucket{job=\"$service\"}[5m]))",
+            "legendFormat": "p95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(aimp_http_request_duration_seconds_bucket{job=\"$service\"}[5m]))",
+            "legendFormat": "p99"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 10,
+              "spanNulls": true
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "title": "Requests by Status Code",
+        "type": "timeseries",
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "sum by (status) (rate(aimp_http_requests_total{job=\"$service\"}[5m]))",
+            "legendFormat": "HTTP {{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "custom": {
+              "drawStyle": "line",
+              "stacking": {"mode": "normal"},
+              "fillOpacity": 40
+            }
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Database Health",
+        "type": "table",
+        "gridPos": {"h": 6, "w": 12, "x": 0, "y": 12},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "aimp_db_query_duration_seconds_bucket{job=\"$service\"}",
+            "format": "table",
+            "instant": true
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Redis Health",
+        "type": "table",
+        "gridPos": {"h": 6, "w": 12, "x": 12, "y": 12},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "aimp_redis_operation_duration_seconds_bucket{job=\"$service\"}",
+            "format": "table",
+            "instant": true
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "DB Query Duration (p95)",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 8, "x": 0, "y": 18},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(aimp_db_query_duration_seconds_bucket{job=\"$service\"}[5m]))",
+            "legendFormat": "{{query_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 10
+            }
+          }
+        }
+      },
+      {
+        "id": 12,
+        "title": "Redis Operation Duration (p95)",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 8, "x": 8, "y": 18},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(aimp_redis_operation_duration_seconds_bucket{job=\"$service\"}[5m]))",
+            "legendFormat": "{{operation}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 10
+            }
+          }
+        }
+      },
+      {
+        "id": 13,
+        "title": "Error Distribution",
+        "type": "piechart",
+        "gridPos": {"h": 6, "w": 8, "x": 16, "y": 18},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "sum by (error_type) (increase(aimp_errors_total{job=\"$service\"}[1h]))",
+            "legendFormat": "{{error_type}}"
+          }
+        ],
+        "options": {
+          "pieType": "donut",
+          "legend": {"displayMode": "table", "placement": "right"}
+        }
+      },
+      {
+        "id": 14,
+        "title": "Background Jobs",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 12, "x": 0, "y": 24},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "aimp_background_jobs{job=\"$service\"}",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "custom": {
+              "drawStyle": "line",
+              "stacking": {"mode": "normal"},
+              "fillOpacity": 30
+            }
+          }
+        }
+      },
+      {
+        "id": 15,
+        "title": "AI Request Volume",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 12, "x": 12, "y": 24},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "sum by (model) (rate(aimp_ai_requests_total{job=\"$service\"}[5m]))",
+            "legendFormat": "{{model}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "custom": {
+              "drawStyle": "line",
+              "fillOpacity": 20
+            }
+          }
+        }
+      },
+      {
+        "id": 16,
+        "title": "AI Token Usage",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 12, "x": 0, "y": 30},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "sum by (model, token_type) (rate(aimp_ai_tokens_used_total{job=\"$service\"}[5m]))",
+            "legendFormat": "{{model}} - {{token_type}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "tps",
+            "custom": {
+              "drawStyle": "line",
+              "stacking": {"mode": "normal"},
+              "fillOpacity": 30
+            }
+          }
+        }
+      },
+      {
+        "id": 17,
+        "title": "Social API Requests",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 12, "x": 12, "y": 30},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "sum by (platform) (rate(aimp_social_api_requests_total{job=\"$service\"}[5m]))",
+            "legendFormat": "{{platform}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "custom": {
+              "drawStyle": "line",
+              "fillOpacity": 20
+            }
+          }
+        }
+      },
+      {
+        "id": 18,
+        "title": "ERP Sync Status",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 12, "x": 0, "y": 36},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "sum by (status) (rate(aimp_erp_sync_total{job=\"$service\"}[5m]))",
+            "legendFormat": "{{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "custom": {
+              "drawStyle": "line",
+              "stacking": {"mode": "normal"},
+              "fillOpacity": 30
+            }
+          }
+        }
+      },
+      {
+        "id": 19,
+        "title": "Notification Volume",
+        "type": "timeseries",
+        "gridPos": {"h": 6, "w": 12, "x": 12, "y": 36},
+        "datasource": {"type": "prometheus", "uid": "${prometheus}"},
+        "targets": [
+          {
+            "expr": "sum by (channel, status) (rate(aimp_notifications_total{job=\"$service\"}[5m]))",
+            "legendFormat": "{{channel}} - {{status}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "custom": {
+              "drawStyle": "line",
+              "fillOpacity": 20
+            }
+          }
+        }
+      }
+    ]
+  }
+}

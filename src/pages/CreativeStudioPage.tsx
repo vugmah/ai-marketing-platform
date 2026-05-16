@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sparkles,
   Wand2,
@@ -30,6 +30,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 // ─── Types ───────────────────────────────────────────────
 
@@ -508,6 +509,31 @@ function FormatRow({ format, index }: { format: FormatItem; index: number }) {
 // ─── Main Component ──────────────────────────────────────
 
 export default function CreativeStudioPage() {
+  const [loading, setLoading] = useState(true);
+
+  // Load creative studio data from API
+  useEffect(() => {
+    let mounted = true;
+    async function loadData() {
+      try {
+        setLoading(true);
+        await Promise.all([
+          api.creative.features(),
+          api.creative.generatedContent(),
+          api.creative.audit(),
+          api.creative.calendar(),
+          api.creative.formats(),
+        ]);
+      } catch (err) {
+        if (mounted) console.error("Creative studio verisi yüklenemedi:", err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    loadData();
+    return () => { mounted = false; };
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* ═══ Page Header ═══════════════════════════════ */}

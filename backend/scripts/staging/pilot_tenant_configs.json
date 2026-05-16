@@ -1,0 +1,585 @@
+{
+  "pilots": [
+    {
+      "tenant": {
+        "tenant_id": "pilot_001",
+        "name": "Pilot Musteri Alpha",
+        "description": "Perakende sektoru pilot musterisi - AI support + analytics",
+        "sector": "retail",
+        "branches": [
+          {
+            "branch_id": "alpha_main",
+            "name": "Alpha Ana Sube",
+            "timezone": "Europe/Istanbul"
+          },
+          {
+            "branch_id": "alpha_online",
+            "name": "Alpha Online",
+            "timezone": "Europe/Istanbul"
+          }
+        ],
+        "contacts": {
+          "primary": "alpha@pilot.example.com",
+          "technical": "tech-alpha@pilot.example.com"
+        }
+      },
+      "config_version": "1.0",
+      "created_at": "2026-05-16T10:59:14.278280+00:00",
+      "feature_flags": {
+        "ai_chat": true,
+        "ai_support": true,
+        "ai_safety_approval": true,
+        "analytics_dashboard": true,
+        "follower_intelligence": true,
+        "social_media_connect": true,
+        "whatsapp_integration": true,
+        "campaign_management": false,
+        "creative_studio": false,
+        "reports_export": true,
+        "knowledge_base": true,
+        "branch_management": true,
+        "user_management": true,
+        "erp_sync": true,
+        "erp_write": false,
+        "billing": false,
+        "revenue_intelligence": true,
+        "tenant_governance": true,
+        "observability": true,
+        "governance_dashboards": false
+      },
+      "rate_limits": {
+        "requests_per_minute": 60,
+        "requests_per_hour": 1500,
+        "ai_requests_per_minute": 15,
+        "ai_requests_per_hour": 200,
+        "webhook_calls_per_minute": 30,
+        "erp_sync_per_hour": 20,
+        "exports_per_day": 10,
+        "reports_per_day": 25,
+        "media_uploads_per_hour": 10,
+        "follower_sync_per_hour": 5,
+        "outreach_per_day": 20,
+        "whatsapp_per_day": 50,
+        "telegram_per_day": 30
+      },
+      "ai_quotas": {
+        "tokens_per_hour": 50000,
+        "tokens_per_day": 200000,
+        "max_context_window": 4000,
+        "allowed_models": [
+          "gpt-4o-mini"
+        ],
+        "blocked_models": [
+          "gpt-4",
+          "gpt-4o",
+          "claude-sonnet",
+          "claude-opus"
+        ],
+        "temperature_max": 0.7,
+        "auto_send_enabled": false,
+        "escalation_threshold": 0.75,
+        "require_approval_for": [
+          "email_send",
+          "campaign_publish",
+          "bulk_message",
+          "erp_write",
+          "customer_delete",
+          "whatsapp_message",
+          "follower_outreach",
+          "ai_message_send"
+        ],
+        "max_concurrent_ai_requests": 3,
+        "response_timeout_seconds": 30
+      },
+      "follower_intelligence": {
+        "enabled": true,
+        "auto_sync_interval_hours": 24,
+        "engagement_decay_days": 14,
+        "bot_detection_enabled": true,
+        "approval_required_for": [
+          "reengagement_message",
+          "outreach_send",
+          "bulk_sync"
+        ],
+        "platform_limits": {
+          "instagram": {
+            "messages_per_minute": 5,
+            "messages_per_hour": 50,
+            "cooldown_seconds": 120
+          },
+          "facebook": {
+            "messages_per_minute": 10,
+            "messages_per_hour": 100,
+            "cooldown_seconds": 60
+          },
+          "tiktok": {
+            "messages_per_minute": 3,
+            "messages_per_hour": 30,
+            "cooldown_seconds": 300
+          },
+          "whatsapp": {
+            "messages_per_minute": 15,
+            "messages_per_hour": 200,
+            "cooldown_seconds": 30
+          },
+          "telegram": {
+            "messages_per_minute": 20,
+            "messages_per_hour": 300,
+            "cooldown_seconds": 30
+          }
+        },
+        "warmup_schedule": {
+          "enabled": true,
+          "day_1": 0.2,
+          "day_2": 0.3,
+          "day_3": 0.4,
+          "day_4": 0.5,
+          "day_5": 0.6,
+          "day_6": 0.7,
+          "day_7": 0.8,
+          "day_8": 1.0
+        },
+        "governance": {
+          "daily_quota": 20,
+          "cooldown_hours": 24,
+          "spam_risk_threshold": 0.7,
+          "fatigue_threshold": 0.5,
+          "reputation_threshold": 60,
+          "confidence_threshold": 0.5
+        }
+      },
+      "pilot_constraints": {
+        "max_users": 5,
+        "max_branches": 2,
+        "max_campaigns": 5,
+        "max_media_files": 50,
+        "max_knowledge_docs": 25,
+        "data_retention_days": 90,
+        "max_daily_outreach": 20,
+        "max_weekly_outreach": 100
+      },
+      "support_config": {
+        "support_tier": "white_glove",
+        "response_time_sla_hours": 4,
+        "dedicated_channel": true,
+        "weekly_review": true,
+        "ai_support_available": true,
+        "onboarding_assistance": true,
+        "escalation_path": "l1_support -> l2_tech -> l3_engineering"
+      },
+      "rollout_flags": {
+        "phase": "pilot_week_1",
+        "features_enabled": [
+          "ai_support",
+          "analytics",
+          "reports",
+          "whatsapp_support",
+          "follower_intelligence"
+        ],
+        "features_pending": [
+          "campaigns",
+          "creative_studio"
+        ],
+        "abort_criteria_active": true,
+        "auto_escalation_enabled": true
+      },
+      "monitoring": {
+        "ai_cost_alerts": true,
+        "spam_risk_alerts": true,
+        "fatigue_alerts": true,
+        "webhook_failure_alerts": true,
+        "queue_latency_alerts": true,
+        "tenant_health_dashboard": true,
+        "alert_severity": "medium",
+        "critical_alerts_channel": "pilot-ops-critical",
+        "standard_alerts_channel": "pilot-ops"
+      }
+    },
+    {
+      "tenant": {
+        "tenant_id": "pilot_002",
+        "name": "Pilot Musteri Beta",
+        "description": "Hizmet sektoru pilot musterisi - campaigns + creative studio",
+        "sector": "services",
+        "branches": [
+          {
+            "branch_id": "beta_main",
+            "name": "Beta Merkez",
+            "timezone": "Europe/Istanbul"
+          }
+        ],
+        "contacts": {
+          "primary": "beta@pilot.example.com",
+          "technical": "tech-beta@pilot.example.com"
+        }
+      },
+      "config_version": "1.0",
+      "created_at": "2026-05-16T10:59:14.278332+00:00",
+      "feature_flags": {
+        "ai_chat": true,
+        "ai_support": true,
+        "ai_safety_approval": true,
+        "analytics_dashboard": true,
+        "follower_intelligence": true,
+        "social_media_connect": true,
+        "whatsapp_integration": true,
+        "campaign_management": true,
+        "creative_studio": true,
+        "reports_export": true,
+        "knowledge_base": true,
+        "branch_management": true,
+        "user_management": true,
+        "erp_sync": true,
+        "erp_write": false,
+        "billing": false,
+        "revenue_intelligence": true,
+        "tenant_governance": true,
+        "observability": true,
+        "governance_dashboards": false
+      },
+      "rate_limits": {
+        "requests_per_minute": 60,
+        "requests_per_hour": 1500,
+        "ai_requests_per_minute": 15,
+        "ai_requests_per_hour": 200,
+        "webhook_calls_per_minute": 30,
+        "erp_sync_per_hour": 20,
+        "exports_per_day": 10,
+        "reports_per_day": 25,
+        "media_uploads_per_hour": 10,
+        "follower_sync_per_hour": 5,
+        "outreach_per_day": 20,
+        "whatsapp_per_day": 50,
+        "telegram_per_day": 30
+      },
+      "ai_quotas": {
+        "tokens_per_hour": 50000,
+        "tokens_per_day": 200000,
+        "max_context_window": 4000,
+        "allowed_models": [
+          "gpt-4o-mini"
+        ],
+        "blocked_models": [
+          "gpt-4",
+          "gpt-4o",
+          "claude-sonnet",
+          "claude-opus"
+        ],
+        "temperature_max": 0.7,
+        "auto_send_enabled": false,
+        "escalation_threshold": 0.75,
+        "require_approval_for": [
+          "email_send",
+          "campaign_publish",
+          "bulk_message",
+          "erp_write",
+          "customer_delete",
+          "whatsapp_message",
+          "follower_outreach",
+          "ai_message_send"
+        ],
+        "max_concurrent_ai_requests": 3,
+        "response_timeout_seconds": 30
+      },
+      "follower_intelligence": {
+        "enabled": true,
+        "auto_sync_interval_hours": 24,
+        "engagement_decay_days": 14,
+        "bot_detection_enabled": true,
+        "approval_required_for": [
+          "reengagement_message",
+          "outreach_send",
+          "bulk_sync"
+        ],
+        "platform_limits": {
+          "instagram": {
+            "messages_per_minute": 5,
+            "messages_per_hour": 50,
+            "cooldown_seconds": 120
+          },
+          "facebook": {
+            "messages_per_minute": 10,
+            "messages_per_hour": 100,
+            "cooldown_seconds": 60
+          },
+          "tiktok": {
+            "messages_per_minute": 3,
+            "messages_per_hour": 30,
+            "cooldown_seconds": 300
+          },
+          "whatsapp": {
+            "messages_per_minute": 15,
+            "messages_per_hour": 200,
+            "cooldown_seconds": 30
+          },
+          "telegram": {
+            "messages_per_minute": 20,
+            "messages_per_hour": 300,
+            "cooldown_seconds": 30
+          }
+        },
+        "warmup_schedule": {
+          "enabled": true,
+          "day_1": 0.2,
+          "day_2": 0.3,
+          "day_3": 0.4,
+          "day_4": 0.5,
+          "day_5": 0.6,
+          "day_6": 0.7,
+          "day_7": 0.8,
+          "day_8": 1.0
+        },
+        "governance": {
+          "daily_quota": 20,
+          "cooldown_hours": 24,
+          "spam_risk_threshold": 0.7,
+          "fatigue_threshold": 0.5,
+          "reputation_threshold": 60,
+          "confidence_threshold": 0.5
+        }
+      },
+      "pilot_constraints": {
+        "max_users": 5,
+        "max_branches": 1,
+        "max_campaigns": 5,
+        "max_media_files": 50,
+        "max_knowledge_docs": 25,
+        "data_retention_days": 90,
+        "max_daily_outreach": 20,
+        "max_weekly_outreach": 100
+      },
+      "support_config": {
+        "support_tier": "white_glove",
+        "response_time_sla_hours": 4,
+        "dedicated_channel": true,
+        "weekly_review": true,
+        "ai_support_available": true,
+        "onboarding_assistance": true,
+        "escalation_path": "l1_support -> l2_tech -> l3_engineering"
+      },
+      "rollout_flags": {
+        "phase": "pilot_week_2",
+        "features_enabled": [
+          "ai_support",
+          "analytics",
+          "reports",
+          "whatsapp_support",
+          "follower_intelligence"
+        ],
+        "features_pending": [
+          "erp_sync"
+        ],
+        "abort_criteria_active": true,
+        "auto_escalation_enabled": true
+      },
+      "monitoring": {
+        "ai_cost_alerts": true,
+        "spam_risk_alerts": true,
+        "fatigue_alerts": true,
+        "webhook_failure_alerts": true,
+        "queue_latency_alerts": true,
+        "tenant_health_dashboard": true,
+        "alert_severity": "medium",
+        "critical_alerts_channel": "pilot-ops-critical",
+        "standard_alerts_channel": "pilot-ops"
+      }
+    },
+    {
+      "tenant": {
+        "tenant_id": "pilot_003",
+        "name": "Pilot Musteri Gamma",
+        "description": "Uretim sektoru pilot musterisi - ERP sync + governance dashboards",
+        "sector": "manufacturing",
+        "branches": [
+          {
+            "branch_id": "gamma_main",
+            "name": "Gamma Fabrika",
+            "timezone": "Europe/Istanbul"
+          },
+          {
+            "branch_id": "gamma_depot",
+            "name": "Gamma Depo",
+            "timezone": "Europe/Istanbul"
+          }
+        ],
+        "contacts": {
+          "primary": "gamma@pilot.example.com",
+          "technical": "tech-gamma@pilot.example.com"
+        }
+      },
+      "config_version": "1.0",
+      "created_at": "2026-05-16T10:59:14.278360+00:00",
+      "feature_flags": {
+        "ai_chat": true,
+        "ai_support": true,
+        "ai_safety_approval": true,
+        "analytics_dashboard": true,
+        "follower_intelligence": true,
+        "social_media_connect": true,
+        "whatsapp_integration": true,
+        "campaign_management": true,
+        "creative_studio": true,
+        "reports_export": true,
+        "knowledge_base": true,
+        "branch_management": true,
+        "user_management": true,
+        "erp_sync": true,
+        "erp_write": false,
+        "billing": false,
+        "revenue_intelligence": true,
+        "tenant_governance": true,
+        "observability": true,
+        "governance_dashboards": true
+      },
+      "rate_limits": {
+        "requests_per_minute": 60,
+        "requests_per_hour": 1500,
+        "ai_requests_per_minute": 15,
+        "ai_requests_per_hour": 200,
+        "webhook_calls_per_minute": 30,
+        "erp_sync_per_hour": 20,
+        "exports_per_day": 10,
+        "reports_per_day": 25,
+        "media_uploads_per_hour": 10,
+        "follower_sync_per_hour": 5,
+        "outreach_per_day": 20,
+        "whatsapp_per_day": 50,
+        "telegram_per_day": 30
+      },
+      "ai_quotas": {
+        "tokens_per_hour": 50000,
+        "tokens_per_day": 200000,
+        "max_context_window": 4000,
+        "allowed_models": [
+          "gpt-4o-mini"
+        ],
+        "blocked_models": [
+          "gpt-4",
+          "gpt-4o",
+          "claude-sonnet",
+          "claude-opus"
+        ],
+        "temperature_max": 0.7,
+        "auto_send_enabled": false,
+        "escalation_threshold": 0.75,
+        "require_approval_for": [
+          "email_send",
+          "campaign_publish",
+          "bulk_message",
+          "erp_write",
+          "customer_delete",
+          "whatsapp_message",
+          "follower_outreach",
+          "ai_message_send"
+        ],
+        "max_concurrent_ai_requests": 3,
+        "response_timeout_seconds": 30
+      },
+      "follower_intelligence": {
+        "enabled": true,
+        "auto_sync_interval_hours": 24,
+        "engagement_decay_days": 14,
+        "bot_detection_enabled": true,
+        "approval_required_for": [
+          "reengagement_message",
+          "outreach_send",
+          "bulk_sync"
+        ],
+        "platform_limits": {
+          "instagram": {
+            "messages_per_minute": 5,
+            "messages_per_hour": 50,
+            "cooldown_seconds": 120
+          },
+          "facebook": {
+            "messages_per_minute": 10,
+            "messages_per_hour": 100,
+            "cooldown_seconds": 60
+          },
+          "tiktok": {
+            "messages_per_minute": 3,
+            "messages_per_hour": 30,
+            "cooldown_seconds": 300
+          },
+          "whatsapp": {
+            "messages_per_minute": 15,
+            "messages_per_hour": 200,
+            "cooldown_seconds": 30
+          },
+          "telegram": {
+            "messages_per_minute": 20,
+            "messages_per_hour": 300,
+            "cooldown_seconds": 30
+          }
+        },
+        "warmup_schedule": {
+          "enabled": true,
+          "day_1": 0.2,
+          "day_2": 0.3,
+          "day_3": 0.4,
+          "day_4": 0.5,
+          "day_5": 0.6,
+          "day_6": 0.7,
+          "day_7": 0.8,
+          "day_8": 1.0
+        },
+        "governance": {
+          "daily_quota": 20,
+          "cooldown_hours": 24,
+          "spam_risk_threshold": 0.7,
+          "fatigue_threshold": 0.5,
+          "reputation_threshold": 60,
+          "confidence_threshold": 0.5
+        }
+      },
+      "pilot_constraints": {
+        "max_users": 5,
+        "max_branches": 2,
+        "max_campaigns": 5,
+        "max_media_files": 50,
+        "max_knowledge_docs": 25,
+        "data_retention_days": 90,
+        "max_daily_outreach": 20,
+        "max_weekly_outreach": 100
+      },
+      "support_config": {
+        "support_tier": "white_glove",
+        "response_time_sla_hours": 4,
+        "dedicated_channel": true,
+        "weekly_review": true,
+        "ai_support_available": true,
+        "onboarding_assistance": true,
+        "escalation_path": "l1_support -> l2_tech -> l3_engineering"
+      },
+      "rollout_flags": {
+        "phase": "pilot_week_3",
+        "features_enabled": [
+          "ai_support",
+          "analytics",
+          "reports",
+          "whatsapp_support",
+          "follower_intelligence"
+        ],
+        "features_pending": [],
+        "abort_criteria_active": true,
+        "auto_escalation_enabled": true
+      },
+      "monitoring": {
+        "ai_cost_alerts": true,
+        "spam_risk_alerts": true,
+        "fatigue_alerts": true,
+        "webhook_failure_alerts": true,
+        "queue_latency_alerts": true,
+        "tenant_health_dashboard": true,
+        "alert_severity": "medium",
+        "critical_alerts_channel": "pilot-ops-critical",
+        "standard_alerts_channel": "pilot-ops"
+      }
+    }
+  ],
+  "cohort_size": 3,
+  "created_at": "2026-05-16T10:59:14.278713+00:00",
+  "safety_validated": true,
+  "critical_issues": 0,
+  "warnings": 0
+}

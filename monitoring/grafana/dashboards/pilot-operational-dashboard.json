@@ -1,0 +1,212 @@
+{
+  "dashboard": {
+    "title": "Pilot Operational Dashboard",
+    "tags": ["pilot", "operations"],
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Tenant Health Score",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+        "targets": [
+          {
+            "expr": "avg(pilot_tenant_health_score) by (tenant_id)",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 60, "color": "yellow"},
+                {"value": 80, "color": "green"}
+              ]
+            },
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "API Error Rate (5m)",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{status=~\"5..\"}[5m]) / rate(http_requests_total[5m]) * 100",
+            "legendFormat": "Error %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 1, "color": "yellow"},
+                {"value": 5, "color": "red"}
+              ]
+            },
+            "unit": "percent"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "AI Request Latency (P95)",
+        "type": "graph",
+        "gridPos": {"h": 6, "w": 12, "x": 0, "y": 4},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(ai_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "P95 Latency"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(ai_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "P50 Latency"
+          }
+        ],
+        "yAxes": [
+          {"label": "Seconds", "min": 0}
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Queue Depth",
+        "type": "graph",
+        "gridPos": {"h": 6, "w": 12, "x": 12, "y": 4},
+        "targets": [
+          {
+            "expr": "celery_queue_length{queue=\"celery\"}",
+            "legendFormat": "Default Queue"
+          },
+          {
+            "expr": "celery_queue_length{queue=\"dead_letter\"}",
+            "legendFormat": "Dead Letter Queue"
+          }
+        ],
+        "alert": {
+          "conditions": [
+            {
+              "evaluator": {"params": [1000], "type": "gt"},
+              "operator": {"type": "and"},
+              "query": {"params": ["A", "5m", "now"]},
+              "reducer": {"type": "avg"}
+            }
+          ],
+          "executionErrorState": "alerting",
+          "frequency": "1m",
+          "handler": 1,
+          "name": "Queue Depth High"
+        }
+      },
+      {
+        "id": 5,
+        "title": "Redis Memory Usage",
+        "type": "graph",
+        "gridPos": {"h": 5, "w": 6, "x": 0, "y": 10},
+        "targets": [
+          {
+            "expr": "redis_memory_used_bytes / redis_memory_max_bytes * 100",
+            "legendFormat": "Memory %"
+          }
+        ],
+        "yAxes": [{"min": 0, "max": 100}]
+      },
+      {
+        "id": 6,
+        "title": "MySQL Connections",
+        "type": "graph",
+        "gridPos": {"h": 5, "w": 6, "x": 6, "y": 10},
+        "targets": [
+          {
+            "expr": "mysql_global_status_threads_connected",
+            "legendFormat": "Active"
+          },
+          {
+            "expr": "mysql_global_variables_max_connections",
+            "legendFormat": "Max"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "AI Cost per Tenant",
+        "type": "graph",
+        "gridPos": {"h": 5, "w": 12, "x": 12, "y": 10},
+        "targets": [
+          {
+            "expr": "ai_cost_usd_total",
+            "legendFormat": "{{tenant_id}}"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Webhook Delivery Success Rate",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(webhook_delivery_success_total[5m]) / rate(webhook_delivery_total[5m]) * 100",
+            "legendFormat": "Success %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 90, "color": "yellow"},
+                {"value": 99, "color": "green"}
+              ]
+            },
+            "unit": "percent"
+          }
+        }
+      },
+      {
+        "id": 9,
+        "title": "Support SLA Compliance",
+        "type": "stat",
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+        "targets": [
+          {
+            "expr": "rate(support_tickets_resolved_sla_total[1h]) / rate(support_tickets_total[1h]) * 100",
+            "legendFormat": "SLA %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "thresholds": {
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 80, "color": "yellow"},
+                {"value": 95, "color": "green"}
+              ]
+            },
+            "unit": "percent"
+          }
+        }
+      },
+      {
+        "id": 10,
+        "title": "Incident Trend (7 days)",
+        "type": "graph",
+        "gridPos": {"h": 6, "w": 24, "x": 0, "y": 15},
+        "targets": [
+          {
+            "expr": "increase(incidents_total[1h])",
+            "legendFormat": "{{severity}}"
+          }
+        ]
+      }
+    ]
+  }
+}

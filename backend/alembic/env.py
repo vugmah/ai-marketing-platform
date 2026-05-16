@@ -22,7 +22,13 @@ from app.database import Base  # noqa: E402
 # Import all models so Base.metadata contains all tables
 from app.auth.models import User  # noqa: E402, F401
 from app.companies.models import Company  # noqa: E402, F401
-from app.branches.models import Branch  # noqa: E402, F401
+from app.branches.models import (  # noqa: E402, F401
+    Branch,
+    BranchConfig,
+    ERPConnectionConfig,
+    SocialAccountConfig,
+    AIPromptOverride,
+)
 from app.erp.models import (  # noqa: E402, F401
     ERPConnection,
     ERPCustomer,
@@ -35,6 +41,19 @@ from app.erp.models import (  # noqa: E402, F401
     ERPSyncJob,
     ERPSyncLog,
 )
+from app.ads.models import *  # noqa: E402, F401
+from app.ai.models import *  # noqa: E402, F401
+from app.analytics.models import *  # noqa: E402, F401
+from app.audit.models import *  # noqa: E402, F401
+from app.billing.models import *  # noqa: E402, F401
+from app.events.models import *  # noqa: E402, F401
+from app.followers.models import *  # noqa: E402, F401
+from app.governance.models import *  # noqa: E402, F401
+from app.knowledge.models import *  # noqa: E402, F401
+from app.media.models import *  # noqa: E402, F401
+from app.reports.models import *  # noqa: E402, F401
+from app.social.models import *  # noqa: E402, F401
+from app.support.models import *  # noqa: E402, F401
 
 # -- Alembic Config object --
 config = context.config
@@ -82,6 +101,7 @@ def do_run_migrations(connection: Connection) -> None:
         compare_server_default=True,
         include_schemas=True,
         version_table_schema="public",
+        render_as_batch=True,  # Required for MySQL compatibility
     )
 
     with context.begin_transaction():

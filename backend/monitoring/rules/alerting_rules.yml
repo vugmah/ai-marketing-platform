@@ -1,0 +1,349 @@
+# =============================================================================
+# Prometheus Alerting Rules for AI Marketing Platform
+# =============================================================================
+# Critical alerts that trigger notifications via Alertmanager.
+# Each alert has severity: critical (page), warning (ticket), info (log only).
+#
+# Alertmanager routing:
+#   critical  -> PagerDuty / Slack #alerts-critical / Email
+#   warning   -> Slack #alerts / Email
+#   info      -> Slack #monitoring
+# =============================================================================
+
+groups:
+  # ---------------------------------------------------------------------------
+  # Group 1: API Health (CRITICAL)
+  # ---------------------------------------------------------------------------
+  - name: aimp_api_critical
+    rules:
+      # CRITICAL: API is down (no successful probes)
+      - alert: AIMP_API_Down
+        expr: |
+          up{job="aimp-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "AIMP API is DOWN"
+          description: "The AIMP backend API has been unreachable for more than 1 minute."
+          runbook_url: "https://wiki.internal/aimp/runbooks/api-down"
+
+      # CRITICAL: High error rate (>10% 5xx errors)
+      - alert: AIMP_HighErrorRate
+        expr: |
+          aimp:recorded:http_5xx_rate_5m > 0.10
+        for: 2m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High 5xx error rate on AIMP API"
+          description: "5xx error rate is {{ $value | humanizePercentage }} for endpoint {{ $labels.endpoint }} (method={{ $labels.method }})."
+
+      # CRITICAL: Very high p95 latency (>5 seconds)
+      - alert: AIMP_HighLatency
+        expr: |
+          aimp:recorded:http_request_duration_p95_5m > 5
+        for: 3m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High p95 latency on AIMP API"
+          description: "p95 latency is {{ $value }}s for {{ $labels.method }} {{ $labels.endpoint }}."
+
+      # CRITICAL: Endpoint returning 100% errors
+      - alert: AIMP_EndpointCompleteFailure
+        expr: |
+          (
+            sum by (method, endpoint) (rate(aimp_http_requests_total{status=~"5.."}[2m]))
+            /
+            sum by (method, endpoint) (rate(aimp_http_requests_total[2m]))
+          ) == 1
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "Endpoint completely failing: {{ $labels.endpoint }}"
+          description: "All requests to {{ $labels.method }} {{ $labels.endpoint }} are returning 5xx."
+
+  # ---------------------------------------------------------------------------
+  # Group 2: API Warnings
+  # ---------------------------------------------------------------------------
+  - name: aimp_api_warning
+    rules:
+      # WARNING: Elevated error rate (>5%)
+      - alert: AIMP_ElevatedErrorRate
+        expr: |
+          aimp:recorded:http_5xx_rate_5m > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "Elevated error rate on AIMP API"
+          description: "5xx error rate is {{ $value | humanizePercentage }} for endpoint {{ $labels.endpoint }}."
+
+      # WARNING: Elevated 4xx rate (>20%)
+      - alert: AIMP_Elevated4xxRate
+        expr: |
+          aimp:recorded:overall_4xx_percent > 20
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High 4xx error rate"
+          description: "4xx rate is {{ $value }}% - possible client misconfiguration or API changes."
+
+      # WARNING: High latency (>2s p95)
+      - alert: AIMP_ElevatedLatency
+        expr: |
+          aimp:recorded:http_request_duration_p95_5m > 2
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "Elevated p95 latency"
+          description: "p95 latency is {{ $value }}s for {{ $labels.method }} {{ $labels.endpoint }}."
+
+      # WARNING: Request rate anomaly (sudden drop >50%)
+      - alert: AIMP_RequestRateDrop
+        expr: |
+          (
+            sum(rate(aimp_http_requests_total[5m]))
+            /
+            sum(rate(aimp_http_requests_total[1h]))
+          ) < 0.5
+        for: 3m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "Request rate dropped significantly"
+          description: "Current request rate is {{ $value | humanizePercentage }} of the 1h average."
+
+      # WARNING: High concurrent connections
+      - alert: AIMP_HighActiveConnections
+        expr: |
+          aimp_http_active_connections > 100
+        for: 5m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "High number of active connections"
+          description: "{{ $value }} active connections - possible traffic spike or connection leak."
+
+  # ---------------------------------------------------------------------------
+  # Group 3: Database Alerts
+  # ---------------------------------------------------------------------------
+  - name: aimp_database
+    rules:
+      # CRITICAL: Database down
+      - alert: AIMP_DatabaseDown
+        expr: |
+          mysql_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "MySQL is DOWN"
+          description: "MySQL exporter reports the database is unreachable."
+
+      # CRITICAL: DB query latency too high
+      - alert: AIMP_DBSlowQueries
+        expr: |
+          aimp:recorded:db_query_p95_5m > 1
+        for: 5m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "Slow database queries detected"
+          description: "DB p95 latency is {{ $value }}s for query_type={{ $labels.query_type }}."
+
+      # WARNING: DB connection pool near exhaustion
+      - alert: AIMP_DBPoolExhaustion
+        expr: |
+          aimp:recorded:db_pool_utilization > 0.8
+        for: 3m
+        labels:
+          severity: warning
+          component: database
+        annotations:
+          summary: "DB connection pool near exhaustion"
+          description: "Pool utilization is {{ $value | humanizePercentage }}."
+
+  # ---------------------------------------------------------------------------
+  # Group 4: Redis Alerts
+  # ---------------------------------------------------------------------------
+  - name: aimp_redis
+    rules:
+      # CRITICAL: Redis down
+      - alert: AIMP_RedisDown
+        expr: |
+          redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: redis
+        annotations:
+          summary: "Redis is DOWN"
+          description: "Redis exporter reports Redis is unreachable."
+
+      # WARNING: High Redis memory usage
+      - alert: AIMP_RedisMemoryHigh
+        expr: |
+          redis_memory_used_bytes / redis_memory_max_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          component: redis
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis memory is {{ $value | humanizePercentage }} of max."
+
+  # ---------------------------------------------------------------------------
+  # Group 5: AI Usage Alerts
+  # ---------------------------------------------------------------------------
+  - name: aimp_ai
+    rules:
+      # WARNING: High AI error rate
+      - alert: AIMP_AIHighErrorRate
+        expr: |
+          aimp:recorded:ai_error_rate_5m > 0.20
+        for: 5m
+        labels:
+          severity: warning
+          component: ai
+        annotations:
+          summary: "High AI API error rate"
+          description: "AI error rate is {{ $value | humanizePercentage }} for model={{ $labels.model }}."
+
+      # WARNING: AI latency high
+      - alert: AIMP_AISlow
+        expr: |
+          aimp:recorded:ai_duration_p95_5m > 30
+        for: 5m
+        labels:
+          severity: warning
+          component: ai
+        annotations:
+          summary: "AI API responses are slow"
+          description: "AI p95 latency is {{ $value }}s for model={{ $labels.model }}."
+
+      # INFO: AI cost spike
+      - alert: AIMP_AICostSpike
+        expr: |
+          aimp:recorded:ai_cost_per_hour > 10
+        for: 15m
+        labels:
+          severity: info
+          component: ai
+        annotations:
+          summary: "AI usage cost spike"
+          description: "Estimated AI cost is ${{ $value }}/hour."
+
+  # ---------------------------------------------------------------------------
+  # Group 6: Infrastructure
+  # ---------------------------------------------------------------------------
+  - name: aimp_infrastructure
+    rules:
+      # CRITICAL: Disk nearly full
+      - alert: AIMP_DiskFull
+        expr: |
+          (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.05
+        for: 1m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Disk nearly full on {{ $labels.instance }}"
+          description: "Less than 5% disk space remaining on {{ $labels.mountpoint }}."
+
+      # WARNING: Disk usage high
+      - alert: AIMP_DiskHigh
+        expr: |
+          (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.15
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "Disk usage high on {{ $labels.instance }}"
+          description: "Less than 15% disk space remaining on {{ $labels.mountpoint }}."
+
+      # CRITICAL: Memory nearly exhausted
+      - alert: AIMP_MemoryCritical
+        expr: |
+          (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) < 0.05
+        for: 2m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Memory critically low on {{ $labels.instance }}"
+          description: "Less than 5% memory available."
+
+      # WARNING: CPU high for extended period
+      - alert: AIMP_CPUHigh
+        expr: |
+          100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is {{ $value }}% for more than 10 minutes."
+
+  # ---------------------------------------------------------------------------
+  # Group 7: SSL & External Services
+  # ---------------------------------------------------------------------------
+  - name: aimp_external
+    rules:
+      # WARNING: External API probe failed
+      - alert: AIMP_ExternalAPIDown
+        expr: |
+          probe_success == 0
+        for: 2m
+        labels:
+          severity: warning
+          component: external
+        annotations:
+          summary: "External API probe failed: {{ $labels.instance }}"
+          description: "Health check probe to {{ $labels.instance }} has been failing."
+
+  # ---------------------------------------------------------------------------
+  # Group 8: Celery Background Jobs
+  # ---------------------------------------------------------------------------
+  - name: aimp_celery
+    rules:
+      # CRITICAL: Celery worker down
+      - alert: AIMP_CeleryWorkerDown
+        expr: |
+          up{job="celery"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: celery
+        annotations:
+          summary: "Celery exporter is unreachable"
+          description: "Celery worker monitoring is down."
+
+      # WARNING: High dead letter queue count
+      - alert: AIMP_DLQBuildup
+        expr: |
+          aimp_background_jobs{status="failed"} > 50
+        for: 10m
+        labels:
+          severity: warning
+          component: celery
+        annotations:
+          summary: "Dead letter queue building up"
+          description: "{{ $value }} failed background jobs are accumulating."

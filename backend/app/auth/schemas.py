@@ -77,6 +77,10 @@ class PasswordChange(BaseModel):
         return validate_password(value)
 
 
+# Alias for backward compatibility (media/router.py uses TokenData)
+TokenData = JWTPayload
+
+
 class TokenResponse(BaseModel):
     """Token response schema for login and refresh."""
 

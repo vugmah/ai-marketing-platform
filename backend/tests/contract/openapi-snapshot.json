@@ -1,0 +1,5127 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "AI Marketing Platform",
+    "version": "2.0.0",
+    "description": "AI Marketing Platform API v2.0",
+    "x-endpoint-count": 250,
+    "x-schema-count": 428,
+    "x-module-count": 15,
+    "x-generated-at": "2025-01-15T00:00:00Z",
+    "x-method-distribution": {
+      "POST": 78,
+      "GET": 123,
+      "PUT": 22,
+      "DELETE": 23,
+      "PATCH": 4
+    },
+    "x-response-model-coverage": "228/250 (91.2%)"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local"
+    },
+    {
+      "url": "https://api.aimarketing.com",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/api/v2/ads/analytics/cpa": {
+      "get": {
+        "operationId": "get_cpa_analysis",
+        "summary": "Get CPA analysis",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/analytics/roas": {
+      "get": {
+        "operationId": "get_roas_analysis",
+        "summary": "Get ROAS analysis",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/audiences": {
+      "get": {
+        "operationId": "list_audiences",
+        "summary": "List ad audiences",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_audience",
+        "summary": "Create ad audience",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/audiences/lookalikes": {
+      "get": {
+        "operationId": "get_lookalike_suggestions",
+        "summary": "Get lookalike audience suggestions",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/audiences/overlap": {
+      "get": {
+        "operationId": "get_audience_overlap",
+        "summary": "Get audience overlap detection",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/audiences/{audience_id}": {
+      "delete": {
+        "operationId": "delete_audience",
+        "summary": "Delete ad audience",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_audience",
+        "summary": "Get audience details",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_audience",
+        "summary": "Update ad audience",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/audiences/{audience_id}/performance": {
+      "get": {
+        "operationId": "get_audience_performance",
+        "summary": "Get audience performance analysis",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/campaigns": {
+      "get": {
+        "operationId": "list_campaigns",
+        "summary": "List ad campaigns",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_campaign",
+        "summary": "Create ad campaign",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/campaigns/{campaign_id}": {
+      "delete": {
+        "operationId": "delete_campaign",
+        "summary": "Delete ad campaign",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_campaign",
+        "summary": "Get campaign details",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_campaign",
+        "summary": "Update ad campaign",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/campaigns/{campaign_id}/metrics": {
+      "get": {
+        "operationId": "get_campaign_metrics",
+        "summary": "Get campaign metrics",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/creatives": {
+      "get": {
+        "operationId": "list_creatives",
+        "summary": "List ad creatives",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/creatives/{creative_id}": {
+      "get": {
+        "operationId": "get_creative",
+        "summary": "Get creative details",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_creative",
+        "summary": "Update ad creative",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/creatives/{creative_id}/fatigue": {
+      "get": {
+        "operationId": "get_creative_fatigue",
+        "summary": "Get creative fatigue analysis",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/metrics": {
+      "get": {
+        "operationId": "get_metrics",
+        "summary": "Get aggregated metrics",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/performance": {
+      "get": {
+        "operationId": "get_performance_dashboard",
+        "summary": "Get performance dashboard data",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/platforms": {
+      "get": {
+        "operationId": "list_platforms",
+        "summary": "List connected ad platform accounts",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "connect_platform",
+        "summary": "Connect an ad platform account",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/platforms/{platform_id}": {
+      "delete": {
+        "operationId": "disconnect_platform",
+        "summary": "Disconnect an ad platform account",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_platform",
+        "summary": "Get ad platform account details",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_platform",
+        "summary": "Update ad platform account",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/recommendations/budget": {
+      "get": {
+        "operationId": "get_budget_recommendations",
+        "summary": "Get budget recommendations",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/recommendations/budget/generate": {
+      "post": {
+        "operationId": "generate_budget_recommendations",
+        "summary": "Generate new budget recommendations",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/recommendations/budget/{recommendation_id}/apply": {
+      "post": {
+        "operationId": "apply_budget_recommendation",
+        "summary": "Apply budget recommendation",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/recommendations/creative": {
+      "get": {
+        "operationId": "get_creative_recommendations",
+        "summary": "Get creative refresh recommendations",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/recommendations/local": {
+      "get": {
+        "operationId": "get_local_recommendations",
+        "summary": "Get local campaign recommendations",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ads/sync/{platform}": {
+      "post": {
+        "operationId": "sync_platform_data",
+        "summary": "Sync data from ad platform",
+        "tags": [
+          "Ads"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/conversations": {
+      "get": {
+        "operationId": "list_conversations",
+        "summary": "List AI conversations",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_conversation",
+        "summary": "Start a new AI conversation",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/conversations/{conversation_id}": {
+      "delete": {
+        "operationId": "delete_conversation",
+        "summary": "Delete a conversation",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/conversations/{conversation_id}/messages": {
+      "get": {
+        "operationId": "get_messages",
+        "summary": "Get messages in a conversation",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "send_message",
+        "summary": "Send a message in a conversation",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/generate": {
+      "post": {
+        "operationId": "generate_completion",
+        "summary": "Generate an AI completion",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/prompts": {
+      "get": {
+        "operationId": "list_prompts",
+        "summary": "List AI prompt templates",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_prompt",
+        "summary": "Create a new AI prompt template",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/prompts/{prompt_id}": {
+      "delete": {
+        "operationId": "delete_prompt",
+        "summary": "Soft delete a prompt template",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_prompt",
+        "summary": "Get a prompt template by ID",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_prompt",
+        "summary": "Update a prompt template",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/recommendations": {
+      "get": {
+        "operationId": "list_recommendations",
+        "summary": "List AI recommendations",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/recommendations/generate": {
+      "post": {
+        "operationId": "generate_recommendations",
+        "summary": "Generate new AI recommendations",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/recommendations/{recommendation_id}/apply": {
+      "post": {
+        "operationId": "apply_recommendation",
+        "summary": "Mark a recommendation as applied",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/recommendations/{recommendation_id}/dismiss": {
+      "post": {
+        "operationId": "dismiss_recommendation",
+        "summary": "Mark a recommendation as dismissed",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/suggestions": {
+      "get": {
+        "operationId": "list_suggestions",
+        "summary": "List AI suggestions",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "generate_suggestions",
+        "summary": "Generate AI suggestions for context",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/suggestions/{suggestion_id}/feedback": {
+      "post": {
+        "operationId": "submit_suggestion_feedback",
+        "summary": "Submit feedback for a suggestion",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/ai/usage": {
+      "get": {
+        "operationId": "get_usage_analytics",
+        "summary": "Get AI usage analytics",
+        "tags": [
+          "Ai"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/analytics/audience": {
+      "get": {
+        "operationId": "get_audience_data",
+        "summary": "Get audience demographics",
+        "tags": [
+          "Analytics"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/analytics/branches": {
+      "get": {
+        "operationId": "get_branch_comparison",
+        "summary": "Get branch comparison analytics",
+        "tags": [
+          "Analytics"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/analytics/branches-kpi": {
+      "get": {
+        "operationId": "get_branch_kpi_endpoint",
+        "summary": "Get detailed branch KPI aggregation",
+        "tags": [
+          "Analytics"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/analytics/erp-correlation": {
+      "get": {
+        "operationId": "get_erp_correlation_endpoint",
+        "summary": "Get ERP sync + analytics cross-reference",
+        "tags": [
+          "Analytics"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/analytics/growth": {
+      "get": {
+        "operationId": "get_growth_endpoint",
+        "summary": "Get month-over-month growth metrics",
+        "tags": [
+          "Analytics"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/analytics/kpi": {
+      "get": {
+        "operationId": "get_kpi_metrics",
+        "summary": "Get detailed KPI metrics",
+        "tags": [
+          "Analytics"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/analytics/overview": {
+      "get": {
+        "operationId": "get_analytics_overview",
+        "summary": "Get analytics overview summary",
+        "tags": [
+          "Analytics"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/analytics/traffic": {
+      "get": {
+        "operationId": "get_traffic_data",
+        "summary": "Get daily traffic for the last N days",
+        "tags": [
+          "Analytics"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/api-keys": {
+      "get": {
+        "operationId": "list_api_keys",
+        "summary": "List API keys",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_api_key",
+        "summary": "Create API key",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/api-keys/validate": {
+      "post": {
+        "operationId": "validate_api_key",
+        "summary": "Validate API key",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/data-access": {
+      "get": {
+        "operationId": "list_data_access_logs",
+        "summary": "List data access logs",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/login-attempts": {
+      "get": {
+        "operationId": "list_login_attempts",
+        "summary": "List login attempts",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/logs": {
+      "get": {
+        "operationId": "list_audit_logs",
+        "summary": "List audit logs",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/logs/export": {
+      "get": {
+        "operationId": "export_audit_logs",
+        "summary": "Export audit trail",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/security-events": {
+      "get": {
+        "operationId": "list_security_events",
+        "summary": "List security events",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/security-events/{event_id}/resolve": {
+      "post": {
+        "operationId": "resolve_security_event",
+        "summary": "Resolve security event",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/audit/stats": {
+      "get": {
+        "operationId": "get_audit_stats",
+        "summary": "Audit statistics",
+        "tags": [
+          "Audit"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/login": {
+      "post": {
+        "operationId": "login",
+        "summary": "Authenticate and get tokens",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/logout": {
+      "post": {
+        "operationId": "logout",
+        "summary": "Logout and revoke tokens",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/me": {
+      "get": {
+        "operationId": "me",
+        "summary": "Get current user profile",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/refresh": {
+      "post": {
+        "operationId": "refresh",
+        "summary": "Refresh access token",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/register": {
+      "post": {
+        "operationId": "register",
+        "summary": "Register a new user",
+        "tags": [
+          "Auth"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/events": {
+      "get": {
+        "operationId": "list_events",
+        "summary": "List billing events",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/features": {
+      "get": {
+        "operationId": "get_features",
+        "summary": "Get enabled features",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/invoice/preview": {
+      "get": {
+        "operationId": "preview_invoice",
+        "summary": "Preview next invoice",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/invoices": {
+      "get": {
+        "operationId": "list_invoices",
+        "summary": "List invoice history",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/invoices/{invoice_id}": {
+      "get": {
+        "operationId": "get_invoice",
+        "summary": "Get invoice details",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/plans": {
+      "get": {
+        "operationId": "list_plans",
+        "summary": "List available subscription plans",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/plans/{plan_id}": {
+      "get": {
+        "operationId": "get_plan",
+        "summary": "Get plan details",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/quotas": {
+      "get": {
+        "operationId": "get_quotas",
+        "summary": "Get current quotas",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/quotas/check": {
+      "get": {
+        "operationId": "check_quota",
+        "summary": "Check if action is allowed",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/stripe/customer": {
+      "get": {
+        "operationId": "get_stripe_customer",
+        "summary": "Get Stripe-compatible customer object",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/stripe/subscription": {
+      "get": {
+        "operationId": "get_stripe_subscription",
+        "summary": "Get Stripe-compatible subscription object",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/subscribe": {
+      "post": {
+        "operationId": "subscribe",
+        "summary": "Subscribe to a plan",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/subscription": {
+      "get": {
+        "operationId": "get_subscription",
+        "summary": "Get current subscription",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "change_subscription",
+        "summary": "Change subscription plan",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/subscription/cancel": {
+      "post": {
+        "operationId": "cancel_subscription",
+        "summary": "Cancel subscription",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/subscription/renew": {
+      "post": {
+        "operationId": "renew_subscription",
+        "summary": "Renew subscription",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/summary": {
+      "get": {
+        "operationId": "get_company_summary",
+        "summary": "Get company billing summary",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/usage": {
+      "get": {
+        "operationId": "get_usage",
+        "summary": "Get usage analytics",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/billing/usage/track": {
+      "post": {
+        "operationId": "track_usage",
+        "summary": "Track resource usage",
+        "tags": [
+          "Billing"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/branches/": {
+      "get": {
+        "operationId": "list_branches",
+        "summary": "List branches",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_branch",
+        "summary": "Create a new branch",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/branches/{branch_id}": {
+      "delete": {
+        "operationId": "delete_branch",
+        "summary": "Delete a branch",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_branch",
+        "summary": "Get a branch by ID",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_branch",
+        "summary": "Update a branch",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/branches/{branch_id}/configs": {
+      "get": {
+        "operationId": "list_branch_configs",
+        "summary": "List configs for a branch",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_branch_config",
+        "summary": "Create a config entry for a branch",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/branches/{branch_id}/configs/{config_id}": {
+      "delete": {
+        "operationId": "delete_branch_config",
+        "summary": "Delete a branch config",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_branch_config",
+        "summary": "Get a single branch config",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_branch_config",
+        "summary": "Update a branch config",
+        "tags": [
+          "Branches"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/companies/": {
+      "get": {
+        "operationId": "list_companies",
+        "summary": "List all companies",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_company",
+        "summary": "Create a new company",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/companies/{company_id}": {
+      "delete": {
+        "operationId": "delete_company",
+        "summary": "Delete a company",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_company",
+        "summary": "Get a company by ID",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_company",
+        "summary": "Update a company",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/companies/{company_id}/stats": {
+      "get": {
+        "operationId": "get_company_stats",
+        "summary": "Get company statistics",
+        "tags": [
+          "Companies"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/connections": {
+      "get": {
+        "operationId": "list_connections",
+        "summary": "List ERP connections",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_connection",
+        "summary": "Create a new ERP connection",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/connections/{connection_id}": {
+      "get": {
+        "operationId": "get_connection",
+        "summary": "Get an ERP connection by ID",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_connection",
+        "summary": "Update an ERP connection",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/mappings": {
+      "get": {
+        "operationId": "list_field_mappings",
+        "summary": "List field mappings",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_field_mapping",
+        "summary": "Create a field mapping",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/mappings/{mapping_id}": {
+      "delete": {
+        "operationId": "delete_field_mapping",
+        "summary": "Delete a field mapping",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_field_mapping",
+        "summary": "Update a field mapping",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/providers": {
+      "get": {
+        "operationId": "list_providers",
+        "summary": "List available ERP providers",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/sync/health/{connection_id}": {
+      "get": {
+        "operationId": "get_sync_health",
+        "summary": "Get sync health for an ERP connection",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/sync/manual": {
+      "post": {
+        "operationId": "trigger_manual_sync",
+        "summary": "Trigger a manual sync job",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/sync/stats/{connection_id}": {
+      "get": {
+        "operationId": "get_sync_stats",
+        "summary": "Get sync statistics for an ERP connection",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/sync/status/{job_id}": {
+      "get": {
+        "operationId": "get_sync_status",
+        "summary": "Get sync job status",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/sync/{job_id}/cancel": {
+      "post": {
+        "operationId": "cancel_sync_job",
+        "summary": "Cancel a running sync job",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/erp/webhook/{provider_type}": {
+      "post": {
+        "operationId": "receive_webhook",
+        "summary": "Receive webhook from an ERP system",
+        "tags": [
+          "Erp"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/automation-executions": {
+      "get": {
+        "operationId": "list_automation_executions",
+        "summary": "List automation executions",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/automation-rules": {
+      "get": {
+        "operationId": "list_automation_rules",
+        "summary": "List automation rules",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_automation_rule",
+        "summary": "Create an automation rule",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/automation-rules/{rule_id}": {
+      "delete": {
+        "operationId": "delete_automation_rule",
+        "summary": "Delete an automation rule",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_automation_rule",
+        "summary": "Update an automation rule",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/automation-rules/{rule_id}/toggle": {
+      "post": {
+        "operationId": "toggle_automation_rule",
+        "summary": "Toggle automation rule active state",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/dead-letter": {
+      "get": {
+        "operationId": "list_dead_letters",
+        "summary": "List dead letter events",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/dead-letter/{dl_id}/resolve": {
+      "post": {
+        "operationId": "resolve_dead_letter",
+        "summary": "Resolve a dead letter event",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/dead-letter/{dl_id}/retry": {
+      "post": {
+        "operationId": "retry_dead_letter",
+        "summary": "Retry a dead letter event",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/definitions": {
+      "get": {
+        "operationId": "list_event_definitions",
+        "summary": "List event definitions",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_event_definition",
+        "summary": "Create an event definition",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/event-types": {
+      "get": {
+        "operationId": "list_event_types",
+        "summary": "List all available event types",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/log": {
+      "get": {
+        "operationId": "list_event_log",
+        "summary": "List event log entries",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/log/{log_id}": {
+      "get": {
+        "operationId": "get_event_log",
+        "summary": "Get event log detail",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/log/{log_id}/retry": {
+      "post": {
+        "operationId": "retry_event_log",
+        "summary": "Retry a failed event",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/publish": {
+      "post": {
+        "operationId": "publish_event",
+        "summary": "Publish an event to the event bus",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/stats": {
+      "get": {
+        "operationId": "get_event_stats",
+        "summary": "Get event statistics",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/subscriptions": {
+      "get": {
+        "operationId": "list_subscriptions",
+        "summary": "List event subscriptions",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_subscription",
+        "summary": "Create an event subscription",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/events/subscriptions/{subscription_id}": {
+      "delete": {
+        "operationId": "delete_subscription",
+        "summary": "Delete an event subscription",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_subscription",
+        "summary": "Update an event subscription",
+        "tags": [
+          "Events"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/health/": {
+      "get": {
+        "operationId": "basic_health",
+        "summary": "Basic health check",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/health/db": {
+      "get": {
+        "operationId": "db_health",
+        "summary": "Database health check",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/health/live": {
+      "get": {
+        "operationId": "liveness_probe",
+        "summary": "Liveness probe",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/health/metrics": {
+      "get": {
+        "operationId": "prometheus_metrics",
+        "summary": "Prometheus metrics",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      }
+    },
+    "/api/v2/health/ready": {
+      "get": {
+        "operationId": "readiness_probe",
+        "summary": "Readiness probe",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/health/redis": {
+      "get": {
+        "operationId": "redis_health",
+        "summary": "Redis health check",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/assets": {
+      "get": {
+        "operationId": "list_media_assets",
+        "summary": "List media assets with filters",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/assets/{asset_id}": {
+      "delete": {
+        "operationId": "delete_media_asset",
+        "summary": "Delete a media asset",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_media_asset",
+        "summary": "Get media asset details",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_media_asset",
+        "summary": "Update a media asset",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/assets/{asset_id}/analysis": {
+      "get": {
+        "operationId": "get_analysis_results",
+        "summary": "Get AI analysis results",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/assets/{asset_id}/download": {
+      "get": {
+        "operationId": "get_download_url",
+        "summary": "Get a signed download URL",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/assets/{asset_id}/tags": {
+      "post": {
+        "operationId": "add_tags_to_asset",
+        "summary": "Add tags to a media asset",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/assets/{asset_id}/tags/{tag_id}": {
+      "delete": {
+        "operationId": "remove_tag_from_asset",
+        "summary": "Remove a tag from a media asset",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/bulk/delete": {
+      "post": {
+        "operationId": "bulk_delete",
+        "summary": "Bulk delete media assets",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/bulk/tag": {
+      "post": {
+        "operationId": "bulk_tag",
+        "summary": "Bulk tag media assets",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/collections": {
+      "get": {
+        "operationId": "list_collections",
+        "summary": "List media collections",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_collection",
+        "summary": "Create a media collection",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/collections/{collection_id}": {
+      "delete": {
+        "operationId": "delete_collection",
+        "summary": "Delete a collection",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_collection",
+        "summary": "Get collection details",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_collection",
+        "summary": "Update a collection",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/collections/{collection_id}/items": {
+      "post": {
+        "operationId": "add_items_to_collection",
+        "summary": "Add items to a collection",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/collections/{collection_id}/items/{media_id}": {
+      "delete": {
+        "operationId": "remove_item_from_collection",
+        "summary": "Remove item from collection",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/jobs/{job_id}": {
+      "get": {
+        "operationId": "get_job_status",
+        "summary": "Get async job status",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/stats": {
+      "get": {
+        "operationId": "get_media_stats",
+        "summary": "Get media usage statistics",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/tags": {
+      "get": {
+        "operationId": "list_tags",
+        "summary": "List media tags",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_tag",
+        "summary": "Create a media tag",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/tags/{tag_id}": {
+      "delete": {
+        "operationId": "delete_tag",
+        "summary": "Delete a media tag",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_tag",
+        "summary": "Update a media tag",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/media/upload-url": {
+      "post": {
+        "operationId": "get_presigned_upload_url",
+        "summary": "Get a presigned URL for direct browser upload",
+        "tags": [
+          "Media"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/notifications/read-all": {
+      "post": {
+        "operationId": "mark_all_notifications_read",
+        "summary": "Mark all notifications as read",
+        "tags": [
+          "Notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/notifications/{notification_id}": {
+      "delete": {
+        "operationId": "delete_notification",
+        "summary": "Delete a notification",
+        "tags": [
+          "Notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      }
+    },
+    "/api/v2/notifications/{notification_id}/read": {
+      "patch": {
+        "operationId": "mark_notification_read",
+        "summary": "Mark a notification as read",
+        "tags": [
+          "Notifications"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/accounts": {
+      "get": {
+        "operationId": "list_accounts",
+        "summary": "List connected social accounts",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_account",
+        "summary": "Connect a new social media account",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/accounts/{account_id}": {
+      "delete": {
+        "operationId": "delete_account",
+        "summary": "Disconnect a social account",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_account",
+        "summary": "Get a social account by ID",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "update_account",
+        "summary": "Update a social account",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/accounts/{account_id}/analytics": {
+      "get": {
+        "operationId": "get_account_analytics",
+        "summary": "Get account-specific analytics",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/accounts/{account_id}/refresh": {
+      "post": {
+        "operationId": "refresh_account_token",
+        "summary": "Refresh account access token",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/analytics": {
+      "get": {
+        "operationId": "get_analytics_dashboard",
+        "summary": "Social analytics dashboard",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/analytics/snapshots": {
+      "get": {
+        "operationId": "list_analytics_snapshots",
+        "summary": "List analytics snapshots",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_analytics_snapshot",
+        "summary": "Create analytics snapshot",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/comments": {
+      "get": {
+        "operationId": "list_comments",
+        "summary": "List comments",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/comments/sync/{account_id}": {
+      "post": {
+        "operationId": "sync_comments",
+        "summary": "Sync comments from platform",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/comments/{comment_id}": {
+      "get": {
+        "operationId": "get_comment",
+        "summary": "Get a comment by ID",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "update_comment",
+        "summary": "Update a comment",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/comments/{comment_id}/read": {
+      "put": {
+        "operationId": "mark_comment_read",
+        "summary": "Mark a comment as read",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/comments/{comment_id}/reply": {
+      "post": {
+        "operationId": "reply_to_comment",
+        "summary": "Reply to a comment",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/comments/{comment_id}/sentiment": {
+      "post": {
+        "operationId": "analyze_comment_sentiment",
+        "summary": "Analyze comment sentiment",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/competitors": {
+      "get": {
+        "operationId": "list_competitors",
+        "summary": "List tracked competitors",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_competitor",
+        "summary": "Add a competitor",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/competitors/{competitor_id}": {
+      "delete": {
+        "operationId": "delete_competitor",
+        "summary": "Remove a competitor",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_competitor",
+        "summary": "Get a competitor by ID",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "update_competitor",
+        "summary": "Update a competitor",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/competitors/{competitor_id}/analyze": {
+      "post": {
+        "operationId": "analyze_competitor",
+        "summary": "Analyze a competitor",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/messages": {
+      "get": {
+        "operationId": "list_messages",
+        "summary": "List messages",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/messages/conversations": {
+      "get": {
+        "operationId": "list_conversations",
+        "summary": "List conversations",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/messages/{message_id}": {
+      "get": {
+        "operationId": "get_message",
+        "summary": "Get a message by ID",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/messages/{message_id}/reply": {
+      "post": {
+        "operationId": "reply_to_conversation",
+        "summary": "Reply to a conversation",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/posts": {
+      "get": {
+        "operationId": "list_posts",
+        "summary": "List social posts",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/posts/{post_id}": {
+      "delete": {
+        "operationId": "delete_post",
+        "summary": "Delete a post",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_post",
+        "summary": "Get a post by ID",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_post",
+        "summary": "Update a post",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/posts/{post_id}/publish": {
+      "post": {
+        "operationId": "publish_now",
+        "summary": "Publish a post immediately",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/webhooks/events": {
+      "get": {
+        "operationId": "list_webhook_events",
+        "summary": "Webhook event log",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/webhooks/events/{event_id}/process": {
+      "post": {
+        "operationId": "process_webhook_event",
+        "summary": "Process a webhook event",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/webhooks/status": {
+      "get": {
+        "operationId": "webhook_status",
+        "summary": "Webhook processing status",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/social/webhooks/{platform}": {
+      "post": {
+        "operationId": "receive_webhook",
+        "summary": "Receive webhook events",
+        "tags": [
+          "Social"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/analytics": {
+      "get": {
+        "operationId": "get_analytics",
+        "summary": "Get support analytics",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/categorize": {
+      "post": {
+        "operationId": "categorize_ticket",
+        "summary": "Auto-categorize a ticket",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/conversations": {
+      "get": {
+        "operationId": "list_conversations",
+        "summary": "List unified conversations",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/conversations/{ticket_id}/messages": {
+      "get": {
+        "operationId": "get_conversation_messages",
+        "summary": "Get conversation messages",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/conversations/{ticket_id}/reply": {
+      "post": {
+        "operationId": "reply_to_conversation",
+        "summary": "Reply to a conversation",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/escalation-rules": {
+      "get": {
+        "operationId": "list_escalation_rules",
+        "summary": "List escalation rules",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_escalation_rule",
+        "summary": "Create escalation rule",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/escalation-rules/{rule_id}": {
+      "delete": {
+        "operationId": "delete_escalation_rule",
+        "summary": "Delete escalation rule",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_escalation_rule",
+        "summary": "Update escalation rule",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/knowledge-base": {
+      "get": {
+        "operationId": "list_kb_articles",
+        "summary": "List KB articles",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_kb_article",
+        "summary": "Create KB article",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/knowledge-base/categories": {
+      "get": {
+        "operationId": "list_kb_categories",
+        "summary": "List KB categories",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_kb_category",
+        "summary": "Create KB category",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/knowledge-base/{article_id}": {
+      "delete": {
+        "operationId": "delete_kb_article",
+        "summary": "Delete/archive KB article",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_kb_article",
+        "summary": "Get KB article detail",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_kb_article",
+        "summary": "Update KB article",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/macros": {
+      "get": {
+        "operationId": "list_macros",
+        "summary": "List support macros",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_macro",
+        "summary": "Create support macro",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/macros/{macro_id}": {
+      "delete": {
+        "operationId": "delete_macro",
+        "summary": "Delete macro",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "No content"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_macro",
+        "summary": "Update macro",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/macros/{shortcut}": {
+      "get": {
+        "operationId": "get_macro_by_shortcut",
+        "summary": "Get macro by shortcut",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/macros/{shortcut}/expand": {
+      "post": {
+        "operationId": "expand_macro",
+        "summary": "Expand a macro",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/rag-context": {
+      "post": {
+        "operationId": "get_rag_context",
+        "summary": "Retrieve RAG context for a query",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/sentiment": {
+      "post": {
+        "operationId": "analyze_sentiment",
+        "summary": "Analyze sentiment of text",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/tickets": {
+      "get": {
+        "operationId": "list_tickets",
+        "summary": "List support tickets",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_ticket",
+        "summary": "Create a support ticket",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/tickets/{ticket_id}": {
+      "get": {
+        "operationId": "get_ticket",
+        "summary": "Get ticket detail",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "operationId": "update_ticket",
+        "summary": "Update a ticket",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/tickets/{ticket_id}/ai-reply": {
+      "post": {
+        "operationId": "generate_ai_reply",
+        "summary": "Generate AI reply for a ticket",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/tickets/{ticket_id}/assign": {
+      "post": {
+        "operationId": "assign_ticket",
+        "summary": "Assign ticket to agent",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/tickets/{ticket_id}/close": {
+      "post": {
+        "operationId": "close_ticket",
+        "summary": "Close a ticket",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/tickets/{ticket_id}/escalate": {
+      "post": {
+        "operationId": "escalate_ticket",
+        "summary": "Escalate a ticket",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/tickets/{ticket_id}/human-takeover": {
+      "post": {
+        "operationId": "human_takeover",
+        "summary": "Transfer AI-handled ticket to human agent",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v2/support/tickets/{ticket_id}/messages": {
+      "get": {
+        "operationId": "list_messages",
+        "summary": "List ticket messages",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "post": {
+        "operationId": "add_message",
+        "summary": "Add a message to a ticket",
+        "tags": [
+          "Support"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PaginatedResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "DateRangeFilter": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdPlatformBase": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdPlatformCredentials": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdPlatformCreate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdPlatformUpdate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdPlatformResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdPlatformListResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCampaignBase": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCampaignCreate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCampaignUpdate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCampaignResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCampaignListResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCampaignMetricsResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAdsetBase": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAdsetCreate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAdsetUpdate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAdsetResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAdsetListResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCreativeBase": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCreativeCreate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCreativeUpdate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCreativeResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCreativeListResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdMetricBase": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdMetricCreate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdMetricResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdMetricListResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AggregatedMetricsResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAudienceBase": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAudienceCreate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAudienceUpdate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAudienceResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdAudienceListResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AudienceOverlapResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "LookalikeSuggestion": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdBudgetRecommendationBase": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdBudgetRecommendationCreate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdBudgetRecommendationResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdBudgetRecommendationListResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCreativeAnalysisBase": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCreativeAnalysisCreate": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "AdCreativeAnalysisResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "CreativeFatigueResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "ABTestResultResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "PerformanceDashboardResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "ROASAnalysisResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "CPAAnalysisResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "LocalCampaignRecommendation": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "LocalRecommendationsResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "SyncRequest": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "SyncResponse": {
+        "type": "object",
+        "x-module": "ads"
+      },
+      "TenantMixin": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TimestampMixin": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "AIPromptCreate": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIPromptUpdate": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIPromptResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIPromptListResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIMessageCreate": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIMessageResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIConversationCreate": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIConversationResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIConversationListResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIGenerateRequest": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIGenerateResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AISuggestionCreate": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AISuggestionFeedback": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AISuggestionResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AISuggestionListResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIRecommendationCreate": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIRecommendationResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIRecommendationListResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIUsageFilter": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIUsageResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIUsageSummary": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIUsageListResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AICacheResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AICacheStats": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AISendMessageRequest": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AISendMessageResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "AIErrorResponse": {
+        "type": "object",
+        "x-module": "ai"
+      },
+      "PlatformBreakdownItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "AnalyticsOverviewData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "AnalyticsOverviewResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "TrafficMeta": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "TrafficData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "TrafficResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "CityBreakdownItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "BranchTypeItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "MonthlyGrowthItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "AudienceData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "AudienceResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "DateRange": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "KpiMetricsData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "KpiMetricsResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "BranchComparisonItem": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "BranchComparisonMeta": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "BranchComparisonData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "BranchComparisonResponse": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "DailyConversionTrendItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "CampaignConversionItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "ConversionAnalyticsData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "ConversionAnalyticsResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "CategoryBreakdownItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "TopCampaignItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "CampaignAnalyticsData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "CampaignAnalyticsResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "BranchKpiItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "BranchKpiSummary": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "BranchKpiData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "BranchKpiResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "ConnectionItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "SyncJobItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "InventorySummary": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "SalesOrderSummary": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "ERPCorrelationData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "ERPCorrelationResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "ModelBreakdownItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "DailyUsageItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "SuggestionTypeItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "ConversationSummary": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "MessageStatsItem": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "AIInsightsData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "AIInsightsResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "GrowthSummary": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "GrowthMetricsData": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "GrowthMetricsResponse": {
+        "type": "object",
+        "x-module": "analytics"
+      },
+      "AuditLogBase": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "AuditLogCreate": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "AuditLogResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "AuditLogListResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "AuditLogFilter": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "SecurityEventBase": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "SecurityEventCreate": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "SecurityEventResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "SecurityEventListResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "SecurityEventFilter": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "SecurityEventResolve": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "LoginAttemptBase": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "LoginAttemptCreate": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "LoginAttemptResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "LoginAttemptListResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "LoginAttemptFilter": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "APIKeyBase": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "APIKeyCreate": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "APIKeyUpdate": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "APIKeyResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "APIKeyWithPlainKey": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "APIKeyListResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "APIKeyValidateRequest": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "APIKeyValidationResult": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "DataAccessLogBase": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "DataAccessLogCreate": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "DataAccessLogResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "DataAccessLogListResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "DataAccessLogFilter": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "AuditStatsResponse": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "ExportFormat": {
+        "type": "object",
+        "x-module": "audit"
+      },
+      "JWTPayload": {
+        "type": "object",
+        "x-module": "auth"
+      },
+      "UserRegister": {
+        "type": "object",
+        "x-module": "auth"
+      },
+      "UserLogin": {
+        "type": "object",
+        "x-module": "auth"
+      },
+      "PasswordReset": {
+        "type": "object",
+        "x-module": "auth"
+      },
+      "PasswordChange": {
+        "type": "object",
+        "x-module": "auth"
+      },
+      "TokenResponse": {
+        "type": "object",
+        "x-module": "auth"
+      },
+      "UserResponse": {
+        "type": "object",
+        "x-module": "auth"
+      },
+      "LogoutRequest": {
+        "type": "object",
+        "x-module": "auth"
+      },
+      "PlanBase": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "PlanCreate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "PlanUpdate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "PlanResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "PlanListResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "SubscriptionBase": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "SubscriptionCreate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "SubscribeRequest": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "SubscriptionUpdate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "SubscriptionCancelRequest": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "SubscriptionResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "UsageRecordBase": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "UsageRecordCreate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "UsageTrackRequest": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "UsageRecordResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "UsageSummaryResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "QuotaBase": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "QuotaCreate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "QuotaUpdate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "QuotaResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "QuotaCheckResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "InvoiceLineItem": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "InvoiceBase": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "InvoiceCreate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "InvoiceUpdate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "InvoiceResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "InvoiceListResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "FeatureFlagBase": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "FeatureFlagCreate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "FeatureFlagToggleRequest": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "FeatureFlagResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "FeatureCheckResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "BillingEventBase": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "BillingEventCreate": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "BillingEventResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "BillingEventListResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "BillingStatsResponse": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "CompanyBillingSummary": {
+        "type": "object",
+        "x-module": "billing"
+      },
+      "BranchBase": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchCreate": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchUpdate": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchResponse": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchListResponse": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchConfigBase": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchConfigCreate": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchConfigUpdate": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchConfigResponse": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "BranchConfigListResponse": {
+        "type": "object",
+        "x-module": "branches"
+      },
+      "CompanyBase": {
+        "type": "object",
+        "x-module": "companies"
+      },
+      "CompanyCreate": {
+        "type": "object",
+        "x-module": "companies"
+      },
+      "CompanyUpdate": {
+        "type": "object",
+        "x-module": "companies"
+      },
+      "CompanyResponse": {
+        "type": "object",
+        "x-module": "companies"
+      },
+      "CompanyListResponse": {
+        "type": "object",
+        "x-module": "companies"
+      },
+      "DashboardStatsData": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "DashboardStatsResponse": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "DashboardChartData": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "DashboardChartResponse": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "DashboardAlertItem": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "DashboardAlertsResponse": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "ExecutiveSummaryData": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "ExecutiveSummaryResponse": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "BranchDashboardData": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "BranchDashboardResponse": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "BranchMonthlyGrowth": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "BranchGrowthResponse": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "KPIAlertThreshold": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "KPIAlertThresholdsResponse": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "PeriodFilter": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "BranchFilter": {
+        "type": "object",
+        "x-module": "dashboard"
+      },
+      "ERPConnectionCreate": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "ERPConnectionUpdate": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "ERPConnectionResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SyncTriggerRequest": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SyncStatusResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SyncLogResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SyncLogListResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "ERPWebhookPayload": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "WebhookResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "FieldMappingCreate": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "FieldMappingUpdate": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "FieldMappingResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SyncHealthCheckResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SyncStatsResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SyncConflictResolutionRequest": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SyncConflictResolutionResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "x-module": "erp"
+      },
+      "EventStatsResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventDefinitionBase": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventDefinitionCreate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventDefinitionUpdate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventDefinitionResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventDefinitionListResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventSubscriptionBase": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventSubscriptionCreate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventSubscriptionUpdate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventSubscriptionResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventSubscriptionListResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventHandlerResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventLogBase": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventLogCreate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventLogUpdate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventLogResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventLogListResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventRetryRequest": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventRetryResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "DeadLetterEventBase": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "DeadLetterEventCreate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "DeadLetterEventResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "DeadLetterEventListResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "DeadLetterResolveRequest": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "DeadLetterResolveResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "DeadLetterRetryResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationRuleBase": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationRuleCreate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationRuleUpdate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationRuleResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationRuleListResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationRuleToggleResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationExecutionBase": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationExecutionCreate": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationExecutionResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "AutomationExecutionListResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "WebhookDeliveryRequest": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "WebhookDeliveryResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventPublishRequest": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "EventPublishResponse": {
+        "type": "object",
+        "x-module": "events"
+      },
+      "PaginationParams": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "SortParams": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaTagCreate": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaTagUpdate": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaTagResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaVariantResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaAssetCreate": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaAssetUpdate": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaAssetResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaAssetListItem": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaAssetListResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaAssetFilter": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "UploadInitiateRequest": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "PresignedUploadUrlResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "UploadCompleteRequest": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "UploadResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "SignedUrlResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "ThumbnailSizeParam": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "TagAddRequest": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "BulkTagRequest": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "BulkDeleteRequest": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaCollectionCreate": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaCollectionUpdate": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaCollectionItemAdd": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaCollectionResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaCollectionListResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "AIAnalysisRequest": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "AIAnalysisResult": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "AIScoreResult": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "AIObjectDetectionResult": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "AIAnalysisTypesResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "JobStatusResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "MediaStatsResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "BulkOperationResponse": {
+        "type": "object",
+        "x-module": "media"
+      },
+      "PlatformEnum": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAccountBase": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAccountCreate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAccountUpdate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAccountInDB": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAccountResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAccountListResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "TokenRefreshRequest": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "TokenRefreshResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialPostBase": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialPostCreate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialPostUpdate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialPostInDB": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialPostResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialPostListResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "PublishNowRequest": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "PublishNowResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCommentBase": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCommentCreate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCommentUpdate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCommentResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCommentListResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "CommentReplyRequest": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "CommentReplyResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "CommentMarkReadResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialMessageBase": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialMessageCreate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialMessageResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "ConversationListResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "MessageReplyRequest": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "MessageReplyResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAnalyticsBase": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAnalyticsCreate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAnalyticsResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "AnalyticsDashboard": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "AnalyticsQueryParams": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialAnalyticsListResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCompetitorBase": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCompetitorCreate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCompetitorUpdate": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCompetitorResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "SocialCompetitorListResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "WebhookPayload": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "WebhookEventResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "WebhookEventListResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "WebhookVerifyResponse": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "WebhookProcessingStatus": {
+        "type": "object",
+        "x-module": "social"
+      },
+      "TicketBase": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TicketCreate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TicketUpdate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TicketAssign": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TicketEscalate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TicketClose": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TicketResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TicketListResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "TicketFilterParams": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "MessageBase": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "MessageCreate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "MessageResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "MessageListResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "AIReplyRequest": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "AIReplyResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "HumanTakeoverRequest": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "HumanTakeoverResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseArticleBase": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseArticleCreate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseArticleUpdate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseArticleResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseArticleListResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseSearchRequest": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseSearchResult": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseSearchResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseCategoryBase": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseCategoryCreate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseCategoryUpdate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "KnowledgeBaseCategoryResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportMacroBase": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportMacroCreate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportMacroUpdate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportMacroResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportMacroListResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "MacroExpandRequest": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "MacroExpandResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "EscalationRuleBase": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "EscalationRuleCreate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "EscalationRuleUpdate": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "EscalationRuleResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "EscalationRuleListResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "EscalationTriggerResult": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportAnalyticsBase": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportAnalyticsResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportAnalyticsSummary": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SupportAnalyticsDateRange": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "ConversationMessage": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "ConversationReplyRequest": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "ConversationReplyResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SentimentAnalysisRequest": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "SentimentAnalysisResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "CategorizationRequest": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "CategorizationResponse": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "RAGContextRequest": {
+        "type": "object",
+        "x-module": "support"
+      },
+      "RAGContextResponse": {
+        "type": "object",
+        "x-module": "support"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

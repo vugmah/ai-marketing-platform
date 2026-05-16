@@ -69,6 +69,27 @@ class Cache:
         """Delete a key from cache."""
         await self._redis.delete(key)
 
+    async def increment(self, key: str, amount: int = 1) -> int:
+        """Increment a counter in Redis. Returns the new value.
+
+        Args:
+            key: The counter key.
+            amount: Amount to increment by (default 1).
+
+        Returns:
+            The new counter value.
+        """
+        return await self._redis.incr(key, amount)
+
+    async def expire(self, key: str, seconds: int) -> None:
+        """Set expiration (TTL) on a key.
+
+        Args:
+            key: The key to set TTL on.
+            seconds: TTL in seconds.
+        """
+        await self._redis.expire(key, seconds)
+
     async def health_check(self) -> bool:
         """Check Redis connectivity."""
         try:
