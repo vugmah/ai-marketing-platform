@@ -31,6 +31,10 @@ class TenantMiddleware(BaseHTTPMiddleware):
     # Paths to skip tenant check entirely
     SKIP_PATHS = [
         "/api/health",
+        "/api/v2/health",
+        "/api/v2/health/live",
+        "/api/v2/health/ready",
+        "/api/v2/health/db",
         "/api/docs",
         "/api/redoc",
         "/api/openapi.json",

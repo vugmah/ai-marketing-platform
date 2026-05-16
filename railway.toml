@@ -4,3 +4,7 @@ dockerfilePath = "backend/Dockerfile"
 
 [deploy]
 healthcheckPath = "/api/v2/health/live"
+restartPolicyType = "on_failure"
+
+[deploy.env]
+PORT = "8080"
