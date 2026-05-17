@@ -4,10 +4,6 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 
-# Backward-compatible alias for modules that import APIError
-APIError = AppException
-
-
 class AppException(Exception):
     """Base application exception."""
 
@@ -103,3 +99,8 @@ def register_exception_handlers(app: FastAPI) -> None:
     """Register all custom exception handlers on the FastAPI application."""
     app.add_exception_handler(AppException, app_exception_handler)
     app.add_exception_handler(Exception, generic_exception_handler)
+
+
+# Backward-compatible alias for modules that import APIError
+# Must be after AppException class definition
+APIError = AppException
