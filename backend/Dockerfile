@@ -3,17 +3,35 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Install system dependencies + Node.js for frontend build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     default-libmysqlclient-dev curl \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Python dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend/ .
+# Install Node.js dependencies for frontend
+COPY package*.json .
+RUN npm install 2>&1 || echo "No package.json, skipping npm install"
 
-# Create empty static dir (frontend will be added later)
-RUN mkdir -p /app/static
+# Copy all source code
+COPY . .
+
+# Build frontend if it exists
+RUN if [ -f package.json ] && [ -d frontend ]; then \
+        npm run build 2>&1 && \
+        rm -rf /app/static && \
+        cp -r /app/dist /app/static; \
+    else \
+        mkdir -p /app/static; \
+    fi
+
+# Copy backend source
+COPY backend/ .
 
 RUN groupadd --gid 1000 aimp && \
     useradd --uid 1000 --gid aimp --shell /bin/false --create-home aimp
