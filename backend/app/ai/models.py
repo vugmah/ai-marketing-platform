@@ -123,7 +123,7 @@ class AIPrompt(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_prompts_company_id",
@@ -134,7 +134,7 @@ class AIPrompt(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ai_prompts_branch_id",
@@ -226,7 +226,7 @@ class AIConversation(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_conversations_company_id",
@@ -237,7 +237,7 @@ class AIConversation(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ai_conversations_branch_id",
@@ -248,7 +248,7 @@ class AIConversation(Base):
     user_id = Column(
         Integer,
         ForeignKey(
-            "public.users.id",
+            "users.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_conversations_user_id",
@@ -260,7 +260,7 @@ class AIConversation(Base):
     prompt_id = Column(
         Integer,
         ForeignKey(
-            "public.ai_prompts.id",
+            "ai_prompts.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ai_conversations_prompt_id",
@@ -336,7 +336,7 @@ class AIMessage(Base):
     conversation_id = Column(
         Integer,
         ForeignKey(
-            "public.ai_conversations.id",
+            "ai_conversations.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_messages_conversation_id",
@@ -397,7 +397,7 @@ class AISuggestion(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_suggestions_company_id",
@@ -408,7 +408,7 @@ class AISuggestion(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ai_suggestions_branch_id",
@@ -435,7 +435,7 @@ class AISuggestion(Base):
     was_applied = Column(Boolean, default=False, nullable=False)
     # Supervised mode: human approval tracking
     supervised_mode = Column(Boolean, default=True, nullable=False)
-    approved_by = Column(Integer, ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True)
+    approved_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     approved_at = Column(DateTime, nullable=True)
     approval_status = Column(
         String(20),
@@ -486,7 +486,7 @@ class AIRecommendation(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_recommendations_company_id",
@@ -497,7 +497,7 @@ class AIRecommendation(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ai_recommendations_branch_id",
@@ -565,7 +565,7 @@ class AIUsageLog(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_usage_logs_company_id",
@@ -576,7 +576,7 @@ class AIUsageLog(Base):
     user_id = Column(
         Integer,
         ForeignKey(
-            "public.users.id",
+            "users.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ai_usage_logs_user_id",
@@ -606,7 +606,7 @@ class AIUsageLog(Base):
     supervised_mode = Column(Boolean, default=True, nullable=False)
 
     # Branch ID for branch-aware analytics
-    branch_id = Column(Integer, ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True)
+    branch_id = Column(Integer, ForeignKey("branches.id", ondelete="SET NULL"), nullable=True)
 
     # Request metadata: prompt_id, cache_hit, retry_count, moderation_result
     request_metadata = Column(JSON, nullable=True, default=dict)
