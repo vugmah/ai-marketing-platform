@@ -12,7 +12,7 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 
 from app.database import close_db, init_db
 from app.redis_client import close_redis, get_redis_client
@@ -176,8 +176,8 @@ app = FastAPI(
     title="AI Marketing Platform",
     version="2.0.0",
     lifespan=lifespan,
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url=None,  # Custom docs below
+    redoc_url=None,
     openapi_url="/api/openapi.json",
 )
 
@@ -202,7 +202,26 @@ async def root():
         "health": "/api/v2/health/live",
     }
 
-# Redirect /api/docs to /docs (local swagger with static files)
+# Custom /docs with unpkg.com CDN (more reliable than jsdelivr)
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return HTMLResponse("""
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+    <link rel="shortcut icon" href="https://fastapi.tiangolo.com/img/favicon.png">
+    <title>AI Marketing Platform - Swagger UI</title>
+    </head><body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+    <script>const ui=SwaggerUIBundle({url:'/api/openapi.json',dom_id:'#swagger-ui',layout:'BaseLayout',deepLinking:true,showExtensions:true,showCommonExtensions:true,presets:[SwaggerUIBundle.presets.apis,SwaggerUIBundle.SwaggerUIStandalonePreset]});</script>
+    </body></html>
+    """)
+
+# Redirect /api/docs to /docs
 @app.get("/api/docs", include_in_schema=False)
 async def redirect_docs():
     return RedirectResponse(url="/docs")
