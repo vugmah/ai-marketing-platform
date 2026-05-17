@@ -43,7 +43,7 @@ MODULE_FLAGS = {
     "billing": os.environ.get("ENABLE_BILLING", "true").lower() == "true",
     "audit": os.environ.get("ENABLE_AUDIT", "false").lower() == "true",
     "ads": os.environ.get("ENABLE_ADS", "true").lower() == "true",
-    "reports": os.environ.get("ENABLE_REPORTS", "false").lower() == "true",
+    "reports": os.environ.get("ENABLE_REPORTS", "true").lower() == "true",
     "support": os.environ.get("ENABLE_SUPPORT", "true").lower() == "true",
     "knowledge": os.environ.get("ENABLE_KNOWLEDGE", "false").lower() == "true",
     "governance": os.environ.get("ENABLE_GOVERNANCE", "false").lower() == "true",

@@ -49,7 +49,11 @@ def _get_database_url() -> str:
 DATABASE_URL = _get_database_url()
 
 _is_sqlite = "sqlite" in DATABASE_URL.lower()
-_engine_kwargs = {"echo": False, "pool_pre_ping": True}
+_engine_kwargs = {
+    "echo": False,
+    "pool_pre_ping": True,
+    "pool_recycle": 3600,  # Recycle connections after 1 hour
+}
 if not _is_sqlite:
     _engine_kwargs.update(pool_size=20, max_overflow=30)
 
