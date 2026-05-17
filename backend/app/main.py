@@ -10,7 +10,7 @@ import os
 from contextlib import asynccontextmanager
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 
@@ -203,7 +203,7 @@ async def root():
     }
 
 @app.get("/docs", include_in_schema=False)
-async def api_docs(request):
+async def api_docs(request: Request):
     """Simple API documentation - reads openapi.json and renders HTML."""
     import json
     from fastapi.openapi.utils import get_openapi
