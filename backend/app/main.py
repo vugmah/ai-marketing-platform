@@ -202,24 +202,33 @@ async def root():
         "health": "/api/v2/health/live",
     }
 
-# Custom /docs with unpkg.com CDN (more reliable than jsdelivr)
+# Local swagger UI using swagger-ui-dist package (no CDN dependency)
+try:
+    import swagger_ui_dist
+    _swagger_ui_path = os.path.dirname(swagger_ui_dist.__file__)
+    app.mount("/docs-static", StaticFiles(directory=_swagger_ui_path), name="swagger-static")
+    logger.info(f"[DOCS] Swagger UI static files mounted from {_swagger_ui_path}")
+except ImportError:
+    _swagger_ui_path = None
+    logger.warning("[DOCS] swagger-ui-dist not installed, docs may not load")
+
 @app.get("/docs", include_in_schema=False)
 async def custom_swagger_ui_html():
-    return HTMLResponse("""
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
-    <link rel="shortcut icon" href="https://fastapi.tiangolo.com/img/favicon.png">
-    <title>AI Marketing Platform - Swagger UI</title>
-    </head><body>
-    <div id="swagger-ui"></div>
-    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
-    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
-    <script>const ui=SwaggerUIBundle({url:'/api/openapi.json',dom_id:'#swagger-ui',layout:'BaseLayout',deepLinking:true,showExtensions:true,showCommonExtensions:true,presets:[SwaggerUIBundle.presets.apis,SwaggerUIBundle.SwaggerUIStandalonePreset]});</script>
-    </body></html>
-    """)
+    if _swagger_ui_path:
+        return HTMLResponse("""
+        <!DOCTYPE html><html><head><meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/docs-static/swagger-ui.css">
+        <link rel="shortcut icon" href="https://fastapi.tiangolo.com/img/favicon.png">
+        <title>AI Marketing Platform - Swagger UI</title></head><body>
+        <div id="swagger-ui"></div>
+        <script src="/docs-static/swagger-ui-bundle.js"></script>
+        <script src="/docs-static/swagger-ui-standalone-preset.js"></script>
+        <script>const ui=SwaggerUIBundle({url:'/api/openapi.json',dom_id:'#swagger-ui',layout:'BaseLayout',deepLinking:true,showExtensions:true,showCommonExtensions:true,presets:[SwaggerUIBundle.presets.apis,SwaggerUIBundle.SwaggerUIStandalonePreset]});</script>
+        </body></html>
+        """)
+    else:
+        return HTMLResponse("<html><body><h1>Swagger UI not available</h1><p>Install swagger-ui-dist package</p></body></html>")
 
 # Redirect /api/docs to /docs
 @app.get("/api/docs", include_in_schema=False)

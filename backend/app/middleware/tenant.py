@@ -49,6 +49,7 @@ class TenantMiddleware(BaseHTTPMiddleware):
         "/api/v2/auth",
         "/api/docs",
         "/docs",
+        "/docs-static",
         "/redoc",
         "/static",
     ]
