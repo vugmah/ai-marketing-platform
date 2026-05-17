@@ -202,33 +202,60 @@ async def root():
         "health": "/api/v2/health/live",
     }
 
-# Local swagger UI using swagger-ui-dist package (no CDN dependency)
-try:
-    import swagger_ui_dist
-    _swagger_ui_path = os.path.dirname(swagger_ui_dist.__file__)
-    app.mount("/docs-static", StaticFiles(directory=_swagger_ui_path), name="swagger-static")
-    logger.info(f"[DOCS] Swagger UI static files mounted from {_swagger_ui_path}")
-except ImportError:
-    _swagger_ui_path = None
-    logger.warning("[DOCS] swagger-ui-dist not installed, docs may not load")
-
 @app.get("/docs", include_in_schema=False)
-async def custom_swagger_ui_html():
-    if _swagger_ui_path:
-        return HTMLResponse("""
-        <!DOCTYPE html><html><head><meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="/docs-static/swagger-ui.css">
-        <link rel="shortcut icon" href="https://fastapi.tiangolo.com/img/favicon.png">
-        <title>AI Marketing Platform - Swagger UI</title></head><body>
-        <div id="swagger-ui"></div>
-        <script src="/docs-static/swagger-ui-bundle.js"></script>
-        <script src="/docs-static/swagger-ui-standalone-preset.js"></script>
-        <script>const ui=SwaggerUIBundle({url:'/api/openapi.json',dom_id:'#swagger-ui',layout:'BaseLayout',deepLinking:true,showExtensions:true,showCommonExtensions:true,presets:[SwaggerUIBundle.presets.apis,SwaggerUIBundle.SwaggerUIStandalonePreset]});</script>
-        </body></html>
-        """)
-    else:
-        return HTMLResponse("<html><body><h1>Swagger UI not available</h1><p>Install swagger-ui-dist package</p></body></html>")
+async def api_docs(request):
+    """Simple API documentation - reads openapi.json and renders HTML."""
+    import json
+    from fastapi.openapi.utils import get_openapi
+    
+    try:
+        openapi_schema = get_openapi(
+            title=app.title,
+            version=app.version,
+            openapi_version=app.openapi_version,
+            description=app.description,
+            routes=app.routes,
+        )
+    except Exception:
+        return HTMLResponse("<h1>API Documentation</h1><p>Schema not available yet. Try again in a moment.</p>")
+    
+    paths_html = ""
+    for path, path_info in openapi_schema.get("paths", {}).items():
+        for method, method_info in path_info.items():
+            if method == "parameters":
+                continue
+            summary = method_info.get("summary", "")
+            tag = (method_info.get("tags", [""])[0]) if method_info.get("tags") else ""
+            paths_html += f'<tr><td><span class="method method-{method}">{method.upper()}</span></td><td><code>{path}</code></td><td>{summary}</td><td>{tag}</td></tr>'
+    
+    return HTMLResponse(f"""
+    <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Marketing Platform API Docs</title>
+    <style>
+        body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:1200px;margin:0 auto;padding:20px;background:#f5f5f5}}
+        h1{{color:#333;margin-bottom:10px}} .subtitle{{color:#666;margin-bottom:30px}}
+        .info{{background:#fff;padding:15px 20px;border-radius:8px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.1)}}
+        table{{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}}
+        th{{background:#2d3748;color:#fff;padding:12px 16px;text-align:left;font-weight:600}}
+        td{{padding:10px 16px;border-bottom:1px solid #e2e8f0}}
+        tr:hover{{background:#f7fafc}}
+        .method{{padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600}}
+        .method-get{{background:#c6f6d5;color:#22543d}}
+        .method-post{{background:#bee3f8;color:#2a4365}}
+        .method-put{{background:#feebc8;color:#744210}}
+        .method-delete{{background:#fed7d7;color:#742a2a}}
+        code{{background:#edf2f7;padding:2px 6px;border-radius:4px;font-size:13px}}
+        .links{{margin-top:20px}} .links a{{color:#3182ce;margin-right:20px}}
+    </style></head><body>
+    <h1>AI Marketing Platform API</h1>
+    <p class="subtitle">Version {app.version} | <a href="/api/openapi.json">Download OpenAPI JSON</a></p>
+    <div class="info"><strong>Health:</strong> <a href="/api/v2/health/live">/api/v2/health/live</a> | 
+    <strong>DB:</strong> <a href="/api/v2/health/db">/api/v2/health/db</a> | 
+    <strong>Root:</strong> <a href="/">/</a></div>
+    <table><tr><th>Method</th><th>Path</th><th>Summary</th><th>Tag</th></tr>{paths_html}</table>
+    <div class="links"><a href="/api/openapi.json">OpenAPI JSON</a><a href="/">API Root</a></div>
+    </body></html>
+    """)
 
 # Redirect /api/docs to /docs
 @app.get("/api/docs", include_in_schema=False)
