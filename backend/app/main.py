@@ -181,12 +181,26 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
-# Serve frontend static files
+# Serve frontend static files at /app path (not root, to avoid conflicts with API)
 static_dir = "/app/static"
-if os.path.exists(static_dir):
-    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+if os.path.exists(static_dir) and os.path.exists(os.path.join(static_dir, "index.html")):
+    app.mount("/app", StaticFiles(directory=static_dir, html=True), name="static")
+    logger.info(f"[STATIC] Frontend serving enabled at /app")
 else:
-    logger.warning(f"[STATIC] Static directory not found: {static_dir}")
+    logger.warning(f"[STATIC] Frontend not built yet, serving API only")
+
+# Root endpoint - serve index.html if available, otherwise API info
+@app.get("/", tags=["Root"])
+async def root():
+    index_path = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {
+        "name": "AI Marketing Platform API",
+        "version": "2.0.0",
+        "status": "running",
+        "health": "/api/v2/health/live",
+    }
 
 # CORS
 setup_cors(app)
