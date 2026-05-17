@@ -39,7 +39,13 @@ export default function Layout() {
     return saved === "true";
   });
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  // Initialize isMobile correctly on first render to prevent flash
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
 
   // Detect mobile viewport
   useEffect(() => {
@@ -69,13 +75,11 @@ export default function Layout() {
   const currentPath = location.pathname;
   const meta = pageMeta[currentPath] || { title: "Dashboard", subtitle: "" };
 
-  // Determine sidebar width for CSS variable
-  // Mobile (< md): sidebar hidden, content takes full width
-  // Desktop: sidebar takes 72px (collapsed) or 260px (expanded)
-  const sidebarWidth = isMobile ? 0 : collapsed && !mobileOpen ? 72 : 260;
+  // Sidebar width: mobile = 0 (overlay drawer), desktop = 72 or 260
+  const sidebarWidth = collapsed ? 72 : 260;
 
   return (
-    <div className="min-h-[100dvh]">
+    <div className="min-h-[100dvh] overflow-x-hidden">
       {/* ── Sidebar ─────────────────────────────── */}
       <Sidebar
         collapsed={collapsed}
@@ -86,10 +90,10 @@ export default function Layout() {
 
       {/* ── Header ──────────────────────────────── */}
       <div
-        className={cn(isMobile && "md:ml-0")}
+        className="md:ml-0"
         style={
           {
-            "--sidebar-offset": `${sidebarWidth}px`,
+            "--sidebar-offset": isMobile ? "0px" : `${sidebarWidth}px`,
           } as React.CSSProperties
         }
       >
@@ -101,18 +105,13 @@ export default function Layout() {
       </div>
 
       {/* ── Main Content ────────────────────────── */}
+      {/* Mobile: full width, no sidebar margin. Desktop: sidebar offset */}
       <main
-        className={cn(
-          "min-h-[100dvh] pt-16 pb-20 md:pb-0 transition-all duration-300",
-          "bg-[#F1F5F9]",
-          // Mobile: no margin (sidebar hidden), Desktop: sidebar offset
-          isMobile ? "ml-0" : undefined
-        )}
+        className="min-h-[100dvh] pt-16 pb-20 md:pb-0 bg-[#F1F5F9] transition-all duration-300"
         style={{
           marginLeft: isMobile ? 0 : sidebarWidth,
         }}
       >
-        {/* Mobile: full-width padding, larger screens: comfortable padding */}
         <div className="p-3 sm:p-4 md:p-6 lg:p-8 max-w-[1440px] mx-auto">
           <Outlet />
         </div>

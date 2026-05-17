@@ -118,11 +118,14 @@ export default function Sidebar({
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - hidden on mobile by default, drawer when mobileOpen */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full z-50 flex flex-col transition-all duration-300 ease-in-out",
-          "bg-[#0F172A] text-white"
+          "fixed left-0 top-0 h-full z-50 flex-col transition-all duration-300 ease-in-out",
+          "bg-[#0F172A] text-white",
+          // Mobile: hidden unless mobileOpen is true
+          "hidden md:flex",
+          mobileOpen && "!flex"
         )}
         style={{
           width: collapsed && !mobileOpen ? 72 : 260,
