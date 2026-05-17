@@ -46,7 +46,7 @@ MODULE_FLAGS = {
     "reports": os.environ.get("ENABLE_REPORTS", "true").lower() == "true",
     "support": os.environ.get("ENABLE_SUPPORT", "true").lower() == "true",
     "knowledge": os.environ.get("ENABLE_KNOWLEDGE", "false").lower() == "true",
-    "governance": os.environ.get("ENABLE_GOVERNANCE", "false").lower() == "true",
+    "governance": os.environ.get("ENABLE_GOVERNANCE", "true").lower() == "true",
     "localization": os.environ.get("ENABLE_LOCALIZATION", "false").lower() == "true",
     "realtime": os.environ.get("ENABLE_REALTIME", "true").lower() == "true",
     "revenue": os.environ.get("ENABLE_REVENUE", "false").lower() == "true",
