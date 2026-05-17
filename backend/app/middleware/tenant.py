@@ -48,6 +48,8 @@ class TenantMiddleware(BaseHTTPMiddleware):
         "/api/v2/health",
         "/api/v2/auth",
         "/api/docs",
+        "/docs",
+        "/redoc",
         "/static",
     ]
 

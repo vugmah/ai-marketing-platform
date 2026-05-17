@@ -12,7 +12,7 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 
 from app.database import close_db, init_db
 from app.redis_client import close_redis, get_redis_client
@@ -176,8 +176,8 @@ app = FastAPI(
     title="AI Marketing Platform",
     version="2.0.0",
     lifespan=lifespan,
-    docs_url="/api/docs",
-    redoc_url="/api/redoc",
+    docs_url="/docs",
+    redoc_url="/redoc",
     openapi_url="/api/openapi.json",
 )
 
@@ -201,6 +201,16 @@ async def root():
         "status": "running",
         "health": "/api/v2/health/live",
     }
+
+# Redirect /api/docs to /docs (local swagger with static files)
+@app.get("/api/docs", include_in_schema=False)
+async def redirect_docs():
+    return RedirectResponse(url="/docs")
+
+# Redirect /api/redoc to /redoc
+@app.get("/api/redoc", include_in_schema=False)
+async def redirect_redoc():
+    return RedirectResponse(url="/redoc")
 
 # CORS
 setup_cors(app)
