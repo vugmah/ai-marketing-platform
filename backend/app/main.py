@@ -182,26 +182,31 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
-# Serve frontend static files at root
-# API routes are registered BEFORE this mount, so /api/* takes precedence
+# Serve frontend at root - via endpoint (not mount, to avoid API route conflicts)
 static_dir = "/app/static"
 _frontend_available = os.path.exists(static_dir) and os.path.exists(os.path.join(static_dir, "index.html"))
 
 if _frontend_available:
-    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
-    logger.info("[STATIC] Frontend serving enabled at /")
+    logger.info("[STATIC] Frontend available, serving at /")
 else:
     logger.warning("[STATIC] Frontend not built yet, serving API only")
-    
-    # Fallback root endpoint when no frontend
-    @app.get("/", tags=["Root"], include_in_schema=False)
-    async def root():
-        return {
-            "name": "AI Marketing Platform API",
-            "version": "2.0.0",
-            "status": "running",
-            "health": "/api/v2/health/live",
-        }
+
+@app.get("/", include_in_schema=False)
+async def root():
+    """Serve frontend index.html if available, otherwise API info."""
+    index_path = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {
+        "name": "AI Marketing Platform API",
+        "version": "2.0.0",
+        "status": "running",
+        "health": "/api/v2/health/live",
+    }
+
+# Serve frontend assets at /assets
+if _frontend_available:
+    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="frontend-assets")
 
 # Redirect /api/docs to /docs
 @app.get("/api/docs", include_in_schema=False)
