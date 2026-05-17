@@ -120,8 +120,10 @@ async def get_db() -> AsyncSession:
             await session.close()
 
 
-# Alias for backward compatibility (media/router.py uses get_db_session)
+# Alias for backward compatibility
 get_db_session = get_db
+# Alias for governance and other modules that use get_async_session
+get_async_session = get_db
 
 
 @asynccontextmanager

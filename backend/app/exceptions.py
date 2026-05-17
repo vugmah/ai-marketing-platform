@@ -4,6 +4,10 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 
+# Backward-compatible alias for modules that import APIError
+APIError = AppException
+
+
 class AppException(Exception):
     """Base application exception."""
 

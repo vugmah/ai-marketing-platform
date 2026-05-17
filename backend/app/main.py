@@ -400,7 +400,8 @@ try:
     if MODULE_FLAGS.get("realtime"):
         from app.realtime.gateway import websocket_endpoint
         from app.realtime.router import router as realtime_router
-        app.add_websocket_route("/ws", websocket_endpoint, name="websocket_gateway")
+        # Use FastAPI websocket decorator instead of add_websocket_route
+        app.websocket("/ws")(websocket_endpoint)
         app.include_router(realtime_router, prefix="/api/v2/realtime", tags=["Realtime"])
         logger.info("[ROUTER] realtime: loaded")
 except Exception as e:
