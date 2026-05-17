@@ -24,9 +24,10 @@ COPY backend/ .
 # Copy all source code (frontend overrides backend copy)
 COPY . .
 
-# Build frontend if it exists
+# Build frontend if it exists (with cache clean)
 RUN if [ -f package.json ] && [ -d frontend ]; then \
-        npm run build 2>&1 && \
+        rm -rf /app/node_modules/.vite /app/node_modules/.cache && \
+        npx vite build --force 2>&1 && \
         rm -rf /app/static && \
         cp -r /app/dist /app/static; \
     else \
