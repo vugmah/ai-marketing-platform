@@ -38,7 +38,7 @@ MODULE_FLAGS = {
     "ai": os.environ.get("ENABLE_AI", "false").lower() == "true",
     "rag": os.environ.get("ENABLE_RAG", "false").lower() == "true",
     "social": os.environ.get("ENABLE_SOCIAL", "false").lower() == "true",
-    "media": os.environ.get("ENABLE_MEDIA", "false").lower() == "true",
+    "media": os.environ.get("ENABLE_MEDIA", "true").lower() == "true",
     "events": os.environ.get("ENABLE_EVENTS", "false").lower() == "true",
     "billing": os.environ.get("ENABLE_BILLING", "false").lower() == "true",
     "audit": os.environ.get("ENABLE_AUDIT", "false").lower() == "true",
