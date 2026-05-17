@@ -52,6 +52,7 @@ class TenantMiddleware(BaseHTTPMiddleware):
         "/docs-static",
         "/redoc",
         "/static",
+        "/assets",
     ]
 
     # Response body fields that indicate tenant ID
