@@ -46,7 +46,7 @@ class DataLineageRecord(Base):
     transformation_description = Column(Text, nullable=True)
     performed_by = Column(Integer, nullable=True)
     performed_by_type = Column(String(20), nullable=False, default="user")  # user, system, ai, webhook
-    metadata = Column(JSON, nullable=False, default=dict)
+    config_metadata = Column("metadata", JSON, nullable=False, default=dict)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
 

@@ -14,7 +14,7 @@ class OperationalIncident(Base):
         Index("ix_oi_severity", "severity"),
         Index("ix_oi_company", "company_id"),
         Index("ix_oi_type", "incident_type"),
-        {"schema": "public", "comment": "Operational incident tracking"},
+        {"comment": "Operational incident tracking"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -44,15 +44,15 @@ class IncidentTimelineEvent(Base):
     __table_args__ = (
         Index("ix_ite_incident", "incident_id"),
         Index("ix_ite_time", "created_at"),
-        {"schema": "public", "comment": "Incident timeline events"},
+        {"comment": "Incident timeline events"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    incident_id = Column(Integer, ForeignKey("public.operational_incidents.id"), nullable=False)
+    incident_id = Column(Integer, ForeignKey("operational_incidents.id"), nullable=False)
     event_type = Column(String(50), nullable=False)  # detection, acknowledgment, action, mitigation, resolution
     description = Column(Text, nullable=False)
     performed_by = Column(Integer, nullable=True)
-    metadata = Column(JSON, nullable=False, default=dict)
+    config_metadata = Column("metadata", JSON, nullable=False, default=dict)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
 
@@ -61,7 +61,7 @@ class AutoRecoveryPlaybook(Base):
     __tablename__ = "auto_recovery_playbooks"
     __table_args__ = (
         Index("ix_arb_type", "incident_type"),
-        {"schema": "public", "comment": "Auto-recovery playbooks"},
+        {"comment": "Auto-recovery playbooks"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
