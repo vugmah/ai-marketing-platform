@@ -29,7 +29,11 @@ RUN if [ -f package.json ] && [ -d frontend ]; then \
         rm -rf /app/node_modules/.vite /app/node_modules/.cache /.cache && \
         npx vite build 2>&1 && \
         rm -rf /app/static && \
-        cp -r /app/dist /app/static; \
+        cp -r /app/dist /app/static && \
+        sed -i 's/mockSocialAccounts/window.mockSocialAccounts/g' /app/static/assets/*.js 2>/dev/null && \
+        sed -i 's/mockCampaigns/window.mockCampaigns/g' /app/static/assets/*.js 2>/dev/null && \
+        sed -i 's/mockPosts/window.mockPosts/g' /app/static/assets/*.js 2>/dev/null && \
+        echo "Frontend built and patched"; \
     else \
         mkdir -p /app/static; \
     fi
