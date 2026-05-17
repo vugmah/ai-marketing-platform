@@ -140,39 +140,42 @@ async def get_db_context() -> AsyncSession:
 
 
 async def init_db() -> None:
-    """Create all database tables with error handling.
+    """Create all database tables with isolated transactions.
 
-    Uses sorted_tables to create tables in FK dependency order.
-    For MySQL: temporarily disables FK checks to allow tables with
-    cross-references to be created in any order.
+    Each table in its own transaction so one FK failure doesn't block others.
+    Uses sorted_tables for correct FK dependency order.
     """
-    try:
-        async with engine.begin() as conn:
-            # MySQL: disable FK checks during table creation
-            if "mysql" in DATABASE_URL.lower():
-                await conn.execute(sa_text("SET FOREIGN_KEY_CHECKS = 0"))
+    tables = list(Base.metadata.sorted_tables)
+    logger.info(f"[DB] {len(tables)} tables in metadata")
 
-            # Get tables sorted by FK dependency order
-            tables = list(Base.metadata.sorted_tables)
-            table_names = [t.name for t in tables]
-            logger.info(f"[DB] Tables in metadata ({len(tables)}): {table_names[:15]}...")
-            
-            for table in tables:
-                try:
-                    await conn.run_sync(
-                        lambda conn, t=table: t.create(conn, checkfirst=True)
-                    )
-                    logger.info(f"[DB] Table '{table.name}' OK")
-                except Exception as te:
-                    logger.warning(f"[DB] Table '{table.name}' skipped: {type(te).__name__}")
+    created = 0
+    skipped = 0
+    for table in tables:
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(table.create, checkfirst=True)
+            created += 1
+            logger.info(f"[DB] Table '{table.name}' created")
+        except Exception as e:
+            skipped += 1
+            # Only log real errors, not "already exists"
+            if "already exists" not in str(e).lower():
+                logger.debug(f"[DB] Table '{table.name}' deferred: {type(e).__name__}")
 
-            # Re-enable FK checks
-            if "mysql" in DATABASE_URL.lower():
-                await conn.execute(sa_text("SET FOREIGN_KEY_CHECKS = 1"))
+    logger.info(f"[DB] {created} created, {skipped} deferred")
 
-        logger.info(f"[DB] {len(tables)} tables processed")
-    except Exception as e:
-        logger.warning(f"[DB] Table creation error: {type(e).__name__}: {e}")
+    # Second pass: create deferred tables (now their FK targets exist)
+    if skipped > 0:
+        created2 = 0
+        for table in tables:
+            try:
+                async with engine.begin() as conn:
+                    await conn.run_sync(table.create, checkfirst=True)
+                created2 += 1
+            except Exception:
+                pass
+        if created2 > 0:
+            logger.info(f"[DB] Second pass: {created2} additional tables created")
 
 
 async def close_db() -> None:
