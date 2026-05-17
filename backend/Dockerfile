@@ -18,7 +18,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY package*.json .
 RUN npm install 2>&1 || echo "No package.json, skipping npm install"
 
-# Copy all source code
+# Copy backend source first
+COPY backend/ .
+
+# Copy all source code (frontend overrides backend copy)
 COPY . .
 
 # Build frontend if it exists
@@ -29,9 +32,6 @@ RUN if [ -f package.json ] && [ -d frontend ]; then \
     else \
         mkdir -p /app/static; \
     fi
-
-# Copy backend source
-COPY backend/ .
 
 RUN groupadd --gid 1000 aimp && \
     useradd --uid 1000 --gid aimp --shell /bin/false --create-home aimp
