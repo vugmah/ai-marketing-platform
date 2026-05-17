@@ -43,6 +43,7 @@ class AccountStatus(str, enum.Enum):
 
     ACTIVE = "active"
     DISCONNECTED = "disconnected"
+    NOT_CONNECTED = "not_connected"
     ERROR = "error"
 
 
