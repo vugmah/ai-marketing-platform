@@ -12,7 +12,7 @@ class FeatureFlag(Base):
     __table_args__ = (
         Index("ix_ff_key", "flag_key"),
         Index("ix_ff_company", "company_id"),
-        {"schema": "public", "comment": "Feature flags for tenant-based rollout"},
+        {"comment": "Feature flags for tenant-based rollout", "extend_existing": True},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -36,7 +36,7 @@ class RolloutCohort(Base):
     __table_args__ = (
         Index("ix_rc_name", "name"),
         Index("ix_rc_company", "company_id"),
-        {"schema": "public", "comment": "Beta rollout cohorts"},
+        {"extend_existing": True, "comment": "Beta rollout cohorts"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -58,7 +58,7 @@ class ReleaseNote(Base):
     __table_args__ = (
         Index("ix_rn_version", "version"),
         Index("ix_rn_company", "company_id"),
-        {"schema": "public", "comment": "Release notes per version"},
+        {"extend_existing": True, "comment": "Release notes per version"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -81,11 +81,11 @@ class RolloutEvent(Base):
     __table_args__ = (
         Index("ix_re_flag", "flag_id"),
         Index("ix_re_time", "created_at"),
-        {"schema": "public", "comment": "Rollout event log"},
+        {"extend_existing": True, "comment": "Rollout event log"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    flag_id = Column(Integer, ForeignKey("public.feature_flags.id"), nullable=False)
+    flag_id = Column(Integer, ForeignKey("feature_flags.id"), nullable=False)
     event_type = Column(String(50), nullable=False)  # enable, disable, pct_change, rollback
     old_value = Column(String(200), nullable=True)
     new_value = Column(String(200), nullable=True)
