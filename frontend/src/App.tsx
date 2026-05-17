@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
+import { HashRouter, Routes, Route, NavLink } from 'react-router-dom'
 import { LayoutDashboard, Users, BarChart3, Megaphone, Settings, Briefcase, HelpCircle, MessageSquare, Building2, FileText, Zap, Globe } from 'lucide-react'
 
 /* ─── pages ─── */
@@ -144,7 +144,9 @@ function Layout() {
         <Routes>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/social" element={<SocialPage />} />
+          <Route path="/social-media" element={<SocialPage />} />
           <Route path="/ads" element={<AdsPage />} />
+          <Route path="/advertising-management" element={<AdsPage />} />
           <Route path="/followers" element={<FollowersPage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
@@ -159,8 +161,8 @@ function Layout() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Layout />
-    </BrowserRouter>
+    </HashRouter>
   )
 }
