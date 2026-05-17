@@ -47,6 +47,7 @@ class TenantMiddleware(BaseHTTPMiddleware):
     SKIP_PATHS_PREFIX = [
         "/api/v2/health",
         "/api/v2/auth",
+        "/api/docs",
         "/static",
     ]
 
