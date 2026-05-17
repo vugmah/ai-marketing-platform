@@ -177,86 +177,31 @@ app = FastAPI(
     title="AI Marketing Platform",
     version="2.0.0",
     lifespan=lifespan,
-    docs_url=None,  # Custom docs below
-    redoc_url=None,
+    docs_url="/docs",
+    redoc_url="/redoc",
     openapi_url="/api/openapi.json",
 )
 
-# Serve frontend static files at /app path (not root, to avoid conflicts with API)
+# Serve frontend static files at root
+# API routes are registered BEFORE this mount, so /api/* takes precedence
 static_dir = "/app/static"
-if os.path.exists(static_dir) and os.path.exists(os.path.join(static_dir, "index.html")):
-    app.mount("/app", StaticFiles(directory=static_dir, html=True), name="static")
-    logger.info(f"[STATIC] Frontend serving enabled at /app")
+_frontend_available = os.path.exists(static_dir) and os.path.exists(os.path.join(static_dir, "index.html"))
+
+if _frontend_available:
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+    logger.info("[STATIC] Frontend serving enabled at /")
 else:
-    logger.warning(f"[STATIC] Frontend not built yet, serving API only")
-
-# Root endpoint - serve index.html if available, otherwise API info
-@app.get("/", tags=["Root"])
-async def root():
-    index_path = os.path.join(static_dir, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {
-        "name": "AI Marketing Platform API",
-        "version": "2.0.0",
-        "status": "running",
-        "health": "/api/v2/health/live",
-    }
-
-@app.get("/docs", include_in_schema=False)
-async def api_docs(request: Request):
-    """Simple API documentation - reads openapi.json and renders HTML."""
-    import json
-    from fastapi.openapi.utils import get_openapi
+    logger.warning("[STATIC] Frontend not built yet, serving API only")
     
-    try:
-        openapi_schema = get_openapi(
-            title=app.title,
-            version=app.version,
-            openapi_version=app.openapi_version,
-            description=app.description,
-            routes=app.routes,
-        )
-    except Exception:
-        return HTMLResponse("<h1>API Documentation</h1><p>Schema not available yet. Try again in a moment.</p>")
-    
-    paths_html = ""
-    for path, path_info in openapi_schema.get("paths", {}).items():
-        for method, method_info in path_info.items():
-            if method == "parameters":
-                continue
-            summary = method_info.get("summary", "")
-            tag = (method_info.get("tags", [""])[0]) if method_info.get("tags") else ""
-            paths_html += f'<tr><td><span class="method method-{method}">{method.upper()}</span></td><td><code>{path}</code></td><td>{summary}</td><td>{tag}</td></tr>'
-    
-    return HTMLResponse(f"""
-    <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Marketing Platform API Docs</title>
-    <style>
-        body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:1200px;margin:0 auto;padding:20px;background:#f5f5f5}}
-        h1{{color:#333;margin-bottom:10px}} .subtitle{{color:#666;margin-bottom:30px}}
-        .info{{background:#fff;padding:15px 20px;border-radius:8px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.1)}}
-        table{{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}}
-        th{{background:#2d3748;color:#fff;padding:12px 16px;text-align:left;font-weight:600}}
-        td{{padding:10px 16px;border-bottom:1px solid #e2e8f0}}
-        tr:hover{{background:#f7fafc}}
-        .method{{padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600}}
-        .method-get{{background:#c6f6d5;color:#22543d}}
-        .method-post{{background:#bee3f8;color:#2a4365}}
-        .method-put{{background:#feebc8;color:#744210}}
-        .method-delete{{background:#fed7d7;color:#742a2a}}
-        code{{background:#edf2f7;padding:2px 6px;border-radius:4px;font-size:13px}}
-        .links{{margin-top:20px}} .links a{{color:#3182ce;margin-right:20px}}
-    </style></head><body>
-    <h1>AI Marketing Platform API</h1>
-    <p class="subtitle">Version {app.version} | <a href="/api/openapi.json">Download OpenAPI JSON</a></p>
-    <div class="info"><strong>Health:</strong> <a href="/api/v2/health/live">/api/v2/health/live</a> | 
-    <strong>DB:</strong> <a href="/api/v2/health/db">/api/v2/health/db</a> | 
-    <strong>Root:</strong> <a href="/">/</a></div>
-    <table><tr><th>Method</th><th>Path</th><th>Summary</th><th>Tag</th></tr>{paths_html}</table>
-    <div class="links"><a href="/api/openapi.json">OpenAPI JSON</a><a href="/">API Root</a></div>
-    </body></html>
-    """)
+    # Fallback root endpoint when no frontend
+    @app.get("/", tags=["Root"], include_in_schema=False)
+    async def root():
+        return {
+            "name": "AI Marketing Platform API",
+            "version": "2.0.0",
+            "status": "running",
+            "health": "/api/v2/health/live",
+        }
 
 # Redirect /api/docs to /docs
 @app.get("/api/docs", include_in_schema=False)
