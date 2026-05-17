@@ -34,7 +34,7 @@ MODULE_FLAGS = {
     "dashboard": os.environ.get("ENABLE_DASHBOARD", "true").lower() == "true",
     "analytics": os.environ.get("ENABLE_ANALYTICS", "true").lower() == "true",
     "erp": os.environ.get("ENABLE_ERP", "true").lower() == "true",
-    "notifications": os.environ.get("ENABLE_NOTIFICATIONS", "false").lower() == "true",
+    "notifications": os.environ.get("ENABLE_NOTIFICATIONS", "true").lower() == "true",
     "ai": os.environ.get("ENABLE_AI", "false").lower() == "true",
     "rag": os.environ.get("ENABLE_RAG", "false").lower() == "true",
     "social": os.environ.get("ENABLE_SOCIAL", "false").lower() == "true",
