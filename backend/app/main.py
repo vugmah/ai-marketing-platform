@@ -117,23 +117,34 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Logging config failed: {e}")
 
-    # Pre-register ALL models in SQLAlchemy metadata before create_all
-    # This ensures tables are created in correct FK dependency order
+    # Pre-register base models FIRST (companies, branches must be before ai)
     try:
         from app.companies import models as _companies_models
         from app.branches import models as _branches_models
-        from app.followers import models as _followers_models
-        from app.ai import models as _ai_models
-        logger.info("[INIT] Models pre-registered: companies, branches, followers, ai")
+        logger.info("[INIT] Base models registered: companies, branches")
     except Exception as e:
-        logger.warning(f"[INIT] Model pre-registration failed: {e}")
+        logger.warning(f"[INIT] Base model registration failed: {e}")
 
     # Pre-register social_accounts model for followers FK reference
     try:
         from app.social import models as _social_models
-        logger.info("[INIT] Social models pre-registered in metadata")
+        logger.info("[INIT] Social models registered")
     except Exception as e:
-        logger.warning(f"[INIT] Social model pre-registration failed: {e}")
+        logger.warning(f"[INIT] Social model registration failed: {e}")
+
+    # Pre-register followers models
+    try:
+        from app.followers import models as _followers_models
+        logger.info("[INIT] Followers models registered")
+    except Exception as e:
+        logger.warning(f"[INIT] Followers model registration failed: {e}")
+
+    # Pre-register AI models LAST (after companies/branches are in metadata)
+    try:
+        from app.ai import models as _ai_models
+        logger.info("[INIT] AI models registered")
+    except Exception as e:
+        logger.warning(f"[INIT] AI model registration failed: {e}")
 
     try:
         await init_db()

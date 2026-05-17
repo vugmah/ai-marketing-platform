@@ -1,21 +1,22 @@
 """
 AI Module - Vector Memory & RAG System
-
-Provides:
-- Vector store (pgvector + in-memory fallback)
-- Embedding service (OpenAI + sentence-transformers + fallback)
-- Semantic search with cosine similarity
-- Company/branch-aware retrieval
-- RAG pipeline (retrieval + generation)
-- Document chunking and ingestion
-- Re-index Celery tasks
-- Ingestion cache for embeddings
 """
 
-from app.ai.embeddings import EmbeddingService, get_embedding_service
-from app.ai.rag import RAGPipeline, get_rag_pipeline
-from app.ai.retrieval import ContextRetriever, get_retriever
-from app.ai.vector_store import VectorStore, get_vector_store
+# Lazy imports to avoid circular dependency with companies model
+try:
+    from app.ai.embeddings import EmbeddingService, get_embedding_service
+    from app.ai.rag import RAGPipeline, get_rag_pipeline
+    from app.ai.retrieval import ContextRetriever, get_retriever
+    from app.ai.vector_store import VectorStore, get_vector_store
+except ImportError:
+    EmbeddingService = None
+    get_embedding_service = None
+    RAGPipeline = None
+    get_rag_pipeline = None
+    ContextRetriever = None
+    get_retriever = None
+    VectorStore = None
+    get_vector_store = None
 
 __all__ = [
     "EmbeddingService",
