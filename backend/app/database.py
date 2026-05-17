@@ -24,18 +24,8 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 def _get_database_url() -> str:
-    """Build database URL from Railway environment variables.
-
-    Order of precedence:
-    1. DATABASE_URL env var (Railway auto-provides this for MySQL addon)
-    2. MYSQL_URL env var
-    3. Individual Railway MySQL env vars (MYSQLHOST, MYSQLPORT, etc.)
-    4. Fallback to SQLite (for local dev only)
-
-    IMPORTANT: If DATABASE_URL contains 'localhost', it means Railway
-    MySQL addon env var is stale. Use individual MYSQLHOST instead.
-    """
-    # 3. Individual Railway MySQL env vars (CHECK FIRST - Railway DATABASE_URL is stale)
+    """Build database URL from Railway environment variables."""
+    # 1. Railway individual MySQL env vars (CHECK FIRST)
     host = os.environ.get("MYSQLHOST", "")
     if host and host != "localhost":
         port = os.environ.get("MYSQLPORT", "3306")
@@ -44,47 +34,32 @@ def _get_database_url() -> str:
         database = os.environ.get("MYSQLDATABASE", "")
         if user and password and database:
             db_url = f"mysql+aiomysql://{user}:{password}@{host}:{port}/{database}"
-            logger.warning(f"[DB] Using individual MYSQLHOST env var: {host}")
+            logger.info(f"[DB] Using individual MYSQLHOST: {host}")
             return db_url
 
-    # 1. DATABASE_URL (Railway sets this when MySQL addon is connected)
+    # 2. DATABASE_URL
     db_url = os.environ.get("DATABASE_URL", "")
     if db_url and "localhost" not in db_url:
-        # Convert sync mysql:// to async mysql+aiomysql://
         if db_url.startswith("mysql://") and not db_url.startswith("mysql+aiomysql://"):
             db_url = db_url.replace("mysql://", "mysql+aiomysql://", 1)
         return db_url
     elif db_url and "localhost" in db_url:
-        logger.warning(f"[DB] DATABASE_URL has localhost, ignoring: {db_url[:40]}...")
+        logger.warning(f"[DB] DATABASE_URL has localhost, ignoring")
 
-    # 2. MYSQL_URL
+    # 3. MYSQL_URL
     mysql_url = os.environ.get("MYSQL_URL", "")
     if mysql_url and "localhost" not in mysql_url:
         if mysql_url.startswith("mysql://") and not mysql_url.startswith("mysql+aiomysql://"):
             mysql_url = mysql_url.replace("mysql://", "mysql+aiomysql://", 1)
         return mysql_url
 
-    # 4. Fallback to SQLite (local dev)
-    logger.warning("[DB] No Railway MySQL env vars found, using SQLite fallback")
+    # 4. Fallback to SQLite
+    logger.warning("[DB] No Railway MySQL, using SQLite")
     return "sqlite+aiosqlite:///./aimarketing.db"
 
 
-# Get DB URL at module load time
 DATABASE_URL = _get_database_url()
 
-# Debug: log DB URL with masked password
-if DATABASE_URL:
-    try:
-        from urllib.parse import urlparse
-        parsed = urlparse(DATABASE_URL)
-        masked_url = DATABASE_URL.replace(f":{parsed.password}@", ":****@") if parsed.password else DATABASE_URL
-    except Exception:
-        masked_url = DATABASE_URL
-    logger.warning(f"[DB] Database URL: {masked_url}")
-else:
-    logger.error("[DB] No DATABASE_URL configured!")
-
-# SQLite doesn't support pool_size/max_overflow
 _is_sqlite = "sqlite" in DATABASE_URL.lower()
 _engine_kwargs = {
     "echo": False,
@@ -93,16 +68,10 @@ _engine_kwargs = {
 if not _is_sqlite:
     _engine_kwargs.update(pool_size=20, max_overflow=30)
 
-engine = create_async_engine(
-    DATABASE_URL,
-    **_engine_kwargs,
-)
+engine = create_async_engine(DATABASE_URL, **_engine_kwargs)
 
 AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autoflush=False,
+    engine, class_=AsyncSession, expire_on_commit=False, autoflush=False
 )
 
 Base = declarative_base()
@@ -120,9 +89,7 @@ async def get_db() -> AsyncSession:
             await session.close()
 
 
-# Alias for backward compatibility
 get_db_session = get_db
-# Alias for governance and other modules that use get_async_session
 get_async_session = get_db
 
 
@@ -140,42 +107,62 @@ async def get_db_context() -> AsyncSession:
 
 
 async def init_db() -> None:
-    """Create all database tables with isolated transactions.
+    """Create all database tables with FK-safe two-pass approach.
 
-    Each table in its own transaction so one FK failure doesn't block others.
-    Uses sorted_tables for correct FK dependency order.
+    Pass 1: Create tables without FK constraints (avoid NoReferencedTableError)
+    Pass 2: Add FK constraints to existing tables
     """
+    from sqlalchemy.schema import CreateTable, AddConstraint
+    from sqlalchemy import ForeignKeyConstraint, CheckConstraint
+
     tables = list(Base.metadata.sorted_tables)
     logger.info(f"[DB] {len(tables)} tables in metadata")
 
+    # Separate FK constraints from tables for deferred application
+    fk_constraints = {}
+    for table in tables:
+        fks = [c for c in table.constraints if isinstance(c, ForeignKeyConstraint)]
+        if fks:
+            fk_constraints[table.name] = fks
+            # Remove FKs from table for first pass
+            for fk in fks:
+                table.constraints.discard(fk)
+
+    # Pass 1: Create tables without FKs
     created = 0
-    skipped = 0
     for table in tables:
         try:
             async with engine.begin() as conn:
-                await conn.run_sync(table.create, checkfirst=True)
+                await conn.execute(CreateTable(table, if_not_exists=True))
             created += 1
-            logger.info(f"[DB] Table '{table.name}' created")
         except Exception as e:
-            skipped += 1
-            # Only log real errors, not "already exists"
             if "already exists" not in str(e).lower():
-                logger.debug(f"[DB] Table '{table.name}' deferred: {type(e).__name__}")
+                logger.debug(f"[DB] Table '{table.name}' create: {type(e).__name__}")
 
-    logger.info(f"[DB] {created} created, {skipped} deferred")
+    logger.info(f"[DB] Pass 1: {created}/{len(tables)} tables created")
 
-    # Second pass: create deferred tables (now their FK targets exist)
-    if skipped > 0:
-        created2 = 0
-        for table in tables:
-            try:
-                async with engine.begin() as conn:
-                    await conn.run_sync(table.create, checkfirst=True)
-                created2 += 1
-            except Exception:
-                pass
-        if created2 > 0:
-            logger.info(f"[DB] Second pass: {created2} additional tables created")
+    # Pass 2: Add FK constraints
+    if fk_constraints and not _is_sqlite:
+        fk_added = 0
+        for table_name, fks in fk_constraints.items():
+            table = Base.metadata.tables.get(table_name)
+            if not table:
+                continue
+            for fk in fks:
+                try:
+                    async with engine.begin() as conn:
+                        await conn.execute(AddConstraint(fk))
+                    fk_added += 1
+                except Exception as e:
+                    logger.debug(f"[DB] FK on {table_name}: {type(e).__name__}")
+        logger.info(f"[DB] Pass 2: {fk_added} FK constraints added")
+
+    # Restore FK constraints to metadata for future use
+    for table_name, fks in fk_constraints.items():
+        table = Base.metadata.tables.get(table_name)
+        if table:
+            for fk in fks:
+                table.constraints.add(fk)
 
 
 async def close_db() -> None:
@@ -184,60 +171,31 @@ async def close_db() -> None:
 
 
 # =============================================================================
-# Soft Delete Mixin & Query Helpers (GDPR/KVKK Compliance)
+# Soft Delete Mixin & Query Helpers
 # =============================================================================
 
-
 class SoftDeleteMixin:
-    """Mixin that adds soft-delete columns to any SQLAlchemy model.
-
-    Use this mixin for tables that need GDPR/KVKK-compliant deletion
-    where records must be retained for a period before hard deletion.
-
-    Attributes:
-        deleted_at: Timestamp when the record was soft-deleted.
-        deleted_by: FK to the user who performed the soft delete.
-        is_deleted: Flag indicating whether the record is soft-deleted.
-    """
-
     deleted_at = Column(DateTime, nullable=True, index=True)
-    deleted_by = Column(
-        Integer,
-        ForeignKey("public.users.id", ondelete="SET NULL", name="fk_deleted_by_user_id"),
-        nullable=True,
-    )
+    deleted_by = Column(Integer, ForeignKey("users.id", name="fk_deleted_by"), nullable=True)
     is_deleted = Column(Boolean, default=False, nullable=False, index=True)
 
-    def soft_delete(self, deleted_by: int | None = None) -> None:
-        """Mark this record as soft-deleted."""
+    def soft_delete(self, deleted_by=None):
         self.is_deleted = True
         self.deleted_at = datetime.utcnow()
         self.deleted_by = deleted_by
 
-    def restore(self) -> None:
-        """Restore a soft-deleted record."""
+    def restore(self):
         self.is_deleted = False
         self.deleted_at = None
         self.deleted_by = None
 
 
 class ArchiveMixin(SoftDeleteMixin):
-    """Extended mixin that adds archiving fields for company/branch-level archiving.
-
-    When a company or branch is archived, all related entities get
-    `archived_at` and `archived_by` set via cascade.
-    """
-
     archived_at = Column(DateTime, nullable=True, index=True)
-    archived_by = Column(
-        Integer,
-        ForeignKey("public.users.id", ondelete="SET NULL", name="fk_archived_by_user_id"),
-        nullable=True,
-    )
+    archived_by = Column(Integer, ForeignKey("users.id", name="fk_archived_by"), nullable=True)
     is_archived = Column(Boolean, default=False, nullable=False, index=True)
 
-    def archive(self, archived_by: int | None = None) -> None:
-        """Mark this record as archived."""
+    def archive(self, archived_by=None):
         self.is_archived = True
         self.is_deleted = True
         self.archived_at = datetime.utcnow()
@@ -245,43 +203,10 @@ class ArchiveMixin(SoftDeleteMixin):
         self.deleted_at = datetime.utcnow()
         self.deleted_by = archived_by
 
-    def unarchive(self) -> None:
-        """Restore an archived record."""
+    def unarchive(self):
         self.is_archived = False
         self.is_deleted = False
         self.archived_at = None
         self.archived_by = None
         self.deleted_at = None
         self.deleted_by = None
-
-
-def filter_not_deleted(query, model):
-    """Apply soft-delete filter to a query if the model supports it.
-
-    Args:
-        query: SQLAlchemy select/query object.
-        model: The SQLAlchemy model class to check for soft-delete columns.
-
-    Returns:
-        Query with is_deleted == False filter applied if the model
-        has the SoftDeleteMixin, otherwise the original query.
-    """
-    if hasattr(model, "is_deleted"):
-        return query.where(model.is_deleted.is_(False))
-    return query
-
-
-def filter_not_archived(query, model):
-    """Apply archive filter to a query if the model supports it.
-
-    Args:
-        query: SQLAlchemy select/query object.
-        model: The SQLAlchemy model class to check for archive columns.
-
-    Returns:
-        Query with is_archived == False filter applied if the model
-        has the ArchiveMixin, otherwise the original query.
-    """
-    if hasattr(model, "is_archived"):
-        return query.where(model.is_archived.is_(False))
-    return query
