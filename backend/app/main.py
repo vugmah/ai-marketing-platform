@@ -43,10 +43,10 @@ MODULE_FLAGS = {
     "billing": os.environ.get("ENABLE_BILLING", "true").lower() == "true",
     "audit": os.environ.get("ENABLE_AUDIT", "false").lower() == "true",
     "ads": os.environ.get("ENABLE_ADS", "true").lower() == "true",
-    "reports": os.environ.get("ENABLE_REPORTS", "true").lower() == "true",
+    "reports": os.environ.get("ENABLE_REPORTS", "false").lower() == "true",
     "support": os.environ.get("ENABLE_SUPPORT", "true").lower() == "true",
     "knowledge": os.environ.get("ENABLE_KNOWLEDGE", "false").lower() == "true",
-    "governance": os.environ.get("ENABLE_GOVERNANCE", "true").lower() == "true",
+    "governance": os.environ.get("ENABLE_GOVERNANCE", "false").lower() == "true",
     "localization": os.environ.get("ENABLE_LOCALIZATION", "false").lower() == "true",
     "realtime": os.environ.get("ENABLE_REALTIME", "true").lower() == "true",
     "revenue": os.environ.get("ENABLE_REVENUE", "false").lower() == "true",
@@ -123,7 +123,8 @@ async def lifespan(app: FastAPI):
         from app.companies import models as _companies_models
         from app.branches import models as _branches_models
         from app.followers import models as _followers_models
-        logger.info("[INIT] Models pre-registered: companies, branches, followers")
+        from app.ai import models as _ai_models
+        logger.info("[INIT] Models pre-registered: companies, branches, followers, ai")
     except Exception as e:
         logger.warning(f"[INIT] Model pre-registration failed: {e}")
 
