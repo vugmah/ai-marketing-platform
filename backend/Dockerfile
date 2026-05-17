@@ -26,8 +26,8 @@ COPY . .
 
 # Build frontend if it exists (with cache clean)
 RUN if [ -f package.json ] && [ -d frontend ]; then \
-        rm -rf /app/node_modules/.vite /app/node_modules/.cache && \
-        npx vite build --force 2>&1 && \
+        rm -rf /app/node_modules/.vite /app/node_modules/.cache /.cache && \
+        npx vite build 2>&1 && \
         rm -rf /app/static && \
         cp -r /app/dist /app/static; \
     else \
