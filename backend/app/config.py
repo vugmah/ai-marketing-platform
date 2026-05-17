@@ -8,11 +8,14 @@ SECURITY NOTICE:
   python -c "import secrets; print(secrets.token_hex(32))"
 """
 
+import logging
 import os
 from typing import ClassVar, List
 
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -83,9 +86,9 @@ class Settings(BaseSettings):
         return "redis://localhost:6379/0"
 
     # ------------------------------------------------------------------
-    # JWT - REQUIRED at startup (fail-fast if missing or weak)
+    # JWT - Auto-generate if not set (Railway pilot compatibility)
     # ------------------------------------------------------------------
-    JWT_SECRET_KEY: str = Field(..., min_length=32)
+    JWT_SECRET_KEY: str = Field(default="")
     JWT_ALGORITHM: str = Field(default="HS256")
     ACCESS_TOKEN_EXPIRE_HOURS: int = Field(default=24)
     REFRESH_TOKEN_EXPIRE_DAYS: int = Field(default=7)
@@ -122,8 +125,8 @@ class Settings(BaseSettings):
             )
         return v
 
-    # Encryption - REQUIRED at startup (fail-fast if missing)
-    SECRET_KEY: str = Field(..., min_length=32)
+    # Encryption - Auto-generate if not set (Railway pilot compatibility)
+    SECRET_KEY: str = Field(default="")
 
     # Celery
     CELERY_BROKER_URL: str = Field(default="redis://localhost:6379/1")
@@ -302,74 +305,66 @@ class Settings(BaseSettings):
             entropy -= p * math.log2(p)
         return entropy
 
-    @field_validator("JWT_SECRET_KEY")
+    @field_validator("JWT_SECRET_KEY", mode="before")
     @classmethod
     def validate_jwt_secret(cls, v: str) -> str:
-        # Fail-fast: secret must be provided
+        import secrets as _secrets
+        # Auto-generate if not provided (Railway pilot: set JWT_SECRET_KEY env var for persistence)
         if not v or len(v) < 32:
-            raise ValueError(
-                "JWT_SECRET_KEY must be at least 32 characters. "
-                "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+            auto = _secrets.token_hex(32)
+            logger.warning(
+                "[CONFIG] JWT_SECRET_KEY not set or too short. Auto-generated a random key. "
+                "Set JWT_SECRET_KEY env var in Railway dashboard for persistence across restarts."
             )
+            return auto
         # Check against known weak/default values (case-insensitive)
         if v.lower() in cls.DEFAULT_SECRET_VALUES:
-            raise ValueError(
-                f"JWT_SECRET_KEY cannot be a default/placeholder value: '{v[:8]}...'. "
-                f"Generate a secure secret with: python -c \"import secrets; print(secrets.token_hex(32))\""
+            auto = _secrets.token_hex(32)
+            logger.warning(
+                f"[CONFIG] JWT_SECRET_KEY is a known weak value: '{v[:8]}...'. "
+                f"Auto-generated a secure key. Set JWT_SECRET_KEY env var for persistence."
             )
-        # Check entropy (reject low-entropy/repeated patterns)
+            return auto
+        # Check entropy (warn but accept if low - auto-regenerate below threshold)
         entropy = cls._calculate_entropy(v)
-        if entropy < 3.5:
-            raise ValueError(
-                f"JWT_SECRET_KEY has too low entropy ({entropy:.2f} bits/char). "
-                f"The secret appears to be predictable or repetitive. "
-                f"Generate a cryptographically random secret: "
-                f"python -c \"import secrets; print(secrets.token_hex(32))\""
+        if entropy < 2.0 or len(set(v)) < 8:
+            auto = _secrets.token_hex(32)
+            logger.warning(
+                f"[CONFIG] JWT_SECRET_KEY has low entropy ({entropy:.2f} bits/char) or too few unique chars. "
+                f"Auto-generated a secure key. Set JWT_SECRET_KEY env var for persistence."
             )
-        # Check for repeated character patterns
-        if len(set(v)) < 8:
-            raise ValueError(
-                "JWT_SECRET_KEY must contain at least 8 unique characters. "
-                "Generate a secure secret with: python -c \"import secrets; print(secrets.token_hex(32))\""
-            )
-        # Check for hex pattern (secrets.token_hex output) - acceptable but flag if too short
-        hex_chars = set("0123456789abcdefABCDEF")
-        if all(c in hex_chars for c in v) and len(v) < 32:
-            raise ValueError(
-                "JWT_SECRET_KEY: hex-encoded secrets must be at least 32 characters "
-                "(use secrets.token_hex(32) for a 64-char hex string)."
-            )
+            return auto
         return v
 
-    @field_validator("SECRET_KEY")
+    @field_validator("SECRET_KEY", mode="before")
     @classmethod
     def validate_secret_key(cls, v: str) -> str:
+        import secrets as _secrets
+        # Auto-generate if not provided (Railway pilot: set SECRET_KEY env var for persistence)
         if not v or len(v) < 32:
-            raise ValueError(
-                "SECRET_KEY must be at least 32 characters. "
-                "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+            auto = _secrets.token_hex(32)
+            logger.warning(
+                "[CONFIG] SECRET_KEY not set or too short. Auto-generated a random key. "
+                "Set SECRET_KEY env var in Railway dashboard for persistence across restarts."
             )
+            return auto
         # Check against known weak/default values
         if v.lower() in cls.DEFAULT_SECRET_VALUES:
-            raise ValueError(
-                f"SECRET_KEY cannot be a default/placeholder value: '{v[:8]}...'. "
-                f"Generate a secure secret with: python -c \"import secrets; print(secrets.token_hex(32))\""
+            auto = _secrets.token_hex(32)
+            logger.warning(
+                f"[CONFIG] SECRET_KEY is a known weak value: '{v[:8]}...'. "
+                f"Auto-generated a secure key. Set SECRET_KEY env var for persistence."
             )
+            return auto
         # Check entropy
         entropy = cls._calculate_entropy(v)
-        if entropy < 3.5:
-            raise ValueError(
-                f"SECRET_KEY has too low entropy ({entropy:.2f} bits/char). "
-                f"The secret appears to be predictable or repetitive. "
-                f"Generate a cryptographically random secret: "
-                f"python -c \"import secrets; print(secrets.token_hex(32))\""
+        if entropy < 2.0 or len(set(v)) < 8:
+            auto = _secrets.token_hex(32)
+            logger.warning(
+                f"[CONFIG] SECRET_KEY has low entropy ({entropy:.2f} bits/char) or too few unique chars. "
+                f"Auto-generated a secure key. Set SECRET_KEY env var for persistence."
             )
-        # Check for repeated character patterns
-        if len(set(v)) < 8:
-            raise ValueError(
-                "SECRET_KEY must contain at least 8 unique characters. "
-                "Generate a secure secret with: python -c \"import secrets; print(secrets.token_hex(32))\""
-            )
+            return auto
         return v
 
     @model_validator(mode="after")

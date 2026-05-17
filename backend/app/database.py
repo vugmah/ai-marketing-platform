@@ -21,32 +21,80 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 def _get_database_url() -> str:
+    """Build database URL from Railway env vars with extensive debug logging."""
+    logger.info("[DB] Resolving database URL from environment...")
+
+    # List all DB-related env vars for debugging (hide passwords)
+    db_env_vars = {k: v for k, v in os.environ.items()
+                   if any(x in k.upper() for x in ["DATABASE", "MYSQL", "DB"])}
+    safe_env = {k: (v[:20] + "..." if len(v) > 20 else v) if "PASS" in k or "SECRET" in k else v
+                for k, v in db_env_vars.items()}
+    logger.info(f"[DB] Found env vars: {safe_env}")
+
+    # Priority 1: Railway individual MySQL env vars (MYSQLHOST, MYSQLUSER, etc.)
     host = os.environ.get("MYSQLHOST", "")
-    if host and host != "localhost":
+    if host:
         port = os.environ.get("MYSQLPORT", "3306")
         user = os.environ.get("MYSQLUSER", "")
         password = os.environ.get("MYSQLPASSWORD", "")
         database = os.environ.get("MYSQLDATABASE", "")
+        logger.info(f"[DB] Railway MySQL vars: host={host}, port={port}, user={user}, database={database}")
         if user and password and database:
-            return f"mysql+aiomysql://{user}:{password}@{host}:{port}/{database}"
+            url = f"mysql+aiomysql://{user}:{password}@{host}:{port}/{database}"
+            logger.info(f"[DB] Using Railway MySQL individual vars: {url.replace(password, '***')}")
+            return url
+        else:
+            logger.warning(f"[DB] Railway MySQL vars incomplete: user={bool(user)}, pass={bool(password)}, db={bool(database)}")
+    else:
+        logger.info("[DB] MYSQLHOST not set, skipping individual vars")
 
+    # Priority 2: Railway DATABASE_URL
     db_url = os.environ.get("DATABASE_URL", "")
-    if db_url and "localhost" not in db_url:
+    if db_url:
+        logger.info(f"[DB] DATABASE_URL found: {db_url[:50]}...")
+        # Convert mysql:// to mysql+aiomysql:// for async SQLAlchemy
         if db_url.startswith("mysql://") and not db_url.startswith("mysql+aiomysql://"):
             db_url = db_url.replace("mysql://", "mysql+aiomysql://", 1)
+            logger.info("[DB] Converted mysql:// to mysql+aiomysql://")
+        # Also handle postgres:// URLs from Railway
+        if db_url.startswith("postgres://") and not db_url.startswith("postgresql+"):
+            db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+            logger.info("[DB] Converted postgres:// to postgresql+asyncpg://")
+        logger.info(f"[DB] Using DATABASE_URL")
         return db_url
+    else:
+        logger.info("[DB] DATABASE_URL not set")
 
+    # Priority 3: Railway MYSQL_URL
     mysql_url = os.environ.get("MYSQL_URL", "")
-    if mysql_url and "localhost" not in mysql_url:
+    if mysql_url:
+        logger.info(f"[DB] MYSQL_URL found: {mysql_url[:50]}...")
         if mysql_url.startswith("mysql://") and not mysql_url.startswith("mysql+aiomysql://"):
             mysql_url = mysql_url.replace("mysql://", "mysql+aiomysql://", 1)
+        logger.info("[DB] Using MYSQL_URL")
         return mysql_url
+    else:
+        logger.info("[DB] MYSQL_URL not set")
 
-    logger.warning("[DB] Using SQLite fallback")
+    # Priority 4: PGHOST for PostgreSQL
+    pg_host = os.environ.get("PGHOST", "")
+    if pg_host:
+        pg_port = os.environ.get("PGPORT", "5432")
+        pg_user = os.environ.get("PGUSER", "")
+        pg_pass = os.environ.get("PGPASSWORD", "")
+        pg_db = os.environ.get("PGDATABASE", "")
+        if pg_user and pg_pass and pg_db:
+            url = f"postgresql+asyncpg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}"
+            logger.info(f"[DB] Using PostgreSQL vars")
+            return url
+
+    # Fallback: SQLite (for local dev only)
+    logger.warning("[DB] No database env vars found. Using SQLite fallback (NOT for production)")
     return "sqlite+aiosqlite:///./aimarketing.db"
 
 
 DATABASE_URL = _get_database_url()
+logger.info(f"[DB] Final DATABASE_URL starts with: {DATABASE_URL.split('://')[0] if '://' in DATABASE_URL else 'unknown'}://")
 
 _is_sqlite = "sqlite" in DATABASE_URL.lower()
 _engine_kwargs = {
