@@ -48,3 +48,13 @@ def import_all_models():
             logger.warning(f"[MODELS] {mod_name}: import skipped ({e})")
 
     logger.info(f"[MODELS] {imported}/{len(modules)} model modules imported")
+
+    # Explicitly configure mappers so all tables register in metadata
+    # BEFORE any query tries to compile SQL with FK references
+    try:
+        from sqlalchemy.orm import configure_mappers
+        configure_mappers()
+        logger.info("[MODELS] SQLAlchemy mappers configured successfully")
+    except Exception as e:
+        logger.exception("[MODELS] configure_mappers FAILED: %s", e)
+        raise
