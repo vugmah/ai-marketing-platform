@@ -573,11 +573,7 @@ class MediaAnalytics(Base):
 # ---------------------------------------------------------------------------
 
 
-    account = relationship(
-        "app.social.models.SocialAccount",
-        back_populates="analytics",
-        lazy="selectin",
-    )
+    # Relationships
 
 class AIImageAnalysis(Base):
     """

@@ -568,11 +568,7 @@ class SocialAnalytic(Base):
         return f"<SocialAnalytic(id={self.id}, account_id={self.account_id}, date='{self.metric_date}')>"
 
 
-    media = relationship(
-        "app.media.models.MediaAsset",
-        back_populates="analytics",
-        lazy="selectin",
-    )
+    # Relationships
 
 class SocialCompetitor(Base):
     """Tracked competitor accounts for competitive analysis.

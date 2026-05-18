@@ -348,11 +348,7 @@ class AIMessage(Base):
 # 4. AI Suggestions
 # ---------------------------------------------------------------------------
 
-    account = relationship(
-        "app.social.models.SocialAccount",
-        back_populates="messages",
-        lazy="selectin",
-    )
+    # Relationships
 
 class AISuggestion(Base):
     """
