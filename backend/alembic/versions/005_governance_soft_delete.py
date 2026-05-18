@@ -127,7 +127,7 @@ def upgrade() -> None:
     )
     _add_column_if_not_exists(
         "branches",
-        sa.Column("is_archived", sa.Boolean(), nullable=False, server_default="false"),
+        sa.Column("is_archived", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
     )
     op.create_index(
