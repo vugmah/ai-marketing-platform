@@ -335,11 +335,11 @@ def downgrade() -> None:
     """Drop all composite performance indexes."""
 
     # -- Full-text indexes ---------------------------------------------------
-    op.execute("DROP INDEX IF EXISTS public.ix_media_assets_filename_fulltext;")
-    op.execute("DROP INDEX IF EXISTS public.ix_ai_suggestions_response_fulltext;")
-    op.execute("DROP INDEX IF EXISTS public.ix_social_comments_content_fulltext;")
-    op.execute("DROP INDEX IF EXISTS public.ix_social_posts_content_fulltext;")
-    op.execute("DROP INDEX IF EXISTS public.ix_ai_prompts_name_fulltext;")
+    op.execute("DROP INDEX IF EXISTS ix_media_assets_filename_fulltext;")
+    op.execute("DROP INDEX IF EXISTS ix_ai_suggestions_response_fulltext;")
+    op.execute("DROP INDEX IF EXISTS ix_social_comments_content_fulltext;")
+    op.execute("DROP INDEX IF EXISTS ix_social_posts_content_fulltext;")
+    op.execute("DROP INDEX IF EXISTS ix_ai_prompts_name_fulltext;")
 
     # -- Audit module composite indexes --------------------------------------
     op.drop_index("ix_login_attempts_ip_created", table_name="login_attempts", schema=None)
