@@ -4,9 +4,3 @@ Provides unified management of social media accounts across Instagram, Facebook,
 TikTok, WhatsApp, Telegram, and Google Maps. Includes posting, analytics,
 comment management, messaging, competitor tracking, and webhook processing.
 """
-
-# Import Celery tasks for autodiscovery
-try:
-    from app.social import tasks as social_tasks
-except Exception:
-    social_tasks = None
