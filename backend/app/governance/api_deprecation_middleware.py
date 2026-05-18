@@ -19,7 +19,15 @@ class APIDeprecationMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         start_time = time.time()
-        response = await call_next(request)
+        try:
+            response = await call_next(request)
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception(
+                "[DEPRECATION_MW] Inner exception for %s %s",
+                request.method, request.url.path
+            )
+            raise
 
         path = request.url.path
         method = request.method

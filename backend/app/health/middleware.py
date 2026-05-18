@@ -332,6 +332,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             return response
 
         except Exception as exc:
+            logger.exception("[HEALTH_MW] Inner exception for %s %s", request.method, path)
             if should_log:
                 duration = time.perf_counter() - start
                 user_info = self._extract_user_info(request)
