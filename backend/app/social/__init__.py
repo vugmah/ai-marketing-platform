@@ -6,4 +6,7 @@ comment management, messaging, competitor tracking, and webhook processing.
 """
 
 # Import Celery tasks for autodiscovery
-from app.social import tasks as social_tasks
+try:
+    from app.social import tasks as social_tasks
+except Exception:
+    social_tasks = None
