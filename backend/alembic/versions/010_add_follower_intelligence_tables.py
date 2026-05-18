@@ -45,7 +45,7 @@ def upgrade() -> None:
         sa.Column("confidence_reason", sa.String(255), nullable=True),
         sa.Column("is_suspicious", sa.Boolean, server_default=sa.text("FALSE"), nullable=False),
         sa.Column("event_date", sa.DateTime, nullable=False),
-        sa.Column("details", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
+        sa.Column("details", sa.JSON, nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
         schema=None,
     )
@@ -73,7 +73,7 @@ def upgrade() -> None:
         sa.Column("lead_score", sa.Numeric(4, 3), server_default=sa.text("0.0"), nullable=False),
         sa.Column("campaign_id", sa.String(255), nullable=True),
         sa.Column("event_date", sa.DateTime, nullable=False),
-        sa.Column("raw_data", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
+        sa.Column("raw_data", sa.JSON, nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
         schema=None,
     )
@@ -127,7 +127,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(255), nullable=False),
         sa.Column("subject_template", sa.String(500), nullable=True),
         sa.Column("body_template", sa.Text, nullable=False),
-        sa.Column("variables", sa.JSON, server_default=sa.text("'[]'"), nullable=False),
+        sa.Column("variables", sa.JSON, nullable=False),
         sa.Column("policy_status", sa.String(50), server_default=sa.text("'needs_review'"), nullable=False),
         sa.Column("policy_review_notes", sa.Text, nullable=True),
         sa.Column("is_active", sa.Boolean, server_default=sa.text("TRUE"), nullable=False),
@@ -195,9 +195,9 @@ def upgrade() -> None:
         sa.Column("net_change", sa.Integer, server_default=sa.text("0"), nullable=False),
         sa.Column("is_suspicious", sa.Boolean, server_default=sa.text("FALSE"), nullable=False),
         sa.Column("triggered_alert", sa.Boolean, server_default=sa.text("FALSE"), nullable=False),
-        sa.Column("snapshot_ids", sa.JSON, server_default=sa.text("'[]'"), nullable=False),
+        sa.Column("snapshot_ids", sa.JSON, nullable=False),
         sa.Column("estimate_date", sa.DateTime, nullable=False),
-        sa.Column("details", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
+        sa.Column("details", sa.JSON, nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
         schema=None,
     )
@@ -230,8 +230,8 @@ def upgrade() -> None:
         sa.Column("ghost_followers_removed", sa.Integer, server_default=sa.text("0"), nullable=False),
         sa.Column("inactive_identified", sa.Integer, server_default=sa.text("0"), nullable=False),
         sa.Column("engagement_quality_score", sa.Numeric(4, 3), server_default=sa.text("0.0"), nullable=False),
-        sa.Column("branch_comparison", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
-        sa.Column("details", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
+        sa.Column("branch_comparison", sa.JSON, nullable=False),
+        sa.Column("details", sa.JSON, nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
         schema=None,
     )
@@ -261,7 +261,7 @@ def upgrade() -> None:
         sa.Column("is_inactive", sa.Boolean, server_default=sa.text("FALSE"), nullable=False),
         sa.Column("is_ghost", sa.Boolean, server_default=sa.text("FALSE"), nullable=False),
         sa.Column("scored_at", sa.DateTime, nullable=False),
-        sa.Column("details", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
+        sa.Column("details", sa.JSON, nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
         schema=None,
     )

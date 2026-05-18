@@ -178,7 +178,7 @@ def upgrade() -> None:
             nullable=False,
             index=True,
         ),
-        sa.Column("data_scope", sa.JSON(), nullable=False, server_default='["all"]'),
+        sa.Column("data_scope", sa.JSON(), nullable=False,),
         sa.Column("file_path", sa.String(500), nullable=True),
         sa.Column("file_size_bytes", sa.Integer(), nullable=True),
         sa.Column("record_count", sa.Integer(), nullable=True),
