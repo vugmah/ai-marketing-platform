@@ -16,6 +16,7 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy import inspect
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
@@ -25,17 +26,41 @@ branch_labels: Union[Sequence[str], None] = None
 depends_on: Union[Sequence[str], None] = None
 
 
+def _column_exists(table_name: str, column_name: str, schema=None) -> bool:
+    """Return True if *column_name* already exists on *table_name*."""
+    bind = op.get_bind()
+    try:
+        existing = [c["name"] for c in inspect(bind).get_columns(table_name, schema=schema)]
+    except Exception:
+        return False
+    return column_name in existing
+
+
+def _add_column_if_not_exists(table_name, column, schema=None):
+    """Add a column only when it does not already exist."""
+    if _column_exists(table_name, column.name, schema=schema):
+        return
+    _add_column_if_not_exists(table_name, column, schema=schema)
+
+
+def _drop_column_if_exists(table_name, column_name, schema=None):
+    """Drop a column only when it exists."""
+    if not _column_exists(table_name, column_name, schema=schema):
+        return
+    _drop_column_if_exists(table_name, column_name, schema=schema)
+
+
 def upgrade() -> None:
     """Apply governance and soft-delete migration."""
     # -------------------------------------------------------------------------
     # 1. Add soft-delete columns to companies
     # -------------------------------------------------------------------------
-    op.add_column(
+    _add_column_if_not_exists(
         "companies",
         sa.Column("deleted_at", sa.DateTime(), nullable=True),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "companies",
         sa.Column(
             "deleted_by",
@@ -45,7 +70,7 @@ def upgrade() -> None:
         ),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "companies",
         sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
@@ -60,12 +85,12 @@ def upgrade() -> None:
     # -------------------------------------------------------------------------
     # 2. Add soft-delete columns to branches
     # -------------------------------------------------------------------------
-    op.add_column(
+    _add_column_if_not_exists(
         "branches",
         sa.Column("deleted_at", sa.DateTime(), nullable=True),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "branches",
         sa.Column(
             "deleted_by",
@@ -75,17 +100,17 @@ def upgrade() -> None:
         ),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "branches",
         sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "branches",
         sa.Column("archived_at", sa.DateTime(), nullable=True),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "branches",
         sa.Column(
             "archived_by",
@@ -95,7 +120,7 @@ def upgrade() -> None:
         ),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "branches",
         sa.Column("is_archived", sa.Boolean(), nullable=False, server_default="false"),
         schema=None,
@@ -113,12 +138,12 @@ def upgrade() -> None:
     # -------------------------------------------------------------------------
     # 3. Add soft-delete columns to users
     # -------------------------------------------------------------------------
-    op.add_column(
+    _add_column_if_not_exists(
         "users",
         sa.Column("deleted_at", sa.DateTime(), nullable=True),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "users",
         sa.Column(
             "deleted_by",
@@ -128,7 +153,7 @@ def upgrade() -> None:
         ),
         schema=None,
     )
-    op.add_column(
+    _add_column_if_not_exists(
         "users",
         sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
@@ -337,24 +362,24 @@ def downgrade() -> None:
     # Remove soft-delete columns from users
     op.drop_index("ix_users_is_deleted", table_name="users", schema=None)
     op.drop_index("ix_users_deleted_at", table_name="users", schema=None)
-    op.drop_column("users", "is_deleted", schema=None)
-    op.drop_column("users", "deleted_by", schema=None)
-    op.drop_column("users", "deleted_at", schema=None)
+    _drop_column_if_exists("users", "is_deleted", schema=None)
+    _drop_column_if_exists("users", "deleted_by", schema=None)
+    _drop_column_if_exists("users", "deleted_at", schema=None)
 
     # Remove soft-delete/archive columns from branches
     op.drop_index("ix_branches_is_archived", table_name="branches", schema=None)
     op.drop_index("ix_branches_is_deleted", table_name="branches", schema=None)
     op.drop_index("ix_branches_deleted_at", table_name="branches", schema=None)
-    op.drop_column("branches", "is_archived", schema=None)
-    op.drop_column("branches", "archived_by", schema=None)
-    op.drop_column("branches", "archived_at", schema=None)
-    op.drop_column("branches", "is_deleted", schema=None)
-    op.drop_column("branches", "deleted_by", schema=None)
-    op.drop_column("branches", "deleted_at", schema=None)
+    _drop_column_if_exists("branches", "is_archived", schema=None)
+    _drop_column_if_exists("branches", "archived_by", schema=None)
+    _drop_column_if_exists("branches", "archived_at", schema=None)
+    _drop_column_if_exists("branches", "is_deleted", schema=None)
+    _drop_column_if_exists("branches", "deleted_by", schema=None)
+    _drop_column_if_exists("branches", "deleted_at", schema=None)
 
     # Remove soft-delete columns from companies
     op.drop_index("ix_companies_is_deleted", table_name="companies", schema=None)
     op.drop_index("ix_companies_deleted_at", table_name="companies", schema=None)
-    op.drop_column("companies", "is_deleted", schema=None)
-    op.drop_column("companies", "deleted_by", schema=None)
-    op.drop_column("companies", "deleted_at", schema=None)
+    _drop_column_if_exists("companies", "is_deleted", schema=None)
+    _drop_column_if_exists("companies", "deleted_by", schema=None)
+    _drop_column_if_exists("companies", "deleted_at", schema=None)
