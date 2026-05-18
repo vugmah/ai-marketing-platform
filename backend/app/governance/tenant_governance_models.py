@@ -11,7 +11,7 @@ class TenantResourceQuota(Base):
     __tablename__ = "tenant_resource_quotas"
     __table_args__ = (
         Index("ix_trq_company", "company_id", unique=True),
-        {"schema": "public", "comment": "Per-tenant resource quotas"},
+        {"schema": None, "comment": "Per-tenant resource quotas"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -36,7 +36,7 @@ class TenantResourceUsage(Base):
     __tablename__ = "tenant_resource_usage"
     __table_args__ = (
         Index("ix_tru_company_time", "company_id", "measured_at"),
-        {"schema": "public", "comment": "Tenant resource usage snapshots"},
+        {"schema": None, "comment": "Tenant resource usage snapshots"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -58,7 +58,7 @@ class BranchResourceQuota(Base):
     __tablename__ = "branch_resource_quotas"
     __table_args__ = (
         Index("ix_brq_branch", "branch_id", unique=True),
-        {"schema": "public", "comment": "Per-branch resource quotas"},
+        {"schema": None, "comment": "Per-branch resource quotas"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

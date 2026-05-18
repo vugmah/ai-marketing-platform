@@ -12,7 +12,7 @@ class CampaignRevenueCorrelation(Base):
     __table_args__ = (
         Index("ix_crc_campaign", "campaign_id"),
         Index("ix_crc_company", "company_id"),
-        {"schema": "public", "comment": "Campaign-to-revenue attribution"},
+        {"schema": None, "comment": "Campaign-to-revenue attribution"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -37,7 +37,7 @@ class BranchRevenueAttribution(Base):
     __table_args__ = (
         Index("ix_bra_branch", "branch_id"),
         Index("ix_bra_company", "company_id"),
-        {"schema": "public", "comment": "Branch revenue attribution"},
+        {"schema": None, "comment": "Branch revenue attribution"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -61,7 +61,7 @@ class InventoryCampaignAnalysis(Base):
     __table_args__ = (
         Index("ix_ica_product", "product_id"),
         Index("ix_ica_company", "company_id"),
-        {"schema": "public", "comment": "Inventory campaign effectiveness"},
+        {"schema": None, "comment": "Inventory campaign effectiveness"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -85,7 +85,7 @@ class PromotionEffectiveness(Base):
     __table_args__ = (
         Index("ix_pe_promo", "promotion_id"),
         Index("ix_pe_company", "company_id"),
-        {"schema": "public", "comment": "Promotion effectiveness metrics"},
+        {"schema": None, "comment": "Promotion effectiveness metrics"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -109,7 +109,7 @@ class CustomerLifetimeValue(Base):
     __table_args__ = (
         Index("ix_clv_customer", "customer_id"),
         Index("ix_clv_company", "company_id"),
-        {"schema": "public", "comment": "Customer lifetime value tracking"},
+        {"schema": None, "comment": "Customer lifetime value tracking"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

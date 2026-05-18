@@ -13,7 +13,7 @@ class EndpointHealthScore(Base):
         Index("ix_ehs_endpoint", "method", "path"),
         Index("ix_ehs_time", "measured_at"),
         Index("ix_ehs_company", "company_id"),
-        {"schema": "public", "comment": "Endpoint health scoring"},
+        {"schema": None, "comment": "Endpoint health scoring"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -37,7 +37,7 @@ class QueueBottleneck(Base):
     __table_args__ = (
         Index("ix_qb_queue", "queue_name"),
         Index("ix_qb_time", "measured_at"),
-        {"schema": "public", "comment": "Queue bottleneck detection"},
+        {"schema": None, "comment": "Queue bottleneck detection"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -59,7 +59,7 @@ class AILatencyAnalytics(Base):
         Index("ix_ala_model", "model_name"),
         Index("ix_ala_time", "measured_at"),
         Index("ix_ala_company", "company_id"),
-        {"schema": "public", "comment": "AI latency analytics"},
+        {"schema": None, "comment": "AI latency analytics"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -81,7 +81,7 @@ class ExternalAPIReliability(Base):
     __table_args__ = (
         Index("ix_ear_provider", "provider_name"),
         Index("ix_ear_time", "measured_at"),
-        {"schema": "public", "comment": "External API reliability tracking"},
+        {"schema": None, "comment": "External API reliability tracking"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -103,7 +103,7 @@ class WebhookFailureLog(Base):
     __table_args__ = (
         Index("ix_wfl_webhook", "webhook_id"),
         Index("ix_wfl_time", "failed_at"),
-        {"schema": "public", "comment": "Webhook failure tracking"},
+        {"schema": None, "comment": "Webhook failure tracking"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -124,7 +124,7 @@ class WorkerHealthScore(Base):
     __table_args__ = (
         Index("ix_wh_worker", "worker_name"),
         Index("ix_wh_time", "measured_at"),
-        {"schema": "public", "comment": "Worker health scoring"},
+        {"schema": None, "comment": "Worker health scoring"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

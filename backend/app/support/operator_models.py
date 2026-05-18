@@ -15,7 +15,7 @@ class SupportTicketOperator(Base):
         Index("ix_st_status", "status"),
         Index("ix_st_priority", "priority"),
         Index("ix_st_sla", "sla_deadline"),
-        {"schema": "public", "comment": "Support tickets with operator workspace"},
+        {"schema": None, "comment": "Support tickets with operator workspace"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -45,7 +45,7 @@ class OperatorWorkload(Base):
     __tablename__ = "operator_workloads"
     __table_args__ = (
         Index("ix_ow_operator", "operator_id"),
-        {"schema": "public", "comment": "Operator workload and availability"},
+        {"schema": None, "comment": "Operator workload and availability"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -65,7 +65,7 @@ class SupportEscalationRule(Base):
     __tablename__ = "support_escalation_rules"
     __table_args__ = (
         Index("ix_ser_company", "company_id"),
-        {"schema": "public", "comment": "Support escalation rules"},
+        {"schema": None, "comment": "Support escalation rules"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -87,7 +87,7 @@ class SupportAnalyticsDaily(Base):
     __tablename__ = "support_analytics_daily"
     __table_args__ = (
         Index("ix_sad_company_date", "company_id", "date"),
-        {"schema": "public", "comment": "Daily support analytics"},
+        {"schema": None, "comment": "Daily support analytics"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

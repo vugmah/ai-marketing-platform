@@ -12,7 +12,7 @@ class AIFactCheckLog(Base):
     __table_args__ = (
         Index("ix_afcl_conversation", "conversation_id"),
         Index("ix_afcl_status", "verification_status"),
-        {"schema": "public", "comment": "AI fact validation results"},
+        {"schema": None, "comment": "AI fact validation results"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -38,7 +38,7 @@ class AICriticalActionPolicy(Base):
     __tablename__ = "ai_critical_action_policies"
     __table_args__ = (
         Index("ix_acap_company", "company_id"),
-        {"schema": "public", "comment": "AI critical action policies per company"},
+        {"schema": None, "comment": "AI critical action policies per company"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

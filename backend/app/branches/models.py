@@ -75,7 +75,7 @@ class Branch(Base):
         UniqueConstraint(
             "company_id", "slug", name="uq_branch_company_slug"
         ),
-        {"schema": "public", "comment": "Branches belonging to companies"},
+        {"schema": None, "comment": "Branches belonging to companies"},
     )
 
     # Primary key
@@ -184,7 +184,7 @@ class BranchConfig(Base):
         UniqueConstraint(
             "branch_id", "config_key", name="uq_branch_config_key"
         ),
-        {"schema": "public", "comment": "Branch-level configuration store"},
+        {"schema": None, "comment": "Branch-level configuration store"},
     )
 
     # Primary key
@@ -250,7 +250,7 @@ class AIPromptOverride(Base):
         UniqueConstraint(
             "branch_id", "prompt_key", name="uq_ai_prompt_branch_key"
         ),
-        {"schema": "public", "comment": "Branch-level AI prompt overrides"},
+        {"schema": None, "comment": "Branch-level AI prompt overrides"},
     )
 
     # Primary key
@@ -342,7 +342,7 @@ class SocialAccountConfig(Base):
         UniqueConstraint(
             "branch_id", "platform", name="uq_social_account_branch_platform"
         ),
-        {"schema": "public", "comment": "Branch-level social media account configs"},
+        {"schema": None, "comment": "Branch-level social media account configs"},
     )
 
     # Primary key
@@ -451,7 +451,7 @@ class ERPConnectionConfig(Base):
         UniqueConstraint(
             "branch_id", "provider", name="uq_erp_config_branch_provider"
         ),
-        {"schema": "public", "comment": "Branch-level ERP/POS connection configs"},
+        {"schema": None, "comment": "Branch-level ERP/POS connection configs"},
     )
 
     # Primary key

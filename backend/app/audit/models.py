@@ -121,7 +121,7 @@ class AuditLog(Base):
     """
 
     __tablename__ = "audit_logs"
-    __table_args__ = {"schema": "public", "comment": "Audit trail for all operations"}
+    __table_args__ = {"schema": None, "comment": "Audit trail for all operations"}
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
@@ -186,7 +186,7 @@ class SecurityEvent(Base):
     """
 
     __tablename__ = "security_events"
-    __table_args__ = {"schema": "public", "comment": "Security events and alerts"}
+    __table_args__ = {"schema": None, "comment": "Security events and alerts"}
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
@@ -240,7 +240,7 @@ class LoginAttempt(Base):
     """
 
     __tablename__ = "login_attempts"
-    __table_args__ = {"schema": "public", "comment": "Login attempts tracking"}
+    __table_args__ = {"schema": None, "comment": "Login attempts tracking"}
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
@@ -279,7 +279,7 @@ class APIKey(Base):
     """
 
     __tablename__ = "api_keys"
-    __table_args__ = {"schema": "public", "comment": "Scoped API keys"}
+    __table_args__ = {"schema": None, "comment": "Scoped API keys"}
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
@@ -328,7 +328,7 @@ class DataAccessLog(Base):
     """
 
     __tablename__ = "data_access_logs"
-    __table_args__ = {"schema": "public", "comment": "Data access logs for compliance"}
+    __table_args__ = {"schema": None, "comment": "Data access logs for compliance"}
 
     id = Column(BigInteger, primary_key=True, autoincrement=True, index=True)
     company_id = Column(

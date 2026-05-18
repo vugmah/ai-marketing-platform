@@ -45,7 +45,7 @@ class EventDefinition(Base):
     """
 
     __tablename__ = "event_definitions"
-    __table_args__ = {"schema": "public", "comment": "Registry of event types and schemas"}
+    __table_args__ = {"schema": None, "comment": "Registry of event types and schemas"}
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     company_id = Column(
@@ -113,7 +113,7 @@ class EventSubscription(Base):
 
     __tablename__ = "event_subscriptions"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Subscriptions linking events to handler configurations",
     }
 
@@ -196,7 +196,7 @@ class EventLog(Base):
 
     __tablename__ = "event_log"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Immutable log of all published events",
     }
 
@@ -322,7 +322,7 @@ class EventHandler(Base):
 
     __tablename__ = "event_handlers"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Individual handler execution records",
     }
 
@@ -395,7 +395,7 @@ class DeadLetterEvent(Base):
 
     __tablename__ = "dead_letter_events"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Dead letter queue for failed events",
     }
 
@@ -486,7 +486,7 @@ class AutomationRule(Base):
 
     __tablename__ = "automation_rules"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Automation rules: trigger-event -> conditions -> actions",
     }
 
@@ -589,7 +589,7 @@ class AutomationExecution(Base):
 
     __tablename__ = "automation_executions"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Execution audit trail for automation rules",
     }
 

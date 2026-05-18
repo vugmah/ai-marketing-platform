@@ -14,7 +14,7 @@ class AITokenUsage(Base):
         Index("ix_atu_branch", "branch_id"),
         Index("ix_atu_model", "model_name"),
         Index("ix_atu_date", "created_at"),
-        {"schema": "public", "comment": "AI token usage per request"},
+        {"schema": None, "comment": "AI token usage per request"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -39,7 +39,7 @@ class AIBudget(Base):
     __table_args__ = (
         Index("ix_ab_company", "company_id"),
         Index("ix_ab_branch", "branch_id"),
-        {"schema": "public", "comment": "AI budgets per company and branch"},
+        {"schema": None, "comment": "AI budgets per company and branch"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -62,7 +62,7 @@ class AIModelPricing(Base):
     __tablename__ = "ai_model_pricing"
     __table_args__ = (
         Index("ix_amp_model", "model_name"),
-        {"schema": "public", "comment": "AI model pricing per 1K tokens"},
+        {"schema": None, "comment": "AI model pricing per 1K tokens"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

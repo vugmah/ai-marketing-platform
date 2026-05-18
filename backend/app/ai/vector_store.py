@@ -130,7 +130,7 @@ class VectorEmbedding(Base):
 
     __tablename__ = "vector_embeddings"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Vector embeddings with metadata for semantic search (pgvector)",
     }
 

@@ -12,7 +12,7 @@ class AIHallucinationScore(Base):
     __table_args__ = (
         Index("ix_ahs_conversation", "conversation_id"),
         Index("ix_ahs_company", "company_id"),
-        {"schema": "public", "comment": "AI hallucination scoring per response"},
+        {"schema": None, "comment": "AI hallucination scoring per response"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -38,7 +38,7 @@ class AIRecommendationQuality(Base):
     __table_args__ = (
         Index("ix_arq_rec", "recommendation_id"),
         Index("ix_arq_company", "company_id"),
-        {"schema": "public", "comment": "AI recommendation quality metrics"},
+        {"schema": None, "comment": "AI recommendation quality metrics"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -61,7 +61,7 @@ class AIPromptPerformance(Base):
     __table_args__ = (
         Index("ix_app_prompt", "prompt_template_key"),
         Index("ix_app_company", "company_id"),
-        {"schema": "public", "comment": "Prompt performance analytics"},
+        {"schema": None, "comment": "Prompt performance analytics"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -83,7 +83,7 @@ class AIConfidenceAnalytics(Base):
     __table_args__ = (
         Index("ix_aca_company", "company_id"),
         Index("ix_aca_date", "date"),
-        {"schema": "public", "comment": "AI confidence analytics daily"},
+        {"schema": None, "comment": "AI confidence analytics daily"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

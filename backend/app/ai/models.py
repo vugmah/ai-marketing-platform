@@ -114,7 +114,7 @@ class AIPrompt(Base):
 
     __tablename__ = "ai_prompts"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Reusable AI prompt templates with variable support",
     }
 
@@ -205,7 +205,7 @@ class AIConversation(Base):
 
     __tablename__ = "ai_conversations"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "AI chat conversation sessions",
     }
 
@@ -297,7 +297,7 @@ class AIMessage(Base):
 
     __tablename__ = "ai_messages"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Individual messages within AI conversations",
     }
 
@@ -358,7 +358,7 @@ class AISuggestion(Base):
 
     __tablename__ = "ai_suggestions"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "AI-generated marketing suggestions with feedback tracking",
     }
 
@@ -435,7 +435,7 @@ class AIRecommendation(Base):
 
     __tablename__ = "ai_recommendations"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Data-driven marketing recommendations",
     }
 
@@ -502,7 +502,7 @@ class AIUsageLog(Base):
 
     __tablename__ = "ai_usage_logs"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "AI API usage logs for cost and token tracking",
     }
 
@@ -575,7 +575,7 @@ class AICache(Base):
 
     __tablename__ = "ai_cache"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Cache of AI completion responses",
     }
 

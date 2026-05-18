@@ -12,7 +12,7 @@ class LocalizationString(Base):
     __table_args__ = (
         Index("ix_ls_key_lang", "key", "language"),
         Index("ix_ls_module", "module"),
-        {"schema": "public", "comment": "Translation strings per language"},
+        {"schema": None, "comment": "Translation strings per language"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -29,7 +29,7 @@ class BranchLocaleSettings(Base):
     __tablename__ = "branch_locale_settings"
     __table_args__ = (
         Index("ix_bls_branch", "branch_id", unique=True),
-        {"schema": "public", "comment": "Branch locale, timezone, currency settings"},
+        {"schema": None, "comment": "Branch locale, timezone, currency settings"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -52,7 +52,7 @@ class AIPromptTemplate(Base):
     __tablename__ = "ai_prompt_templates"
     __table_args__ = (
         Index("ix_apt_key_lang", "template_key", "language"),
-        {"schema": "public", "comment": "Multilingual AI prompt templates"},
+        {"schema": None, "comment": "Multilingual AI prompt templates"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

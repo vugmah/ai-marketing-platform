@@ -47,7 +47,7 @@ class AnalyticsSnapshot(Base):
             name="uq_analytics_snapshots_company_branch_report_date",
         ),
         {
-            "schema": "public",
+            "schema": None,
             "comment": "Pre-computed analytics snapshots for fast retrieval",
         },
     )

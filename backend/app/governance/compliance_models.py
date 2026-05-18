@@ -11,7 +11,7 @@ class AuditRetentionPolicy(Base):
     __tablename__ = "audit_retention_policies"
     __table_args__ = (
         Index("ix_arp_company", "company_id"),
-        {"schema": "public", "comment": "Audit data retention policies"},
+        {"schema": None, "comment": "Audit data retention policies"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -33,7 +33,7 @@ class DataLineageRecord(Base):
     __table_args__ = (
         Index("ix_dlr_source", "source_table", "source_id"),
         Index("ix_dlr_target", "target_table", "target_id"),
-        {"schema": "public", "comment": "Data lineage tracking"},
+        {"schema": None, "comment": "Data lineage tracking"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -56,7 +56,7 @@ class PIIDataClassification(Base):
     __table_args__ = (
         Index("ix_pdc_table_record", "table_name", "record_id"),
         Index("ix_pdc_company", "company_id"),
-        {"schema": "public", "comment": "PII data classification"},
+        {"schema": None, "comment": "PII data classification"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -77,7 +77,7 @@ class ComplianceReport(Base):
     __table_args__ = (
         Index("ix_cr_company", "company_id"),
         Index("ix_cr_date", "report_date"),
-        {"schema": "public", "comment": "Compliance reports"},
+        {"schema": None, "comment": "Compliance reports"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -100,7 +100,7 @@ class AdminActionLog(Base):
         Index("ix_aal_admin", "admin_id"),
         Index("ix_aal_company", "company_id"),
         Index("ix_aal_time", "created_at"),
-        {"schema": "public", "comment": "Immutable admin action audit trail"},
+        {"schema": None, "comment": "Immutable admin action audit trail"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

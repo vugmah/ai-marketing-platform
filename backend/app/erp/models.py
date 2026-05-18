@@ -108,7 +108,7 @@ class ERPConnection(Base):
 
     __tablename__ = "erp_connections"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "ERP/external system connection configurations",
     }
 
@@ -258,7 +258,7 @@ class ERPSyncJob(Base):
 
     __tablename__ = "erp_sync_jobs"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "ERP synchronization job tracking",
     }
 
@@ -366,7 +366,7 @@ class ERPSyncLog(Base):
 
     __tablename__ = "erp_sync_logs"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Granular ERP synchronization log entries",
     }
 
@@ -449,7 +449,7 @@ class ERPFieldMapping(Base):
 
     __tablename__ = "erp_field_mappings"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "ERP-to-internal field mapping and transformation rules",
     }
 
@@ -526,7 +526,7 @@ class ERPProduct(Base):
 
     __tablename__ = "erp_products"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Products synchronized from ERP systems",
     }
 
@@ -630,7 +630,7 @@ class ERPInventory(Base):
 
     __tablename__ = "erp_inventory"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Inventory levels synchronized from ERP systems",
     }
 
@@ -733,7 +733,7 @@ class ERPSalesOrder(Base):
 
     __tablename__ = "erp_sales_orders"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Sales orders synchronized from ERP systems",
     }
 
@@ -838,7 +838,7 @@ class ERPCustomer(Base):
 
     __tablename__ = "erp_customers"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Customers synchronized from ERP systems",
     }
 
@@ -935,7 +935,7 @@ class ERPInvoice(Base):
 
     __tablename__ = "erp_invoices"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Invoices synchronized from ERP systems",
     }
 
@@ -1051,7 +1051,7 @@ class ERPPayment(Base):
 
     __tablename__ = "erp_payments"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Payments synchronized from ERP systems",
     }
 

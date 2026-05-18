@@ -52,7 +52,7 @@ class GDPRExportRequest(Base):
 
     __tablename__ = "gdpr_export_requests"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "GDPR/KVKK data export request tracking",
     }
 
@@ -130,7 +130,7 @@ class GDPRDeletionRequest(Base):
 
     __tablename__ = "gdpr_deletion_requests"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "GDPR/KVKK data deletion request tracking",
     }
 
@@ -200,7 +200,7 @@ class RetentionPolicyRun(Base):
 
     __tablename__ = "retention_policy_runs"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Retention policy execution audit log",
     }
 

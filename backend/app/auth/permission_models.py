@@ -11,7 +11,7 @@ class PermissionDefinition(Base):
     __tablename__ = "permission_definitions"
     __table_args__ = (
         Index("ix_pd_scope", "scope"),
-        {"schema": "public", "comment": "Granular permission definitions"},
+        {"schema": None, "comment": "Granular permission definitions"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -29,7 +29,7 @@ class RolePermission(Base):
     __table_args__ = (
         Index("ix_rp_role_perm", "role_id", "permission_id"),
         Index("ix_rp_company", "company_id"),
-        {"schema": "public", "comment": "Role permission assignments"},
+        {"schema": None, "comment": "Role permission assignments"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -46,7 +46,7 @@ class UserPermissionOverride(Base):
     __tablename__ = "user_permission_overrides"
     __table_args__ = (
         Index("ix_upo_user_perm", "user_id", "permission_id"),
-        {"schema": "public", "comment": "User permission overrides"},
+        {"schema": None, "comment": "User permission overrides"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

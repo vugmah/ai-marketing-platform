@@ -12,7 +12,7 @@ class AIRecommendationExplanation(Base):
     __table_args__ = (
         Index("ix_are_rec", "recommendation_id"),
         Index("ix_are_company", "company_id"),
-        {"schema": "public", "comment": "AI recommendation explainability"},
+        {"schema": None, "comment": "AI recommendation explainability"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -36,7 +36,7 @@ class AIScoringFactor(Base):
     __tablename__ = "ai_scoring_factors"
     __table_args__ = (
         Index("ix_asf_rec", "recommendation_id"),
-        {"schema": "public", "comment": "AI scoring factors breakdown"},
+        {"schema": None, "comment": "AI scoring factors breakdown"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

@@ -12,7 +12,7 @@ class APIVersionPolicy(Base):
     __tablename__ = "api_version_policies"
     __table_args__ = (
         Index("ix_avp_company", "company_id"),
-        {"schema": "public", "comment": "API version policy per company"},
+        {"schema": None, "comment": "API version policy per company"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -33,7 +33,7 @@ class APIEndpointLifecycle(Base):
         Index("ix_ael_endpoint", "method", "path"),
         Index("ix_ael_status", "lifecycle_status"),
         Index("ix_ael_company", "company_id"),
-        {"schema": "public", "comment": "API endpoint lifecycle metadata"},
+        {"schema": None, "comment": "API endpoint lifecycle metadata"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -60,7 +60,7 @@ class APIChangelogEntry(Base):
     __table_args__ = (
         Index("ix_acl_version", "version"),
         Index("ix_acl_company", "company_id"),
-        {"schema": "public", "comment": "API changelog entries"},
+        {"schema": None, "comment": "API changelog entries"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -81,7 +81,7 @@ class APIContractSnapshot(Base):
     __tablename__ = "api_contract_snapshots"
     __table_args__ = (
         Index("ix_acs_endpoint", "endpoint_id"),
-        {"schema": "public", "comment": "API contract snapshots for drift detection"},
+        {"schema": None, "comment": "API contract snapshots for drift detection"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

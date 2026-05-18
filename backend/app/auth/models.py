@@ -63,7 +63,7 @@ class User(Base):
     """
 
     __tablename__ = "users"
-    __table_args__ = {"schema": "public", "comment": "User accounts for authentication"}
+    __table_args__ = {"schema": None, "comment": "User accounts for authentication"}
 
     # Primary key
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)

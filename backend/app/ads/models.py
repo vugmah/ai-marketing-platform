@@ -157,7 +157,7 @@ class AdPlatformAccount(Base):
 
     __tablename__ = "ad_platforms"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Connected ad platform accounts with encrypted credentials",
     }
 
@@ -262,7 +262,7 @@ class AdCampaign(Base):
 
     __tablename__ = "ad_campaigns"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Advertising campaigns from Google Ads and Meta Ads",
     }
 
@@ -410,7 +410,7 @@ class AdAdset(Base):
 
     __tablename__ = "ad_adsets"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Ad sets and ad groups from advertising platforms",
     }
 
@@ -488,7 +488,7 @@ class AdCreative(Base):
 
     __tablename__ = "ad_creatives"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Ad creative assets with metadata and copy",
     }
 
@@ -602,7 +602,7 @@ class AdMetric(Base):
 
     __tablename__ = "ad_metrics"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Daily ad performance metrics",
     }
 
@@ -695,7 +695,7 @@ class AdAudience(Base):
 
     __tablename__ = "ad_audiences"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Ad audience definitions and targeting specs",
     }
 
@@ -801,7 +801,7 @@ class AdBudgetRecommendation(Base):
 
     __tablename__ = "ad_budget_recommendations"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "AI-powered budget recommendations for campaigns",
     }
 
@@ -891,7 +891,7 @@ class AdCreativeAnalysis(Base):
 
     __tablename__ = "ad_creative_analysis"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "AI creative analysis results",
     }
 

@@ -11,7 +11,7 @@ class SystemStatusSnapshot(Base):
     __tablename__ = "system_status_snapshots"
     __table_args__ = (
         Index("ix_sss_time", "snapshot_at"),
-        {"schema": "public", "comment": "System status snapshots"},
+        {"schema": None, "comment": "System status snapshots"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -34,7 +34,7 @@ class FailedJobRecovery(Base):
     __table_args__ = (
         Index("ix_fjr_job", "job_type", "job_id"),
         Index("ix_fjr_status", "status"),
-        {"schema": "public", "comment": "Failed job recovery"},
+        {"schema": None, "comment": "Failed job recovery"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -58,7 +58,7 @@ class ModerationQueueItem(Base):
         Index("ix_mq_status", "status"),
         Index("ix_mq_company", "company_id"),
         Index("ix_mq_created", "created_at"),
-        {"schema": "public", "comment": "AI content moderation queue"},
+        {"schema": None, "comment": "AI content moderation queue"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -80,7 +80,7 @@ class AuditExplorerQuery(Base):
     __tablename__ = "audit_explorer_queries"
     __table_args__ = (
         Index("ix_aeq_created_by", "created_by"),
-        {"schema": "public", "comment": "Saved audit explorer queries"},
+        {"schema": None, "comment": "Saved audit explorer queries"},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

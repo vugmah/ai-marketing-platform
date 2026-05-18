@@ -32,7 +32,7 @@ class ExportJob(Base):
 
     __tablename__ = "export_jobs"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Async report export job queue tracking",
     }
 

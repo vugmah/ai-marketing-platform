@@ -67,7 +67,7 @@ class Company(Base):
     """
 
     __tablename__ = "companies"
-    __table_args__ = {"schema": "public", "comment": "Multi-tenant companies table"}
+    __table_args__ = {"schema": None, "comment": "Multi-tenant companies table"}
 
     # Primary key
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)

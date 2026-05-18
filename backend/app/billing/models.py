@@ -139,7 +139,7 @@ class SubscriptionPlan(Base):
 
     __tablename__ = "subscription_plans"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Available subscription plan tiers with pricing and limits",
     }
 
@@ -189,7 +189,7 @@ class CompanySubscription(Base):
 
     __tablename__ = "company_subscriptions"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Company subscription records with lifecycle tracking",
     }
 
@@ -269,7 +269,7 @@ class UsageRecord(Base):
 
     __tablename__ = "usage_records"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Resource usage records for billing and analytics",
     }
 
@@ -326,7 +326,7 @@ class UsageQuota(Base):
             name="uq_usage_quotas_company_resource_period",
         ),
         {
-            "schema": "public",
+            "schema": None,
             "comment": "Per-company resource usage quotas and current consumption",
         },
     )
@@ -389,7 +389,7 @@ class Invoice(Base):
 
     __tablename__ = "invoices"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Customer invoices with line items and payment tracking",
     }
 
@@ -464,7 +464,7 @@ class FeatureFlag(Base):
             name="uq_feature_flags_company_feature",
         ),
         {
-            "schema": "public",
+            "schema": None,
             "comment": "Per-company feature enablement flags",
         },
     )
@@ -531,7 +531,7 @@ class BillingEvent(Base):
 
     __tablename__ = "billing_events"
     __table_args__ = {
-        "schema": "public",
+        "schema": None,
         "comment": "Billing event audit log",
     }
 
@@ -581,7 +581,7 @@ class ApprovalRequest(Base):
     __tablename__ = "approval_requests"
     __table_args__ = (
         {
-            "schema": "public",
+            "schema": None,
             "comment": "AI Approval Center workflow requests",
         },
     )
