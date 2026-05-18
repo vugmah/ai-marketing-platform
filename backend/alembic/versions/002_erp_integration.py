@@ -105,26 +105,26 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_connections_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_erp_connections_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="ERP/external system connection configurations",
     )
-    op.create_index(op.f("ix_erp_connections_id"), "erp_connections", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_connections_company_id"), "erp_connections", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_connections_branch_id"), "erp_connections", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_connections_provider_type"), "erp_connections", ["provider_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_connections_created_at"), "erp_connections", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_connections_id"), "erp_connections", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_connections_company_id"), "erp_connections", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_connections_branch_id"), "erp_connections", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_connections_provider_type"), "erp_connections", ["provider_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_connections_created_at"), "erp_connections", ["created_at"], unique=False, schema=None)
 
     # -- 3. erp_sync_jobs ---------------------------------------------------
     op.create_table(
@@ -165,34 +165,34 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_sync_jobs_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_erp_sync_jobs_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_sync_jobs_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="ERP synchronization job tracking",
     )
-    op.create_index(op.f("ix_erp_sync_jobs_id"), "erp_sync_jobs", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_jobs_company_id"), "erp_sync_jobs", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_jobs_branch_id"), "erp_sync_jobs", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_jobs_connection_id"), "erp_sync_jobs", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_jobs_status"), "erp_sync_jobs", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_jobs_created_at"), "erp_sync_jobs", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_sync_jobs_id"), "erp_sync_jobs", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_jobs_company_id"), "erp_sync_jobs", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_jobs_branch_id"), "erp_sync_jobs", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_jobs_connection_id"), "erp_sync_jobs", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_jobs_status"), "erp_sync_jobs", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_jobs_created_at"), "erp_sync_jobs", ["created_at"], unique=False, schema=None)
 
     # -- 4. erp_sync_logs ---------------------------------------------------
     op.create_table(
@@ -219,34 +219,34 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_sync_logs_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["job_id"],
-            ["public.erp_sync_jobs.id"],
+            ["erp_sync_jobs.id"],
             name=op.f("fk_erp_sync_logs_job_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_sync_logs_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Granular ERP synchronization log entries",
     )
-    op.create_index(op.f("ix_erp_sync_logs_id"), "erp_sync_logs", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_logs_company_id"), "erp_sync_logs", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_logs_job_id"), "erp_sync_logs", ["job_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_logs_connection_id"), "erp_sync_logs", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_logs_external_id"), "erp_sync_logs", ["external_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sync_logs_created_at"), "erp_sync_logs", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_sync_logs_id"), "erp_sync_logs", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_logs_company_id"), "erp_sync_logs", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_logs_job_id"), "erp_sync_logs", ["job_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_logs_connection_id"), "erp_sync_logs", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_logs_external_id"), "erp_sync_logs", ["external_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sync_logs_created_at"), "erp_sync_logs", ["created_at"], unique=False, schema=None)
 
     # -- 5. erp_field_mappings ----------------------------------------------
     op.create_table(
@@ -272,27 +272,27 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_field_mappings_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_field_mappings_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="ERP-to-internal field mapping and transformation rules",
     )
-    op.create_index(op.f("ix_erp_field_mappings_id"), "erp_field_mappings", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_field_mappings_company_id"), "erp_field_mappings", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_field_mappings_connection_id"), "erp_field_mappings", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_field_mappings_provider_type"), "erp_field_mappings", ["provider_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_field_mappings_entity_type"), "erp_field_mappings", ["entity_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_field_mappings_created_at"), "erp_field_mappings", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_field_mappings_id"), "erp_field_mappings", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_field_mappings_company_id"), "erp_field_mappings", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_field_mappings_connection_id"), "erp_field_mappings", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_field_mappings_provider_type"), "erp_field_mappings", ["provider_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_field_mappings_entity_type"), "erp_field_mappings", ["entity_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_field_mappings_created_at"), "erp_field_mappings", ["created_at"], unique=False, schema=None)
 
     # -- 6. erp_products ----------------------------------------------------
     op.create_table(
@@ -326,37 +326,37 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_products_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_erp_products_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_products_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Products synchronized from ERP systems",
     )
-    op.create_index(op.f("ix_erp_products_id"), "erp_products", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_products_company_id"), "erp_products", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_products_branch_id"), "erp_products", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_products_connection_id"), "erp_products", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_products_provider_type"), "erp_products", ["provider_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_products_external_id"), "erp_products", ["external_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_products_external_code"), "erp_products", ["external_code"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_products_barcode"), "erp_products", ["barcode"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_products_created_at"), "erp_products", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_products_id"), "erp_products", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_products_company_id"), "erp_products", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_products_branch_id"), "erp_products", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_products_connection_id"), "erp_products", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_products_provider_type"), "erp_products", ["provider_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_products_external_id"), "erp_products", ["external_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_products_external_code"), "erp_products", ["external_code"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_products_barcode"), "erp_products", ["barcode"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_products_created_at"), "erp_products", ["created_at"], unique=False, schema=None)
 
     # -- 7. erp_inventory ---------------------------------------------------
     op.create_table(
@@ -386,43 +386,43 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_inventory_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_erp_inventory_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_inventory_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["product_id"],
-            ["public.erp_products.id"],
+            ["erp_products.id"],
             name=op.f("fk_erp_inventory_product_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Inventory levels synchronized from ERP systems",
     )
-    op.create_index(op.f("ix_erp_inventory_id"), "erp_inventory", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_inventory_company_id"), "erp_inventory", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_inventory_branch_id"), "erp_inventory", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_inventory_connection_id"), "erp_inventory", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_inventory_product_id"), "erp_inventory", ["product_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_inventory_provider_type"), "erp_inventory", ["provider_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_inventory_external_id"), "erp_inventory", ["external_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_inventory_created_at"), "erp_inventory", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_inventory_id"), "erp_inventory", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_inventory_company_id"), "erp_inventory", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_inventory_branch_id"), "erp_inventory", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_inventory_connection_id"), "erp_inventory", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_inventory_product_id"), "erp_inventory", ["product_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_inventory_provider_type"), "erp_inventory", ["provider_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_inventory_external_id"), "erp_inventory", ["external_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_inventory_created_at"), "erp_inventory", ["created_at"], unique=False, schema=None)
 
     # -- 8. erp_sales_orders ------------------------------------------------
     op.create_table(
@@ -457,38 +457,38 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_sales_orders_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_erp_sales_orders_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_sales_orders_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Sales orders synchronized from ERP systems",
     )
-    op.create_index(op.f("ix_erp_sales_orders_id"), "erp_sales_orders", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_company_id"), "erp_sales_orders", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_branch_id"), "erp_sales_orders", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_connection_id"), "erp_sales_orders", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_provider_type"), "erp_sales_orders", ["provider_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_external_id"), "erp_sales_orders", ["external_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_external_order_number"), "erp_sales_orders", ["external_order_number"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_customer_external_id"), "erp_sales_orders", ["customer_external_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_status"), "erp_sales_orders", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_sales_orders_created_at"), "erp_sales_orders", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_sales_orders_id"), "erp_sales_orders", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_company_id"), "erp_sales_orders", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_branch_id"), "erp_sales_orders", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_connection_id"), "erp_sales_orders", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_provider_type"), "erp_sales_orders", ["provider_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_external_id"), "erp_sales_orders", ["external_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_external_order_number"), "erp_sales_orders", ["external_order_number"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_customer_external_id"), "erp_sales_orders", ["customer_external_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_status"), "erp_sales_orders", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_sales_orders_created_at"), "erp_sales_orders", ["created_at"], unique=False, schema=None)
 
     # -- 9. erp_customers ---------------------------------------------------
     op.create_table(
@@ -523,35 +523,35 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_customers_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_erp_customers_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_customers_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Customers synchronized from ERP systems",
     )
-    op.create_index(op.f("ix_erp_customers_id"), "erp_customers", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_customers_company_id"), "erp_customers", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_customers_branch_id"), "erp_customers", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_customers_connection_id"), "erp_customers", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_customers_provider_type"), "erp_customers", ["provider_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_customers_external_id"), "erp_customers", ["external_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_customers_created_at"), "erp_customers", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_customers_id"), "erp_customers", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_customers_company_id"), "erp_customers", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_customers_branch_id"), "erp_customers", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_customers_connection_id"), "erp_customers", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_customers_provider_type"), "erp_customers", ["provider_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_customers_external_id"), "erp_customers", ["external_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_customers_created_at"), "erp_customers", ["created_at"], unique=False, schema=None)
 
     # -- 10. erp_invoices ---------------------------------------------------
     op.create_table(
@@ -586,45 +586,45 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_invoices_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_erp_invoices_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_invoices_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["sales_order_id"],
-            ["public.erp_sales_orders.id"],
+            ["erp_sales_orders.id"],
             name=op.f("fk_erp_invoices_sales_order_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Invoices synchronized from ERP systems",
     )
-    op.create_index(op.f("ix_erp_invoices_id"), "erp_invoices", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_company_id"), "erp_invoices", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_branch_id"), "erp_invoices", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_connection_id"), "erp_invoices", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_sales_order_id"), "erp_invoices", ["sales_order_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_provider_type"), "erp_invoices", ["provider_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_external_id"), "erp_invoices", ["external_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_external_invoice_number"), "erp_invoices", ["external_invoice_number"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_status"), "erp_invoices", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_invoices_created_at"), "erp_invoices", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_invoices_id"), "erp_invoices", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_company_id"), "erp_invoices", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_branch_id"), "erp_invoices", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_connection_id"), "erp_invoices", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_sales_order_id"), "erp_invoices", ["sales_order_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_provider_type"), "erp_invoices", ["provider_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_external_id"), "erp_invoices", ["external_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_external_invoice_number"), "erp_invoices", ["external_invoice_number"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_status"), "erp_invoices", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_invoices_created_at"), "erp_invoices", ["created_at"], unique=False, schema=None)
 
     # -- 11. erp_payments ---------------------------------------------------
     op.create_table(
@@ -657,44 +657,44 @@ def upgrade() -> None:
         # FKs
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_erp_payments_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_erp_payments_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["connection_id"],
-            ["public.erp_connections.id"],
+            ["erp_connections.id"],
             name=op.f("fk_erp_payments_connection_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["invoice_id"],
-            ["public.erp_invoices.id"],
+            ["erp_invoices.id"],
             name=op.f("fk_erp_payments_invoice_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Payments synchronized from ERP systems",
     )
-    op.create_index(op.f("ix_erp_payments_id"), "erp_payments", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_payments_company_id"), "erp_payments", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_payments_branch_id"), "erp_payments", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_payments_connection_id"), "erp_payments", ["connection_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_payments_invoice_id"), "erp_payments", ["invoice_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_payments_provider_type"), "erp_payments", ["provider_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_payments_external_id"), "erp_payments", ["external_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_payments_status"), "erp_payments", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_erp_payments_created_at"), "erp_payments", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_erp_payments_id"), "erp_payments", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_payments_company_id"), "erp_payments", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_payments_branch_id"), "erp_payments", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_payments_connection_id"), "erp_payments", ["connection_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_payments_invoice_id"), "erp_payments", ["invoice_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_payments_provider_type"), "erp_payments", ["provider_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_payments_external_id"), "erp_payments", ["external_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_payments_status"), "erp_payments", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_erp_payments_created_at"), "erp_payments", ["created_at"], unique=False, schema=None)
 
 
 # ---------------------------------------------------------------------------
@@ -705,101 +705,101 @@ def downgrade() -> None:
     """Drop ERP integration tables and ENUMs in reverse dependency order."""
 
     # -- Drop tables (reverse dependency order) -----------------------------
-    op.drop_index(op.f("ix_erp_payments_created_at"), table_name="erp_payments", schema="public")
-    op.drop_index(op.f("ix_erp_payments_status"), table_name="erp_payments", schema="public")
-    op.drop_index(op.f("ix_erp_payments_external_id"), table_name="erp_payments", schema="public")
-    op.drop_index(op.f("ix_erp_payments_provider_type"), table_name="erp_payments", schema="public")
-    op.drop_index(op.f("ix_erp_payments_invoice_id"), table_name="erp_payments", schema="public")
-    op.drop_index(op.f("ix_erp_payments_connection_id"), table_name="erp_payments", schema="public")
-    op.drop_index(op.f("ix_erp_payments_branch_id"), table_name="erp_payments", schema="public")
-    op.drop_index(op.f("ix_erp_payments_company_id"), table_name="erp_payments", schema="public")
-    op.drop_index(op.f("ix_erp_payments_id"), table_name="erp_payments", schema="public")
-    op.drop_table("erp_payments", schema="public")
+    op.drop_index(op.f("ix_erp_payments_created_at"), table_name="erp_payments", schema=None)
+    op.drop_index(op.f("ix_erp_payments_status"), table_name="erp_payments", schema=None)
+    op.drop_index(op.f("ix_erp_payments_external_id"), table_name="erp_payments", schema=None)
+    op.drop_index(op.f("ix_erp_payments_provider_type"), table_name="erp_payments", schema=None)
+    op.drop_index(op.f("ix_erp_payments_invoice_id"), table_name="erp_payments", schema=None)
+    op.drop_index(op.f("ix_erp_payments_connection_id"), table_name="erp_payments", schema=None)
+    op.drop_index(op.f("ix_erp_payments_branch_id"), table_name="erp_payments", schema=None)
+    op.drop_index(op.f("ix_erp_payments_company_id"), table_name="erp_payments", schema=None)
+    op.drop_index(op.f("ix_erp_payments_id"), table_name="erp_payments", schema=None)
+    op.drop_table("erp_payments", schema=None)
 
-    op.drop_index(op.f("ix_erp_invoices_created_at"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_status"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_external_invoice_number"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_external_id"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_provider_type"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_sales_order_id"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_connection_id"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_branch_id"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_company_id"), table_name="erp_invoices", schema="public")
-    op.drop_index(op.f("ix_erp_invoices_id"), table_name="erp_invoices", schema="public")
-    op.drop_table("erp_invoices", schema="public")
+    op.drop_index(op.f("ix_erp_invoices_created_at"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_status"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_external_invoice_number"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_external_id"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_provider_type"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_sales_order_id"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_connection_id"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_branch_id"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_company_id"), table_name="erp_invoices", schema=None)
+    op.drop_index(op.f("ix_erp_invoices_id"), table_name="erp_invoices", schema=None)
+    op.drop_table("erp_invoices", schema=None)
 
-    op.drop_index(op.f("ix_erp_customers_created_at"), table_name="erp_customers", schema="public")
-    op.drop_index(op.f("ix_erp_customers_external_id"), table_name="erp_customers", schema="public")
-    op.drop_index(op.f("ix_erp_customers_provider_type"), table_name="erp_customers", schema="public")
-    op.drop_index(op.f("ix_erp_customers_connection_id"), table_name="erp_customers", schema="public")
-    op.drop_index(op.f("ix_erp_customers_branch_id"), table_name="erp_customers", schema="public")
-    op.drop_index(op.f("ix_erp_customers_company_id"), table_name="erp_customers", schema="public")
-    op.drop_index(op.f("ix_erp_customers_id"), table_name="erp_customers", schema="public")
-    op.drop_table("erp_customers", schema="public")
+    op.drop_index(op.f("ix_erp_customers_created_at"), table_name="erp_customers", schema=None)
+    op.drop_index(op.f("ix_erp_customers_external_id"), table_name="erp_customers", schema=None)
+    op.drop_index(op.f("ix_erp_customers_provider_type"), table_name="erp_customers", schema=None)
+    op.drop_index(op.f("ix_erp_customers_connection_id"), table_name="erp_customers", schema=None)
+    op.drop_index(op.f("ix_erp_customers_branch_id"), table_name="erp_customers", schema=None)
+    op.drop_index(op.f("ix_erp_customers_company_id"), table_name="erp_customers", schema=None)
+    op.drop_index(op.f("ix_erp_customers_id"), table_name="erp_customers", schema=None)
+    op.drop_table("erp_customers", schema=None)
 
-    op.drop_index(op.f("ix_erp_sales_orders_created_at"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_status"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_customer_external_id"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_external_order_number"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_external_id"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_provider_type"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_connection_id"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_branch_id"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_company_id"), table_name="erp_sales_orders", schema="public")
-    op.drop_index(op.f("ix_erp_sales_orders_id"), table_name="erp_sales_orders", schema="public")
-    op.drop_table("erp_sales_orders", schema="public")
+    op.drop_index(op.f("ix_erp_sales_orders_created_at"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_status"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_customer_external_id"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_external_order_number"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_external_id"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_provider_type"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_connection_id"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_branch_id"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_company_id"), table_name="erp_sales_orders", schema=None)
+    op.drop_index(op.f("ix_erp_sales_orders_id"), table_name="erp_sales_orders", schema=None)
+    op.drop_table("erp_sales_orders", schema=None)
 
-    op.drop_index(op.f("ix_erp_inventory_created_at"), table_name="erp_inventory", schema="public")
-    op.drop_index(op.f("ix_erp_inventory_external_id"), table_name="erp_inventory", schema="public")
-    op.drop_index(op.f("ix_erp_inventory_provider_type"), table_name="erp_inventory", schema="public")
-    op.drop_index(op.f("ix_erp_inventory_product_id"), table_name="erp_inventory", schema="public")
-    op.drop_index(op.f("ix_erp_inventory_connection_id"), table_name="erp_inventory", schema="public")
-    op.drop_index(op.f("ix_erp_inventory_branch_id"), table_name="erp_inventory", schema="public")
-    op.drop_index(op.f("ix_erp_inventory_company_id"), table_name="erp_inventory", schema="public")
-    op.drop_index(op.f("ix_erp_inventory_id"), table_name="erp_inventory", schema="public")
-    op.drop_table("erp_inventory", schema="public")
+    op.drop_index(op.f("ix_erp_inventory_created_at"), table_name="erp_inventory", schema=None)
+    op.drop_index(op.f("ix_erp_inventory_external_id"), table_name="erp_inventory", schema=None)
+    op.drop_index(op.f("ix_erp_inventory_provider_type"), table_name="erp_inventory", schema=None)
+    op.drop_index(op.f("ix_erp_inventory_product_id"), table_name="erp_inventory", schema=None)
+    op.drop_index(op.f("ix_erp_inventory_connection_id"), table_name="erp_inventory", schema=None)
+    op.drop_index(op.f("ix_erp_inventory_branch_id"), table_name="erp_inventory", schema=None)
+    op.drop_index(op.f("ix_erp_inventory_company_id"), table_name="erp_inventory", schema=None)
+    op.drop_index(op.f("ix_erp_inventory_id"), table_name="erp_inventory", schema=None)
+    op.drop_table("erp_inventory", schema=None)
 
-    op.drop_index(op.f("ix_erp_products_created_at"), table_name="erp_products", schema="public")
-    op.drop_index(op.f("ix_erp_products_barcode"), table_name="erp_products", schema="public")
-    op.drop_index(op.f("ix_erp_products_external_code"), table_name="erp_products", schema="public")
-    op.drop_index(op.f("ix_erp_products_external_id"), table_name="erp_products", schema="public")
-    op.drop_index(op.f("ix_erp_products_provider_type"), table_name="erp_products", schema="public")
-    op.drop_index(op.f("ix_erp_products_connection_id"), table_name="erp_products", schema="public")
-    op.drop_index(op.f("ix_erp_products_branch_id"), table_name="erp_products", schema="public")
-    op.drop_index(op.f("ix_erp_products_company_id"), table_name="erp_products", schema="public")
-    op.drop_index(op.f("ix_erp_products_id"), table_name="erp_products", schema="public")
-    op.drop_table("erp_products", schema="public")
+    op.drop_index(op.f("ix_erp_products_created_at"), table_name="erp_products", schema=None)
+    op.drop_index(op.f("ix_erp_products_barcode"), table_name="erp_products", schema=None)
+    op.drop_index(op.f("ix_erp_products_external_code"), table_name="erp_products", schema=None)
+    op.drop_index(op.f("ix_erp_products_external_id"), table_name="erp_products", schema=None)
+    op.drop_index(op.f("ix_erp_products_provider_type"), table_name="erp_products", schema=None)
+    op.drop_index(op.f("ix_erp_products_connection_id"), table_name="erp_products", schema=None)
+    op.drop_index(op.f("ix_erp_products_branch_id"), table_name="erp_products", schema=None)
+    op.drop_index(op.f("ix_erp_products_company_id"), table_name="erp_products", schema=None)
+    op.drop_index(op.f("ix_erp_products_id"), table_name="erp_products", schema=None)
+    op.drop_table("erp_products", schema=None)
 
-    op.drop_index(op.f("ix_erp_field_mappings_created_at"), table_name="erp_field_mappings", schema="public")
-    op.drop_index(op.f("ix_erp_field_mappings_entity_type"), table_name="erp_field_mappings", schema="public")
-    op.drop_index(op.f("ix_erp_field_mappings_provider_type"), table_name="erp_field_mappings", schema="public")
-    op.drop_index(op.f("ix_erp_field_mappings_connection_id"), table_name="erp_field_mappings", schema="public")
-    op.drop_index(op.f("ix_erp_field_mappings_company_id"), table_name="erp_field_mappings", schema="public")
-    op.drop_index(op.f("ix_erp_field_mappings_id"), table_name="erp_field_mappings", schema="public")
-    op.drop_table("erp_field_mappings", schema="public")
+    op.drop_index(op.f("ix_erp_field_mappings_created_at"), table_name="erp_field_mappings", schema=None)
+    op.drop_index(op.f("ix_erp_field_mappings_entity_type"), table_name="erp_field_mappings", schema=None)
+    op.drop_index(op.f("ix_erp_field_mappings_provider_type"), table_name="erp_field_mappings", schema=None)
+    op.drop_index(op.f("ix_erp_field_mappings_connection_id"), table_name="erp_field_mappings", schema=None)
+    op.drop_index(op.f("ix_erp_field_mappings_company_id"), table_name="erp_field_mappings", schema=None)
+    op.drop_index(op.f("ix_erp_field_mappings_id"), table_name="erp_field_mappings", schema=None)
+    op.drop_table("erp_field_mappings", schema=None)
 
-    op.drop_index(op.f("ix_erp_sync_logs_created_at"), table_name="erp_sync_logs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_logs_external_id"), table_name="erp_sync_logs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_logs_connection_id"), table_name="erp_sync_logs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_logs_job_id"), table_name="erp_sync_logs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_logs_company_id"), table_name="erp_sync_logs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_logs_id"), table_name="erp_sync_logs", schema="public")
-    op.drop_table("erp_sync_logs", schema="public")
+    op.drop_index(op.f("ix_erp_sync_logs_created_at"), table_name="erp_sync_logs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_logs_external_id"), table_name="erp_sync_logs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_logs_connection_id"), table_name="erp_sync_logs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_logs_job_id"), table_name="erp_sync_logs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_logs_company_id"), table_name="erp_sync_logs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_logs_id"), table_name="erp_sync_logs", schema=None)
+    op.drop_table("erp_sync_logs", schema=None)
 
-    op.drop_index(op.f("ix_erp_sync_jobs_created_at"), table_name="erp_sync_jobs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_jobs_status"), table_name="erp_sync_jobs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_jobs_connection_id"), table_name="erp_sync_jobs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_jobs_branch_id"), table_name="erp_sync_jobs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_jobs_company_id"), table_name="erp_sync_jobs", schema="public")
-    op.drop_index(op.f("ix_erp_sync_jobs_id"), table_name="erp_sync_jobs", schema="public")
-    op.drop_table("erp_sync_jobs", schema="public")
+    op.drop_index(op.f("ix_erp_sync_jobs_created_at"), table_name="erp_sync_jobs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_jobs_status"), table_name="erp_sync_jobs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_jobs_connection_id"), table_name="erp_sync_jobs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_jobs_branch_id"), table_name="erp_sync_jobs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_jobs_company_id"), table_name="erp_sync_jobs", schema=None)
+    op.drop_index(op.f("ix_erp_sync_jobs_id"), table_name="erp_sync_jobs", schema=None)
+    op.drop_table("erp_sync_jobs", schema=None)
 
-    op.drop_index(op.f("ix_erp_connections_created_at"), table_name="erp_connections", schema="public")
-    op.drop_index(op.f("ix_erp_connections_provider_type"), table_name="erp_connections", schema="public")
-    op.drop_index(op.f("ix_erp_connections_branch_id"), table_name="erp_connections", schema="public")
-    op.drop_index(op.f("ix_erp_connections_company_id"), table_name="erp_connections", schema="public")
-    op.drop_index(op.f("ix_erp_connections_id"), table_name="erp_connections", schema="public")
-    op.drop_table("erp_connections", schema="public")
+    op.drop_index(op.f("ix_erp_connections_created_at"), table_name="erp_connections", schema=None)
+    op.drop_index(op.f("ix_erp_connections_provider_type"), table_name="erp_connections", schema=None)
+    op.drop_index(op.f("ix_erp_connections_branch_id"), table_name="erp_connections", schema=None)
+    op.drop_index(op.f("ix_erp_connections_company_id"), table_name="erp_connections", schema=None)
+    op.drop_index(op.f("ix_erp_connections_id"), table_name="erp_connections", schema=None)
+    op.drop_table("erp_connections", schema=None)
 
     # -- Drop ENUM types (reverse order of creation) ------------------------
     _drop_enum("loglevel")

@@ -241,23 +241,23 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_ai_prompts")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_ai_prompts_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_ai_prompts_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Reusable AI prompt templates with variable support",
     )
-    op.create_index(op.f("ix_ai_prompts_id"), "ai_prompts", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_prompts_company_id"), "ai_prompts", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_prompts_branch_id"), "ai_prompts", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_prompts_name"), "ai_prompts", ["name"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_prompts_created_at"), "ai_prompts", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_ai_prompts_id"), "ai_prompts", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_prompts_company_id"), "ai_prompts", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_prompts_branch_id"), "ai_prompts", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_prompts_name"), "ai_prompts", ["name"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_prompts_created_at"), "ai_prompts", ["created_at"], unique=False, schema=None)
 
     # -- ai_conversations ----------------------------------------------------
     op.create_table(
@@ -286,35 +286,35 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_ai_conversations")),
         sa.UniqueConstraint("session_id", name=op.f("uq_ai_conversations_session_id")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_ai_conversations_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_ai_conversations_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["public.users.id"],
+            ["user_id"], ["users.id"],
             name=op.f("fk_ai_conversations_user_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["prompt_id"], ["public.ai_prompts.id"],
+            ["prompt_id"], ["ai_prompts.id"],
             name=op.f("fk_ai_conversations_prompt_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="AI chat conversation sessions",
     )
-    op.create_index(op.f("ix_ai_conversations_id"), "ai_conversations", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_conversations_company_id"), "ai_conversations", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_conversations_branch_id"), "ai_conversations", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_conversations_user_id"), "ai_conversations", ["user_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_conversations_prompt_id"), "ai_conversations", ["prompt_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_conversations_session_id"), "ai_conversations", ["session_id"], unique=True, schema="public")
-    op.create_index(op.f("ix_ai_conversations_created_at"), "ai_conversations", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_ai_conversations_id"), "ai_conversations", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_conversations_company_id"), "ai_conversations", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_conversations_branch_id"), "ai_conversations", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_conversations_user_id"), "ai_conversations", ["user_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_conversations_prompt_id"), "ai_conversations", ["prompt_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_conversations_session_id"), "ai_conversations", ["session_id"], unique=True, schema=None)
+    op.create_index(op.f("ix_ai_conversations_created_at"), "ai_conversations", ["created_at"], unique=False, schema=None)
 
     # -- ai_messages ---------------------------------------------------------
     op.create_table(
@@ -337,16 +337,16 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_ai_messages")),
         sa.ForeignKeyConstraint(
-            ["conversation_id"], ["public.ai_conversations.id"],
+            ["conversation_id"], ["ai_conversations.id"],
             name=op.f("fk_ai_messages_conversation_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Individual messages within AI conversations",
     )
-    op.create_index(op.f("ix_ai_messages_id"), "ai_messages", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_messages_conversation_id"), "ai_messages", ["conversation_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_messages_created_at"), "ai_messages", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_ai_messages_id"), "ai_messages", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_messages_conversation_id"), "ai_messages", ["conversation_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_messages_created_at"), "ai_messages", ["created_at"], unique=False, schema=None)
 
     # -- ai_suggestions ------------------------------------------------------
     op.create_table(
@@ -381,23 +381,23 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_ai_suggestions")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_ai_suggestions_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_ai_suggestions_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="AI-generated marketing suggestions with feedback tracking",
     )
-    op.create_index(op.f("ix_ai_suggestions_id"), "ai_suggestions", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_suggestions_company_id"), "ai_suggestions", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_suggestions_branch_id"), "ai_suggestions", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_suggestions_trigger_type"), "ai_suggestions", ["trigger_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_suggestions_created_at"), "ai_suggestions", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_ai_suggestions_id"), "ai_suggestions", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_suggestions_company_id"), "ai_suggestions", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_suggestions_branch_id"), "ai_suggestions", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_suggestions_trigger_type"), "ai_suggestions", ["trigger_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_suggestions_created_at"), "ai_suggestions", ["created_at"], unique=False, schema=None)
 
     # -- ai_recommendations --------------------------------------------------
     op.create_table(
@@ -424,24 +424,24 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_ai_recommendations")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_ai_recommendations_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_ai_recommendations_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Data-driven marketing recommendations",
     )
-    op.create_index(op.f("ix_ai_recommendations_id"), "ai_recommendations", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_recommendations_company_id"), "ai_recommendations", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_recommendations_branch_id"), "ai_recommendations", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_recommendations_category"), "ai_recommendations", ["category"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_recommendations_status"), "ai_recommendations", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_recommendations_created_at"), "ai_recommendations", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_ai_recommendations_id"), "ai_recommendations", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_recommendations_company_id"), "ai_recommendations", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_recommendations_branch_id"), "ai_recommendations", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_recommendations_category"), "ai_recommendations", ["category"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_recommendations_status"), "ai_recommendations", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_recommendations_created_at"), "ai_recommendations", ["created_at"], unique=False, schema=None)
 
     # -- ai_usage_logs -------------------------------------------------------
     op.create_table(
@@ -463,23 +463,23 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_ai_usage_logs")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_ai_usage_logs_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["public.users.id"],
+            ["user_id"], ["users.id"],
             name=op.f("fk_ai_usage_logs_user_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="AI API usage logs for cost and token tracking",
     )
-    op.create_index(op.f("ix_ai_usage_logs_id"), "ai_usage_logs", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_usage_logs_company_id"), "ai_usage_logs", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_usage_logs_user_id"), "ai_usage_logs", ["user_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_usage_logs_status"), "ai_usage_logs", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_usage_logs_created_at"), "ai_usage_logs", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_ai_usage_logs_id"), "ai_usage_logs", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_usage_logs_company_id"), "ai_usage_logs", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_usage_logs_user_id"), "ai_usage_logs", ["user_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_usage_logs_status"), "ai_usage_logs", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_usage_logs_created_at"), "ai_usage_logs", ["created_at"], unique=False, schema=None)
 
     # -- ai_cache ------------------------------------------------------------
     op.create_table(
@@ -499,14 +499,14 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_ai_cache")),
         sa.UniqueConstraint("cache_key", name=op.f("uq_ai_cache_cache_key")),
-        schema="public",
+        schema=None,
         comment="Cache of AI completion responses",
     )
-    op.create_index(op.f("ix_ai_cache_id"), "ai_cache", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_cache_cache_key"), "ai_cache", ["cache_key"], unique=True, schema="public")
-    op.create_index(op.f("ix_ai_cache_prompt_hash"), "ai_cache", ["prompt_hash"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_cache_expires_at"), "ai_cache", ["expires_at"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_cache_created_at"), "ai_cache", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_ai_cache_id"), "ai_cache", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_cache_cache_key"), "ai_cache", ["cache_key"], unique=True, schema=None)
+    op.create_index(op.f("ix_ai_cache_prompt_hash"), "ai_cache", ["prompt_hash"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_cache_expires_at"), "ai_cache", ["expires_at"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_cache_created_at"), "ai_cache", ["created_at"], unique=False, schema=None)
 
     # ========================================================================
     # 3. SOCIAL MODULE TABLES (7 tables)
@@ -543,26 +543,26 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_social_accounts")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_social_accounts_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_social_accounts_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Connected social media account credentials and metadata",
     )
-    op.create_index(op.f("ix_social_accounts_id"), "social_accounts", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_accounts_company_id"), "social_accounts", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_accounts_branch_id"), "social_accounts", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_accounts_platform"), "social_accounts", ["platform"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_accounts_status"), "social_accounts", ["status"], unique=False, schema="public")
-    op.create_index("ix_social_accounts_company_platform", "social_accounts", ["company_id", "platform"], unique=False, schema="public")
-    op.create_index("ix_social_accounts_branch", "social_accounts", ["branch_id", "company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_accounts_created_at"), "social_accounts", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_social_accounts_id"), "social_accounts", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_accounts_company_id"), "social_accounts", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_accounts_branch_id"), "social_accounts", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_accounts_platform"), "social_accounts", ["platform"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_accounts_status"), "social_accounts", ["status"], unique=False, schema=None)
+    op.create_index("ix_social_accounts_company_platform", "social_accounts", ["company_id", "platform"], unique=False, schema=None)
+    op.create_index("ix_social_accounts_branch", "social_accounts", ["branch_id", "company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_accounts_created_at"), "social_accounts", ["created_at"], unique=False, schema=None)
 
     # -- social_posts --------------------------------------------------------
     op.create_table(
@@ -594,33 +594,33 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_social_posts")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_social_posts_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_social_posts_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["account_id"], ["public.social_accounts.id"],
+            ["account_id"], ["social_accounts.id"],
             name=op.f("fk_social_posts_account_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Social media post content and scheduling",
     )
-    op.create_index(op.f("ix_social_posts_id"), "social_posts", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_posts_company_id"), "social_posts", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_posts_branch_id"), "social_posts", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_posts_account_id"), "social_posts", ["account_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_posts_external_post_id"), "social_posts", ["external_post_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_posts_status"), "social_posts", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_posts_scheduled_at"), "social_posts", ["scheduled_at"], unique=False, schema="public")
-    op.create_index("ix_social_posts_company_status", "social_posts", ["company_id", "status"], unique=False, schema="public")
-    op.create_index("ix_social_posts_account_status", "social_posts", ["account_id", "status"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_posts_created_at"), "social_posts", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_social_posts_id"), "social_posts", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_posts_company_id"), "social_posts", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_posts_branch_id"), "social_posts", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_posts_account_id"), "social_posts", ["account_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_posts_external_post_id"), "social_posts", ["external_post_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_posts_status"), "social_posts", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_posts_scheduled_at"), "social_posts", ["scheduled_at"], unique=False, schema=None)
+    op.create_index("ix_social_posts_company_status", "social_posts", ["company_id", "status"], unique=False, schema=None)
+    op.create_index("ix_social_posts_account_status", "social_posts", ["account_id", "status"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_posts_created_at"), "social_posts", ["created_at"], unique=False, schema=None)
 
     # -- social_comments -----------------------------------------------------
     op.create_table(
@@ -651,38 +651,38 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_social_comments")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_social_comments_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_social_comments_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["account_id"], ["public.social_accounts.id"],
+            ["account_id"], ["social_accounts.id"],
             name=op.f("fk_social_comments_account_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["post_id"], ["public.social_posts.id"],
+            ["post_id"], ["social_posts.id"],
             name=op.f("fk_social_comments_post_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Comments on social media posts",
     )
-    op.create_index(op.f("ix_social_comments_id"), "social_comments", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_comments_company_id"), "social_comments", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_comments_branch_id"), "social_comments", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_comments_account_id"), "social_comments", ["account_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_comments_post_id"), "social_comments", ["post_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_comments_external_comment_id"), "social_comments", ["external_comment_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_comments_status"), "social_comments", ["status"], unique=False, schema="public")
-    op.create_index("ix_social_comments_company_status", "social_comments", ["company_id", "status"], unique=False, schema="public")
-    op.create_index("ix_social_comments_post_created", "social_comments", ["post_id", "created_at"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_comments_created_at"), "social_comments", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_social_comments_id"), "social_comments", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_comments_company_id"), "social_comments", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_comments_branch_id"), "social_comments", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_comments_account_id"), "social_comments", ["account_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_comments_post_id"), "social_comments", ["post_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_comments_external_comment_id"), "social_comments", ["external_comment_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_comments_status"), "social_comments", ["status"], unique=False, schema=None)
+    op.create_index("ix_social_comments_company_status", "social_comments", ["company_id", "status"], unique=False, schema=None)
+    op.create_index("ix_social_comments_post_created", "social_comments", ["post_id", "created_at"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_comments_created_at"), "social_comments", ["created_at"], unique=False, schema=None)
 
     # -- social_messages -----------------------------------------------------
     op.create_table(
@@ -716,33 +716,33 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_social_messages")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_social_messages_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_social_messages_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["account_id"], ["public.social_accounts.id"],
+            ["account_id"], ["social_accounts.id"],
             name=op.f("fk_social_messages_account_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Direct/conversation messages from social platforms",
     )
-    op.create_index(op.f("ix_social_messages_id"), "social_messages", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_messages_company_id"), "social_messages", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_messages_branch_id"), "social_messages", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_messages_account_id"), "social_messages", ["account_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_messages_external_conversation_id"), "social_messages", ["external_conversation_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_messages_external_message_id"), "social_messages", ["external_message_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_messages_status"), "social_messages", ["status"], unique=False, schema="public")
-    op.create_index("ix_social_messages_company_conv", "social_messages", ["company_id", "external_conversation_id"], unique=False, schema="public")
-    op.create_index("ix_social_messages_account_created", "social_messages", ["account_id", "created_at"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_messages_created_at"), "social_messages", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_social_messages_id"), "social_messages", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_messages_company_id"), "social_messages", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_messages_branch_id"), "social_messages", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_messages_account_id"), "social_messages", ["account_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_messages_external_conversation_id"), "social_messages", ["external_conversation_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_messages_external_message_id"), "social_messages", ["external_message_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_messages_status"), "social_messages", ["status"], unique=False, schema=None)
+    op.create_index("ix_social_messages_company_conv", "social_messages", ["company_id", "external_conversation_id"], unique=False, schema=None)
+    op.create_index("ix_social_messages_account_created", "social_messages", ["account_id", "created_at"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_messages_created_at"), "social_messages", ["created_at"], unique=False, schema=None)
 
     # -- social_analytics ----------------------------------------------------
     op.create_table(
@@ -770,31 +770,31 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_social_analytics")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_social_analytics_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_social_analytics_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["account_id"], ["public.social_accounts.id"],
+            ["account_id"], ["social_accounts.id"],
             name=op.f("fk_social_analytics_account_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Daily social media analytics snapshots",
     )
-    op.create_index(op.f("ix_social_analytics_id"), "social_analytics", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_analytics_company_id"), "social_analytics", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_analytics_branch_id"), "social_analytics", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_analytics_account_id"), "social_analytics", ["account_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_analytics_metric_date"), "social_analytics", ["metric_date"], unique=False, schema="public")
-    op.create_index("ix_social_analytics_account_date", "social_analytics", ["account_id", "metric_date"], unique=False, schema="public")
-    op.create_index("ix_social_analytics_company_date", "social_analytics", ["company_id", "metric_date"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_analytics_created_at"), "social_analytics", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_social_analytics_id"), "social_analytics", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_analytics_company_id"), "social_analytics", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_analytics_branch_id"), "social_analytics", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_analytics_account_id"), "social_analytics", ["account_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_analytics_metric_date"), "social_analytics", ["metric_date"], unique=False, schema=None)
+    op.create_index("ix_social_analytics_account_date", "social_analytics", ["account_id", "metric_date"], unique=False, schema=None)
+    op.create_index("ix_social_analytics_company_date", "social_analytics", ["company_id", "metric_date"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_analytics_created_at"), "social_analytics", ["created_at"], unique=False, schema=None)
 
     # -- social_competitors --------------------------------------------------
     op.create_table(
@@ -818,24 +818,24 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_social_competitors")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_social_competitors_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_social_competitors_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Tracked competitor accounts for competitive analysis",
     )
-    op.create_index(op.f("ix_social_competitors_id"), "social_competitors", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_competitors_company_id"), "social_competitors", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_competitors_branch_id"), "social_competitors", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_competitors_platform"), "social_competitors", ["platform"], unique=False, schema="public")
-    op.create_index("ix_social_competitors_company", "social_competitors", ["company_id", "platform"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_competitors_created_at"), "social_competitors", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_social_competitors_id"), "social_competitors", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_competitors_company_id"), "social_competitors", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_competitors_branch_id"), "social_competitors", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_competitors_platform"), "social_competitors", ["platform"], unique=False, schema=None)
+    op.create_index("ix_social_competitors_company", "social_competitors", ["company_id", "platform"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_competitors_created_at"), "social_competitors", ["created_at"], unique=False, schema=None)
 
     # -- social_webhooks -----------------------------------------------------
     op.create_table(
@@ -856,27 +856,27 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_social_webhooks")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_social_webhooks_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["account_id"], ["public.social_accounts.id"],
+            ["account_id"], ["social_accounts.id"],
             name=op.f("fk_social_webhooks_account_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Received webhook events from social media platforms",
     )
-    op.create_index(op.f("ix_social_webhooks_id"), "social_webhooks", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_webhooks_company_id"), "social_webhooks", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_webhooks_account_id"), "social_webhooks", ["account_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_webhooks_platform"), "social_webhooks", ["platform"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_webhooks_event_type"), "social_webhooks", ["event_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_webhooks_processed"), "social_webhooks", ["processed"], unique=False, schema="public")
-    op.create_index("ix_social_webhooks_company_processed", "social_webhooks", ["company_id", "processed"], unique=False, schema="public")
-    op.create_index("ix_social_webhooks_platform_event", "social_webhooks", ["platform", "event_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_social_webhooks_created_at"), "social_webhooks", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_social_webhooks_id"), "social_webhooks", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_webhooks_company_id"), "social_webhooks", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_webhooks_account_id"), "social_webhooks", ["account_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_webhooks_platform"), "social_webhooks", ["platform"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_webhooks_event_type"), "social_webhooks", ["event_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_webhooks_processed"), "social_webhooks", ["processed"], unique=False, schema=None)
+    op.create_index("ix_social_webhooks_company_processed", "social_webhooks", ["company_id", "processed"], unique=False, schema=None)
+    op.create_index("ix_social_webhooks_platform_event", "social_webhooks", ["platform", "event_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_social_webhooks_created_at"), "social_webhooks", ["created_at"], unique=False, schema=None)
 
     # ========================================================================
     # 4. MEDIA MODULE TABLES (8 tables)
@@ -919,31 +919,31 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_media_assets")),
         sa.UniqueConstraint("filename", name=op.f("uq_media_assets_filename")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_media_assets_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_media_assets_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["created_by"], ["public.users.id"],
+            ["created_by"], ["users.id"],
             name=op.f("fk_media_assets_created_by"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Core media assets (images, videos, documents)",
     )
-    op.create_index(op.f("ix_media_assets_id"), "media_assets", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_assets_company_id"), "media_assets", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_assets_branch_id"), "media_assets", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_assets_filename"), "media_assets", ["filename"], unique=True, schema="public")
-    op.create_index(op.f("ix_media_assets_mime_type"), "media_assets", ["mime_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_assets_category"), "media_assets", ["category"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_assets_status"), "media_assets", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_assets_created_at"), "media_assets", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_media_assets_id"), "media_assets", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_assets_company_id"), "media_assets", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_assets_branch_id"), "media_assets", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_assets_filename"), "media_assets", ["filename"], unique=True, schema=None)
+    op.create_index(op.f("ix_media_assets_mime_type"), "media_assets", ["mime_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_assets_category"), "media_assets", ["category"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_assets_status"), "media_assets", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_assets_created_at"), "media_assets", ["created_at"], unique=False, schema=None)
 
     # -- media_variants ------------------------------------------------------
     op.create_table(
@@ -966,14 +966,14 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_media_variants")),
         sa.ForeignKeyConstraint(
-            ["media_id"], ["public.media_assets.id"],
+            ["media_id"], ["media_assets.id"],
             name=op.f("fk_media_variants_media_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Derived media variants (thumbnails, webp, optimized)",
     )
-    op.create_index(op.f("ix_media_variants_media_id"), "media_variants", ["media_id"], unique=False, schema="public")
+    op.create_index(op.f("ix_media_variants_media_id"), "media_variants", ["media_id"], unique=False, schema=None)
 
     # -- media_tags ----------------------------------------------------------
     op.create_table(
@@ -986,16 +986,16 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_media_tags")),
         sa.UniqueConstraint("company_id", "name", name=op.f("uq_media_tags_company_name")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_media_tags_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Company-scoped tags for media organization",
     )
-    op.create_index(op.f("ix_media_tags_id"), "media_tags", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_tags_company_id"), "media_tags", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_tags_name"), "media_tags", ["name"], unique=False, schema="public")
+    op.create_index(op.f("ix_media_tags_id"), "media_tags", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_tags_company_id"), "media_tags", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_tags_name"), "media_tags", ["name"], unique=False, schema=None)
 
     # -- media_tag_mappings --------------------------------------------------
     op.create_table(
@@ -1005,16 +1005,16 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("media_id", "tag_id", name=op.f("pk_media_tag_mappings")),
         sa.UniqueConstraint("media_id", "tag_id", name=op.f("uq_media_tag_mapping")),
         sa.ForeignKeyConstraint(
-            ["media_id"], ["public.media_assets.id"],
+            ["media_id"], ["media_assets.id"],
             name=op.f("fk_media_tag_mappings_media_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["tag_id"], ["public.media_tags.id"],
+            ["tag_id"], ["media_tags.id"],
             name=op.f("fk_media_tag_mappings_tag_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Media asset to tag mappings",
     )
 
@@ -1032,26 +1032,26 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_media_collections")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_media_collections_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_media_collections_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["cover_media_id"], ["public.media_assets.id"],
+            ["cover_media_id"], ["media_assets.id"],
             name=op.f("fk_media_collections_cover_media_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Named collections of media assets",
     )
-    op.create_index(op.f("ix_media_collections_id"), "media_collections", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_collections_company_id"), "media_collections", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_collections_branch_id"), "media_collections", ["branch_id"], unique=False, schema="public")
+    op.create_index(op.f("ix_media_collections_id"), "media_collections", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_collections_company_id"), "media_collections", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_collections_branch_id"), "media_collections", ["branch_id"], unique=False, schema=None)
 
     # -- media_collection_items ----------------------------------------------
     op.create_table(
@@ -1063,16 +1063,16 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("collection_id", "media_id", name=op.f("pk_media_collection_items")),
         sa.UniqueConstraint("collection_id", "media_id", name=op.f("uq_collection_media_item")),
         sa.ForeignKeyConstraint(
-            ["collection_id"], ["public.media_collections.id"],
+            ["collection_id"], ["media_collections.id"],
             name=op.f("fk_media_collection_items_collection_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["media_id"], ["public.media_assets.id"],
+            ["media_id"], ["media_assets.id"],
             name=op.f("fk_media_collection_items_media_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Ordered items within media collections",
     )
 
@@ -1088,15 +1088,15 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_media_analytics")),
         sa.UniqueConstraint("media_id", name=op.f("uq_media_analytics_media_id")),
         sa.ForeignKeyConstraint(
-            ["media_id"], ["public.media_assets.id"],
+            ["media_id"], ["media_assets.id"],
             name=op.f("fk_media_analytics_media_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="View and download counters per media asset",
     )
-    op.create_index(op.f("ix_media_analytics_id"), "media_analytics", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_media_analytics_media_id"), "media_analytics", ["media_id"], unique=True, schema="public")
+    op.create_index(op.f("ix_media_analytics_id"), "media_analytics", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_media_analytics_media_id"), "media_analytics", ["media_id"], unique=True, schema=None)
 
     # -- ai_image_analysis ---------------------------------------------------
     op.create_table(
@@ -1116,21 +1116,21 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_ai_image_analysis")),
         sa.UniqueConstraint("media_id", "analysis_type", name=op.f("uq_ai_analysis_media_type")),
         sa.ForeignKeyConstraint(
-            ["media_id"], ["public.media_assets.id"],
+            ["media_id"], ["media_assets.id"],
             name=op.f("fk_ai_image_analysis_media_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_ai_image_analysis_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="AI-generated analysis results for media assets",
     )
-    op.create_index(op.f("ix_ai_image_analysis_id"), "ai_image_analysis", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_image_analysis_media_id"), "ai_image_analysis", ["media_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_ai_image_analysis_company_id"), "ai_image_analysis", ["company_id"], unique=False, schema="public")
+    op.create_index(op.f("ix_ai_image_analysis_id"), "ai_image_analysis", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_image_analysis_media_id"), "ai_image_analysis", ["media_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_ai_image_analysis_company_id"), "ai_image_analysis", ["company_id"], unique=False, schema=None)
 
     # ========================================================================
     # 5. EVENTS MODULE TABLES (7 tables)
@@ -1154,17 +1154,17 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_event_definitions")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_event_definitions_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Registry of event types and schemas",
     )
-    op.create_index(op.f("ix_event_definitions_id"), "event_definitions", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_definitions_company_id"), "event_definitions", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_definitions_event_name"), "event_definitions", ["event_name"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_definitions_category"), "event_definitions", ["category"], unique=False, schema="public")
+    op.create_index(op.f("ix_event_definitions_id"), "event_definitions", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_definitions_company_id"), "event_definitions", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_definitions_event_name"), "event_definitions", ["event_name"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_definitions_category"), "event_definitions", ["category"], unique=False, schema=None)
 
     # -- event_subscriptions -------------------------------------------------
     op.create_table(
@@ -1185,18 +1185,18 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_event_subscriptions")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_event_subscriptions_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Subscriptions linking events to handler configurations",
     )
-    op.create_index(op.f("ix_event_subscriptions_id"), "event_subscriptions", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_subscriptions_company_id"), "event_subscriptions", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_subscriptions_event_name"), "event_subscriptions", ["event_name"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_subscriptions_is_active"), "event_subscriptions", ["is_active"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_subscriptions_created_at"), "event_subscriptions", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_event_subscriptions_id"), "event_subscriptions", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_subscriptions_company_id"), "event_subscriptions", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_subscriptions_event_name"), "event_subscriptions", ["event_name"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_subscriptions_is_active"), "event_subscriptions", ["is_active"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_subscriptions_created_at"), "event_subscriptions", ["created_at"], unique=False, schema=None)
 
     # -- event_log -----------------------------------------------------------
     op.create_table(
@@ -1221,32 +1221,32 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_event_log")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_event_log_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_event_log_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["source_user_id"], ["public.users.id"],
+            ["source_user_id"], ["users.id"],
             name=op.f("fk_event_log_source_user_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Immutable log of all published events",
     )
-    op.create_index(op.f("ix_event_log_id"), "event_log", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_log_company_id"), "event_log", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_log_branch_id"), "event_log", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_log_event_name"), "event_log", ["event_name"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_log_source_module"), "event_log", ["source_module"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_log_correlation_id"), "event_log", ["correlation_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_log_status"), "event_log", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_log_source_user_id"), "event_log", ["source_user_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_log_created_at"), "event_log", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_event_log_id"), "event_log", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_log_company_id"), "event_log", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_log_branch_id"), "event_log", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_log_event_name"), "event_log", ["event_name"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_log_source_module"), "event_log", ["source_module"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_log_correlation_id"), "event_log", ["correlation_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_log_status"), "event_log", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_log_source_user_id"), "event_log", ["source_user_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_log_created_at"), "event_log", ["created_at"], unique=False, schema=None)
 
     # -- event_handlers ------------------------------------------------------
     op.create_table(
@@ -1272,16 +1272,16 @@ def upgrade() -> None:
         sa.Column("retry_count", sa.Integer(), server_default="0", nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_event_handlers")),
         sa.ForeignKeyConstraint(
-            ["event_log_id"], ["public.event_log.id"],
+            ["event_log_id"], ["event_log.id"],
             name=op.f("fk_event_handlers_event_log_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Individual handler execution records",
     )
-    op.create_index(op.f("ix_event_handlers_id"), "event_handlers", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_handlers_event_log_id"), "event_handlers", ["event_log_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_event_handlers_status"), "event_handlers", ["status"], unique=False, schema="public")
+    op.create_index(op.f("ix_event_handlers_id"), "event_handlers", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_handlers_event_log_id"), "event_handlers", ["event_log_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_event_handlers_status"), "event_handlers", ["status"], unique=False, schema=None)
 
     # -- dead_letter_events --------------------------------------------------
     op.create_table(
@@ -1304,23 +1304,23 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_dead_letter_events")),
         sa.UniqueConstraint("event_log_id", name=op.f("uq_dead_letter_events_event_log_id")),
         sa.ForeignKeyConstraint(
-            ["event_log_id"], ["public.event_log.id"],
+            ["event_log_id"], ["event_log.id"],
             name=op.f("fk_dead_letter_events_event_log_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["resolved_by"], ["public.users.id"],
+            ["resolved_by"], ["users.id"],
             name=op.f("fk_dead_letter_events_resolved_by"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Dead letter queue for failed events",
     )
-    op.create_index(op.f("ix_dead_letter_events_id"), "dead_letter_events", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_dead_letter_events_event_log_id"), "dead_letter_events", ["event_log_id"], unique=True, schema="public")
-    op.create_index(op.f("ix_dead_letter_events_resolution_status"), "dead_letter_events", ["resolution_status"], unique=False, schema="public")
-    op.create_index(op.f("ix_dead_letter_events_resolved_by"), "dead_letter_events", ["resolved_by"], unique=False, schema="public")
-    op.create_index(op.f("ix_dead_letter_events_created_at"), "dead_letter_events", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_dead_letter_events_id"), "dead_letter_events", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_dead_letter_events_event_log_id"), "dead_letter_events", ["event_log_id"], unique=True, schema=None)
+    op.create_index(op.f("ix_dead_letter_events_resolution_status"), "dead_letter_events", ["resolution_status"], unique=False, schema=None)
+    op.create_index(op.f("ix_dead_letter_events_resolved_by"), "dead_letter_events", ["resolved_by"], unique=False, schema=None)
+    op.create_index(op.f("ix_dead_letter_events_created_at"), "dead_letter_events", ["created_at"], unique=False, schema=None)
 
     # -- automation_rules ----------------------------------------------------
     op.create_table(
@@ -1340,24 +1340,24 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_automation_rules")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_automation_rules_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_automation_rules_branch_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Automation rules: trigger-event -> conditions -> actions",
     )
-    op.create_index(op.f("ix_automation_rules_id"), "automation_rules", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_rules_company_id"), "automation_rules", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_rules_branch_id"), "automation_rules", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_rules_trigger_event"), "automation_rules", ["trigger_event"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_rules_is_active"), "automation_rules", ["is_active"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_rules_created_at"), "automation_rules", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_automation_rules_id"), "automation_rules", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_rules_company_id"), "automation_rules", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_rules_branch_id"), "automation_rules", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_rules_trigger_event"), "automation_rules", ["trigger_event"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_rules_is_active"), "automation_rules", ["is_active"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_rules_created_at"), "automation_rules", ["created_at"], unique=False, schema=None)
 
     # -- automation_executions -----------------------------------------------
     op.create_table(
@@ -1378,23 +1378,23 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_automation_executions")),
         sa.ForeignKeyConstraint(
-            ["rule_id"], ["public.automation_rules.id"],
+            ["rule_id"], ["automation_rules.id"],
             name=op.f("fk_automation_executions_rule_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["trigger_event_id"], ["public.event_log.id"],
+            ["trigger_event_id"], ["event_log.id"],
             name=op.f("fk_automation_executions_trigger_event_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Execution audit trail for automation rules",
     )
-    op.create_index(op.f("ix_automation_executions_id"), "automation_executions", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_executions_rule_id"), "automation_executions", ["rule_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_executions_trigger_event_id"), "automation_executions", ["trigger_event_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_executions_status"), "automation_executions", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_automation_executions_created_at"), "automation_executions", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_automation_executions_id"), "automation_executions", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_executions_rule_id"), "automation_executions", ["rule_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_executions_trigger_event_id"), "automation_executions", ["trigger_event_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_executions_status"), "automation_executions", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_automation_executions_created_at"), "automation_executions", ["created_at"], unique=False, schema=None)
 
     # ========================================================================
     # 6. BILLING MODULE TABLES (7 tables)
@@ -1417,12 +1417,12 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_subscription_plans")),
-        schema="public",
+        schema=None,
         comment="Available subscription plan tiers with pricing and limits",
     )
-    op.create_index(op.f("ix_subscription_plans_id"), "subscription_plans", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_subscription_plans_is_active"), "subscription_plans", ["is_active"], unique=False, schema="public")
-    op.create_index(op.f("ix_subscription_plans_created_at"), "subscription_plans", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_subscription_plans_id"), "subscription_plans", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_subscription_plans_is_active"), "subscription_plans", ["is_active"], unique=False, schema=None)
+    op.create_index(op.f("ix_subscription_plans_created_at"), "subscription_plans", ["created_at"], unique=False, schema=None)
 
     # -- company_subscriptions -----------------------------------------------
     op.create_table(
@@ -1454,23 +1454,23 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_company_subscriptions")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_company_subscriptions_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["plan_id"], ["public.subscription_plans.id"],
+            ["plan_id"], ["subscription_plans.id"],
             name=op.f("fk_company_subscriptions_plan_id"),
             ondelete="RESTRICT", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Company subscription records with lifecycle tracking",
     )
-    op.create_index(op.f("ix_company_subscriptions_id"), "company_subscriptions", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_company_subscriptions_company_id"), "company_subscriptions", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_company_subscriptions_plan_id"), "company_subscriptions", ["plan_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_company_subscriptions_status"), "company_subscriptions", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_company_subscriptions_created_at"), "company_subscriptions", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_company_subscriptions_id"), "company_subscriptions", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_company_subscriptions_company_id"), "company_subscriptions", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_company_subscriptions_plan_id"), "company_subscriptions", ["plan_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_company_subscriptions_status"), "company_subscriptions", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_company_subscriptions_created_at"), "company_subscriptions", ["created_at"], unique=False, schema=None)
 
     # -- usage_records -------------------------------------------------------
     op.create_table(
@@ -1489,17 +1489,17 @@ def upgrade() -> None:
         sa.Column("recorded_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_usage_records")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_usage_records_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Resource usage records for billing and analytics",
     )
-    op.create_index(op.f("ix_usage_records_id"), "usage_records", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_usage_records_company_id"), "usage_records", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_usage_records_resource_type"), "usage_records", ["resource_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_usage_records_recorded_at"), "usage_records", ["recorded_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_usage_records_id"), "usage_records", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_usage_records_company_id"), "usage_records", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_usage_records_resource_type"), "usage_records", ["resource_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_usage_records_recorded_at"), "usage_records", ["recorded_at"], unique=False, schema=None)
 
     # -- usage_quotas --------------------------------------------------------
     op.create_table(
@@ -1526,17 +1526,17 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_usage_quotas")),
         sa.UniqueConstraint("company_id", "resource_type", "period", name=op.f("uq_usage_quotas_company_resource_period")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_usage_quotas_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Per-company resource usage quotas and current consumption",
     )
-    op.create_index(op.f("ix_usage_quotas_id"), "usage_quotas", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_usage_quotas_company_id"), "usage_quotas", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_usage_quotas_resource_type"), "usage_quotas", ["resource_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_usage_quotas_created_at"), "usage_quotas", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_usage_quotas_id"), "usage_quotas", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_usage_quotas_company_id"), "usage_quotas", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_usage_quotas_resource_type"), "usage_quotas", ["resource_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_usage_quotas_created_at"), "usage_quotas", ["created_at"], unique=False, schema=None)
 
     # -- invoices ------------------------------------------------------------
     op.create_table(
@@ -1564,19 +1564,19 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_invoices")),
         sa.UniqueConstraint("invoice_number", name=op.f("uq_invoices_invoice_number")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_invoices_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Customer invoices with line items and payment tracking",
     )
-    op.create_index(op.f("ix_invoices_id"), "invoices", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_invoices_company_id"), "invoices", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_invoices_invoice_number"), "invoices", ["invoice_number"], unique=True, schema="public")
-    op.create_index(op.f("ix_invoices_status"), "invoices", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_invoices_due_date"), "invoices", ["due_date"], unique=False, schema="public")
-    op.create_index(op.f("ix_invoices_created_at"), "invoices", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_invoices_id"), "invoices", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_invoices_company_id"), "invoices", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_invoices_invoice_number"), "invoices", ["invoice_number"], unique=True, schema=None)
+    op.create_index(op.f("ix_invoices_status"), "invoices", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_invoices_due_date"), "invoices", ["due_date"], unique=False, schema=None)
+    op.create_index(op.f("ix_invoices_created_at"), "invoices", ["created_at"], unique=False, schema=None)
 
     # -- feature_flags -------------------------------------------------------
     op.create_table(
@@ -1603,23 +1603,23 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_feature_flags")),
         sa.UniqueConstraint("company_id", "feature_name", name=op.f("uq_feature_flags_company_feature")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_feature_flags_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["enabled_by"], ["public.users.id"],
+            ["enabled_by"], ["users.id"],
             name=op.f("fk_feature_flags_enabled_by"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Per-company feature enablement flags",
     )
-    op.create_index(op.f("ix_feature_flags_id"), "feature_flags", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_feature_flags_company_id"), "feature_flags", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_feature_flags_feature_name"), "feature_flags", ["feature_name"], unique=False, schema="public")
-    op.create_index(op.f("ix_feature_flags_enabled"), "feature_flags", ["enabled"], unique=False, schema="public")
-    op.create_index(op.f("ix_feature_flags_created_at"), "feature_flags", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_feature_flags_id"), "feature_flags", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_feature_flags_company_id"), "feature_flags", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_feature_flags_feature_name"), "feature_flags", ["feature_name"], unique=False, schema=None)
+    op.create_index(op.f("ix_feature_flags_enabled"), "feature_flags", ["enabled"], unique=False, schema=None)
+    op.create_index(op.f("ix_feature_flags_created_at"), "feature_flags", ["created_at"], unique=False, schema=None)
 
     # -- billing_events ------------------------------------------------------
     op.create_table(
@@ -1643,17 +1643,17 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_billing_events")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_billing_events_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Billing event audit log",
     )
-    op.create_index(op.f("ix_billing_events_id"), "billing_events", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_billing_events_company_id"), "billing_events", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_billing_events_event_type"), "billing_events", ["event_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_billing_events_created_at"), "billing_events", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_billing_events_id"), "billing_events", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_billing_events_company_id"), "billing_events", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_billing_events_event_type"), "billing_events", ["event_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_billing_events_created_at"), "billing_events", ["created_at"], unique=False, schema=None)
 
     # ========================================================================
     # 7. AUDIT MODULE TABLES (5 tables)
@@ -1698,35 +1698,35 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_audit_logs")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_audit_logs_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["branch_id"], ["public.branches.id"],
+            ["branch_id"], ["branches.id"],
             name=op.f("fk_audit_logs_branch_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["public.users.id"],
+            ["user_id"], ["users.id"],
             name=op.f("fk_audit_logs_user_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Audit trail for all operations",
     )
-    op.create_index(op.f("ix_audit_logs_id"), "audit_logs", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_company_id"), "audit_logs", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_branch_id"), "audit_logs", ["branch_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_user_id"), "audit_logs", ["user_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_action"), "audit_logs", ["action"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_resource_type"), "audit_logs", ["resource_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_resource_id"), "audit_logs", ["resource_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_ip_address"), "audit_logs", ["ip_address"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_session_id"), "audit_logs", ["session_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_correlation_id"), "audit_logs", ["correlation_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_status"), "audit_logs", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_audit_logs_created_at"), "audit_logs", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_audit_logs_id"), "audit_logs", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_company_id"), "audit_logs", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_branch_id"), "audit_logs", ["branch_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_user_id"), "audit_logs", ["user_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_action"), "audit_logs", ["action"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_resource_type"), "audit_logs", ["resource_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_resource_id"), "audit_logs", ["resource_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_ip_address"), "audit_logs", ["ip_address"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_session_id"), "audit_logs", ["session_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_correlation_id"), "audit_logs", ["correlation_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_status"), "audit_logs", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_audit_logs_created_at"), "audit_logs", ["created_at"], unique=False, schema=None)
 
     # -- security_events -----------------------------------------------------
     op.create_table(
@@ -1760,31 +1760,31 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_security_events")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_security_events_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["public.users.id"],
+            ["user_id"], ["users.id"],
             name=op.f("fk_security_events_user_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["resolved_by"], ["public.users.id"],
+            ["resolved_by"], ["users.id"],
             name=op.f("fk_security_events_resolved_by"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Security events and alerts",
     )
-    op.create_index(op.f("ix_security_events_id"), "security_events", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_security_events_company_id"), "security_events", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_security_events_event_type"), "security_events", ["event_type"], unique=False, schema="public")
-    op.create_index(op.f("ix_security_events_severity"), "security_events", ["severity"], unique=False, schema="public")
-    op.create_index(op.f("ix_security_events_source_ip"), "security_events", ["source_ip"], unique=False, schema="public")
-    op.create_index(op.f("ix_security_events_user_id"), "security_events", ["user_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_security_events_resolved"), "security_events", ["resolved"], unique=False, schema="public")
-    op.create_index(op.f("ix_security_events_created_at"), "security_events", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_security_events_id"), "security_events", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_security_events_company_id"), "security_events", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_security_events_event_type"), "security_events", ["event_type"], unique=False, schema=None)
+    op.create_index(op.f("ix_security_events_severity"), "security_events", ["severity"], unique=False, schema=None)
+    op.create_index(op.f("ix_security_events_source_ip"), "security_events", ["source_ip"], unique=False, schema=None)
+    op.create_index(op.f("ix_security_events_user_id"), "security_events", ["user_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_security_events_resolved"), "security_events", ["resolved"], unique=False, schema=None)
+    op.create_index(op.f("ix_security_events_created_at"), "security_events", ["created_at"], unique=False, schema=None)
 
     # -- login_attempts ------------------------------------------------------
     op.create_table(
@@ -1803,19 +1803,19 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_login_attempts")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_login_attempts_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Login attempts tracking",
     )
-    op.create_index(op.f("ix_login_attempts_id"), "login_attempts", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_login_attempts_company_id"), "login_attempts", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_login_attempts_email"), "login_attempts", ["email"], unique=False, schema="public")
-    op.create_index(op.f("ix_login_attempts_ip_address"), "login_attempts", ["ip_address"], unique=False, schema="public")
-    op.create_index(op.f("ix_login_attempts_status"), "login_attempts", ["status"], unique=False, schema="public")
-    op.create_index(op.f("ix_login_attempts_created_at"), "login_attempts", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_login_attempts_id"), "login_attempts", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_login_attempts_company_id"), "login_attempts", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_login_attempts_email"), "login_attempts", ["email"], unique=False, schema=None)
+    op.create_index(op.f("ix_login_attempts_ip_address"), "login_attempts", ["ip_address"], unique=False, schema=None)
+    op.create_index(op.f("ix_login_attempts_status"), "login_attempts", ["status"], unique=False, schema=None)
+    op.create_index(op.f("ix_login_attempts_created_at"), "login_attempts", ["created_at"], unique=False, schema=None)
 
     # -- api_keys ------------------------------------------------------------
     op.create_table(
@@ -1833,24 +1833,24 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_api_keys")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_api_keys_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["public.users.id"],
+            ["user_id"], ["users.id"],
             name=op.f("fk_api_keys_user_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Scoped API keys",
     )
-    op.create_index(op.f("ix_api_keys_id"), "api_keys", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_api_keys_company_id"), "api_keys", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_api_keys_user_id"), "api_keys", ["user_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_api_keys_expires_at"), "api_keys", ["expires_at"], unique=False, schema="public")
-    op.create_index(op.f("ix_api_keys_is_active"), "api_keys", ["is_active"], unique=False, schema="public")
-    op.create_index(op.f("ix_api_keys_created_at"), "api_keys", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_api_keys_id"), "api_keys", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_api_keys_company_id"), "api_keys", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_api_keys_user_id"), "api_keys", ["user_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_api_keys_expires_at"), "api_keys", ["expires_at"], unique=False, schema=None)
+    op.create_index(op.f("ix_api_keys_is_active"), "api_keys", ["is_active"], unique=False, schema=None)
+    op.create_index(op.f("ix_api_keys_created_at"), "api_keys", ["created_at"], unique=False, schema=None)
 
     # -- data_access_logs ----------------------------------------------------
     op.create_table(
@@ -1870,25 +1870,25 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("NOW()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_data_access_logs")),
         sa.ForeignKeyConstraint(
-            ["company_id"], ["public.companies.id"],
+            ["company_id"], ["companies.id"],
             name=op.f("fk_data_access_logs_company_id"),
             ondelete="CASCADE", onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
-            ["user_id"], ["public.users.id"],
+            ["user_id"], ["users.id"],
             name=op.f("fk_data_access_logs_user_id"),
             ondelete="SET NULL", onupdate="CASCADE",
         ),
-        schema="public",
+        schema=None,
         comment="Data access logs for compliance",
     )
-    op.create_index(op.f("ix_data_access_logs_id"), "data_access_logs", ["id"], unique=False, schema="public")
-    op.create_index(op.f("ix_data_access_logs_company_id"), "data_access_logs", ["company_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_data_access_logs_user_id"), "data_access_logs", ["user_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_data_access_logs_table_name"), "data_access_logs", ["table_name"], unique=False, schema="public")
-    op.create_index(op.f("ix_data_access_logs_record_id"), "data_access_logs", ["record_id"], unique=False, schema="public")
-    op.create_index(op.f("ix_data_access_logs_action"), "data_access_logs", ["action"], unique=False, schema="public")
-    op.create_index(op.f("ix_data_access_logs_created_at"), "data_access_logs", ["created_at"], unique=False, schema="public")
+    op.create_index(op.f("ix_data_access_logs_id"), "data_access_logs", ["id"], unique=False, schema=None)
+    op.create_index(op.f("ix_data_access_logs_company_id"), "data_access_logs", ["company_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_data_access_logs_user_id"), "data_access_logs", ["user_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_data_access_logs_table_name"), "data_access_logs", ["table_name"], unique=False, schema=None)
+    op.create_index(op.f("ix_data_access_logs_record_id"), "data_access_logs", ["record_id"], unique=False, schema=None)
+    op.create_index(op.f("ix_data_access_logs_action"), "data_access_logs", ["action"], unique=False, schema=None)
+    op.create_index(op.f("ix_data_access_logs_created_at"), "data_access_logs", ["created_at"], unique=False, schema=None)
 
     # ========================================================================
     # 8. SEED DATA
@@ -1950,315 +1950,315 @@ def downgrade() -> None:
     """Drop all consolidated tables and ENUMs in reverse dependency order."""
 
     # -- Drop tables: AUDIT module (5) ---------------------------------------
-    op.drop_index(op.f("ix_data_access_logs_created_at"), table_name="data_access_logs", schema="public")
-    op.drop_index(op.f("ix_data_access_logs_action"), table_name="data_access_logs", schema="public")
-    op.drop_index(op.f("ix_data_access_logs_record_id"), table_name="data_access_logs", schema="public")
-    op.drop_index(op.f("ix_data_access_logs_table_name"), table_name="data_access_logs", schema="public")
-    op.drop_index(op.f("ix_data_access_logs_user_id"), table_name="data_access_logs", schema="public")
-    op.drop_index(op.f("ix_data_access_logs_company_id"), table_name="data_access_logs", schema="public")
-    op.drop_index(op.f("ix_data_access_logs_id"), table_name="data_access_logs", schema="public")
-    op.drop_table("data_access_logs", schema="public")
+    op.drop_index(op.f("ix_data_access_logs_created_at"), table_name="data_access_logs", schema=None)
+    op.drop_index(op.f("ix_data_access_logs_action"), table_name="data_access_logs", schema=None)
+    op.drop_index(op.f("ix_data_access_logs_record_id"), table_name="data_access_logs", schema=None)
+    op.drop_index(op.f("ix_data_access_logs_table_name"), table_name="data_access_logs", schema=None)
+    op.drop_index(op.f("ix_data_access_logs_user_id"), table_name="data_access_logs", schema=None)
+    op.drop_index(op.f("ix_data_access_logs_company_id"), table_name="data_access_logs", schema=None)
+    op.drop_index(op.f("ix_data_access_logs_id"), table_name="data_access_logs", schema=None)
+    op.drop_table("data_access_logs", schema=None)
 
-    op.drop_index(op.f("ix_api_keys_created_at"), table_name="api_keys", schema="public")
-    op.drop_index(op.f("ix_api_keys_is_active"), table_name="api_keys", schema="public")
-    op.drop_index(op.f("ix_api_keys_expires_at"), table_name="api_keys", schema="public")
-    op.drop_index(op.f("ix_api_keys_user_id"), table_name="api_keys", schema="public")
-    op.drop_index(op.f("ix_api_keys_company_id"), table_name="api_keys", schema="public")
-    op.drop_index(op.f("ix_api_keys_id"), table_name="api_keys", schema="public")
-    op.drop_table("api_keys", schema="public")
+    op.drop_index(op.f("ix_api_keys_created_at"), table_name="api_keys", schema=None)
+    op.drop_index(op.f("ix_api_keys_is_active"), table_name="api_keys", schema=None)
+    op.drop_index(op.f("ix_api_keys_expires_at"), table_name="api_keys", schema=None)
+    op.drop_index(op.f("ix_api_keys_user_id"), table_name="api_keys", schema=None)
+    op.drop_index(op.f("ix_api_keys_company_id"), table_name="api_keys", schema=None)
+    op.drop_index(op.f("ix_api_keys_id"), table_name="api_keys", schema=None)
+    op.drop_table("api_keys", schema=None)
 
-    op.drop_index(op.f("ix_login_attempts_created_at"), table_name="login_attempts", schema="public")
-    op.drop_index(op.f("ix_login_attempts_status"), table_name="login_attempts", schema="public")
-    op.drop_index(op.f("ix_login_attempts_ip_address"), table_name="login_attempts", schema="public")
-    op.drop_index(op.f("ix_login_attempts_email"), table_name="login_attempts", schema="public")
-    op.drop_index(op.f("ix_login_attempts_company_id"), table_name="login_attempts", schema="public")
-    op.drop_index(op.f("ix_login_attempts_id"), table_name="login_attempts", schema="public")
-    op.drop_table("login_attempts", schema="public")
+    op.drop_index(op.f("ix_login_attempts_created_at"), table_name="login_attempts", schema=None)
+    op.drop_index(op.f("ix_login_attempts_status"), table_name="login_attempts", schema=None)
+    op.drop_index(op.f("ix_login_attempts_ip_address"), table_name="login_attempts", schema=None)
+    op.drop_index(op.f("ix_login_attempts_email"), table_name="login_attempts", schema=None)
+    op.drop_index(op.f("ix_login_attempts_company_id"), table_name="login_attempts", schema=None)
+    op.drop_index(op.f("ix_login_attempts_id"), table_name="login_attempts", schema=None)
+    op.drop_table("login_attempts", schema=None)
 
-    op.drop_index(op.f("ix_security_events_created_at"), table_name="security_events", schema="public")
-    op.drop_index(op.f("ix_security_events_resolved"), table_name="security_events", schema="public")
-    op.drop_index(op.f("ix_security_events_user_id"), table_name="security_events", schema="public")
-    op.drop_index(op.f("ix_security_events_source_ip"), table_name="security_events", schema="public")
-    op.drop_index(op.f("ix_security_events_severity"), table_name="security_events", schema="public")
-    op.drop_index(op.f("ix_security_events_event_type"), table_name="security_events", schema="public")
-    op.drop_index(op.f("ix_security_events_company_id"), table_name="security_events", schema="public")
-    op.drop_index(op.f("ix_security_events_id"), table_name="security_events", schema="public")
-    op.drop_table("security_events", schema="public")
+    op.drop_index(op.f("ix_security_events_created_at"), table_name="security_events", schema=None)
+    op.drop_index(op.f("ix_security_events_resolved"), table_name="security_events", schema=None)
+    op.drop_index(op.f("ix_security_events_user_id"), table_name="security_events", schema=None)
+    op.drop_index(op.f("ix_security_events_source_ip"), table_name="security_events", schema=None)
+    op.drop_index(op.f("ix_security_events_severity"), table_name="security_events", schema=None)
+    op.drop_index(op.f("ix_security_events_event_type"), table_name="security_events", schema=None)
+    op.drop_index(op.f("ix_security_events_company_id"), table_name="security_events", schema=None)
+    op.drop_index(op.f("ix_security_events_id"), table_name="security_events", schema=None)
+    op.drop_table("security_events", schema=None)
 
-    op.drop_index(op.f("ix_audit_logs_created_at"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_status"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_correlation_id"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_session_id"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_ip_address"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_resource_id"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_resource_type"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_action"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_user_id"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_branch_id"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_company_id"), table_name="audit_logs", schema="public")
-    op.drop_index(op.f("ix_audit_logs_id"), table_name="audit_logs", schema="public")
-    op.drop_table("audit_logs", schema="public")
+    op.drop_index(op.f("ix_audit_logs_created_at"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_status"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_correlation_id"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_session_id"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_ip_address"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_resource_id"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_resource_type"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_action"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_user_id"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_branch_id"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_company_id"), table_name="audit_logs", schema=None)
+    op.drop_index(op.f("ix_audit_logs_id"), table_name="audit_logs", schema=None)
+    op.drop_table("audit_logs", schema=None)
 
     # -- Drop tables: BILLING module (7) -------------------------------------
-    op.drop_index(op.f("ix_billing_events_created_at"), table_name="billing_events", schema="public")
-    op.drop_index(op.f("ix_billing_events_event_type"), table_name="billing_events", schema="public")
-    op.drop_index(op.f("ix_billing_events_company_id"), table_name="billing_events", schema="public")
-    op.drop_index(op.f("ix_billing_events_id"), table_name="billing_events", schema="public")
-    op.drop_table("billing_events", schema="public")
+    op.drop_index(op.f("ix_billing_events_created_at"), table_name="billing_events", schema=None)
+    op.drop_index(op.f("ix_billing_events_event_type"), table_name="billing_events", schema=None)
+    op.drop_index(op.f("ix_billing_events_company_id"), table_name="billing_events", schema=None)
+    op.drop_index(op.f("ix_billing_events_id"), table_name="billing_events", schema=None)
+    op.drop_table("billing_events", schema=None)
 
-    op.drop_index(op.f("ix_feature_flags_created_at"), table_name="feature_flags", schema="public")
-    op.drop_index(op.f("ix_feature_flags_enabled"), table_name="feature_flags", schema="public")
-    op.drop_index(op.f("ix_feature_flags_feature_name"), table_name="feature_flags", schema="public")
-    op.drop_index(op.f("ix_feature_flags_company_id"), table_name="feature_flags", schema="public")
-    op.drop_index(op.f("ix_feature_flags_id"), table_name="feature_flags", schema="public")
-    op.drop_table("feature_flags", schema="public")
+    op.drop_index(op.f("ix_feature_flags_created_at"), table_name="feature_flags", schema=None)
+    op.drop_index(op.f("ix_feature_flags_enabled"), table_name="feature_flags", schema=None)
+    op.drop_index(op.f("ix_feature_flags_feature_name"), table_name="feature_flags", schema=None)
+    op.drop_index(op.f("ix_feature_flags_company_id"), table_name="feature_flags", schema=None)
+    op.drop_index(op.f("ix_feature_flags_id"), table_name="feature_flags", schema=None)
+    op.drop_table("feature_flags", schema=None)
 
-    op.drop_index(op.f("ix_invoices_created_at"), table_name="invoices", schema="public")
-    op.drop_index(op.f("ix_invoices_due_date"), table_name="invoices", schema="public")
-    op.drop_index(op.f("ix_invoices_status"), table_name="invoices", schema="public")
-    op.drop_index(op.f("ix_invoices_invoice_number"), table_name="invoices", schema="public")
-    op.drop_index(op.f("ix_invoices_company_id"), table_name="invoices", schema="public")
-    op.drop_index(op.f("ix_invoices_id"), table_name="invoices", schema="public")
-    op.drop_table("invoices", schema="public")
+    op.drop_index(op.f("ix_invoices_created_at"), table_name="invoices", schema=None)
+    op.drop_index(op.f("ix_invoices_due_date"), table_name="invoices", schema=None)
+    op.drop_index(op.f("ix_invoices_status"), table_name="invoices", schema=None)
+    op.drop_index(op.f("ix_invoices_invoice_number"), table_name="invoices", schema=None)
+    op.drop_index(op.f("ix_invoices_company_id"), table_name="invoices", schema=None)
+    op.drop_index(op.f("ix_invoices_id"), table_name="invoices", schema=None)
+    op.drop_table("invoices", schema=None)
 
-    op.drop_index(op.f("ix_usage_quotas_created_at"), table_name="usage_quotas", schema="public")
-    op.drop_index(op.f("ix_usage_quotas_resource_type"), table_name="usage_quotas", schema="public")
-    op.drop_index(op.f("ix_usage_quotas_company_id"), table_name="usage_quotas", schema="public")
-    op.drop_index(op.f("ix_usage_quotas_id"), table_name="usage_quotas", schema="public")
-    op.drop_table("usage_quotas", schema="public")
+    op.drop_index(op.f("ix_usage_quotas_created_at"), table_name="usage_quotas", schema=None)
+    op.drop_index(op.f("ix_usage_quotas_resource_type"), table_name="usage_quotas", schema=None)
+    op.drop_index(op.f("ix_usage_quotas_company_id"), table_name="usage_quotas", schema=None)
+    op.drop_index(op.f("ix_usage_quotas_id"), table_name="usage_quotas", schema=None)
+    op.drop_table("usage_quotas", schema=None)
 
-    op.drop_index(op.f("ix_usage_records_recorded_at"), table_name="usage_records", schema="public")
-    op.drop_index(op.f("ix_usage_records_resource_type"), table_name="usage_records", schema="public")
-    op.drop_index(op.f("ix_usage_records_company_id"), table_name="usage_records", schema="public")
-    op.drop_index(op.f("ix_usage_records_id"), table_name="usage_records", schema="public")
-    op.drop_table("usage_records", schema="public")
+    op.drop_index(op.f("ix_usage_records_recorded_at"), table_name="usage_records", schema=None)
+    op.drop_index(op.f("ix_usage_records_resource_type"), table_name="usage_records", schema=None)
+    op.drop_index(op.f("ix_usage_records_company_id"), table_name="usage_records", schema=None)
+    op.drop_index(op.f("ix_usage_records_id"), table_name="usage_records", schema=None)
+    op.drop_table("usage_records", schema=None)
 
-    op.drop_index(op.f("ix_company_subscriptions_created_at"), table_name="company_subscriptions", schema="public")
-    op.drop_index(op.f("ix_company_subscriptions_status"), table_name="company_subscriptions", schema="public")
-    op.drop_index(op.f("ix_company_subscriptions_plan_id"), table_name="company_subscriptions", schema="public")
-    op.drop_index(op.f("ix_company_subscriptions_company_id"), table_name="company_subscriptions", schema="public")
-    op.drop_index(op.f("ix_company_subscriptions_id"), table_name="company_subscriptions", schema="public")
-    op.drop_table("company_subscriptions", schema="public")
+    op.drop_index(op.f("ix_company_subscriptions_created_at"), table_name="company_subscriptions", schema=None)
+    op.drop_index(op.f("ix_company_subscriptions_status"), table_name="company_subscriptions", schema=None)
+    op.drop_index(op.f("ix_company_subscriptions_plan_id"), table_name="company_subscriptions", schema=None)
+    op.drop_index(op.f("ix_company_subscriptions_company_id"), table_name="company_subscriptions", schema=None)
+    op.drop_index(op.f("ix_company_subscriptions_id"), table_name="company_subscriptions", schema=None)
+    op.drop_table("company_subscriptions", schema=None)
 
-    op.drop_index(op.f("ix_subscription_plans_created_at"), table_name="subscription_plans", schema="public")
-    op.drop_index(op.f("ix_subscription_plans_is_active"), table_name="subscription_plans", schema="public")
-    op.drop_index(op.f("ix_subscription_plans_id"), table_name="subscription_plans", schema="public")
-    op.drop_table("subscription_plans", schema="public")
+    op.drop_index(op.f("ix_subscription_plans_created_at"), table_name="subscription_plans", schema=None)
+    op.drop_index(op.f("ix_subscription_plans_is_active"), table_name="subscription_plans", schema=None)
+    op.drop_index(op.f("ix_subscription_plans_id"), table_name="subscription_plans", schema=None)
+    op.drop_table("subscription_plans", schema=None)
 
     # -- Drop tables: EVENTS module (7) --------------------------------------
-    op.drop_index(op.f("ix_automation_executions_created_at"), table_name="automation_executions", schema="public")
-    op.drop_index(op.f("ix_automation_executions_status"), table_name="automation_executions", schema="public")
-    op.drop_index(op.f("ix_automation_executions_trigger_event_id"), table_name="automation_executions", schema="public")
-    op.drop_index(op.f("ix_automation_executions_rule_id"), table_name="automation_executions", schema="public")
-    op.drop_index(op.f("ix_automation_executions_id"), table_name="automation_executions", schema="public")
-    op.drop_table("automation_executions", schema="public")
+    op.drop_index(op.f("ix_automation_executions_created_at"), table_name="automation_executions", schema=None)
+    op.drop_index(op.f("ix_automation_executions_status"), table_name="automation_executions", schema=None)
+    op.drop_index(op.f("ix_automation_executions_trigger_event_id"), table_name="automation_executions", schema=None)
+    op.drop_index(op.f("ix_automation_executions_rule_id"), table_name="automation_executions", schema=None)
+    op.drop_index(op.f("ix_automation_executions_id"), table_name="automation_executions", schema=None)
+    op.drop_table("automation_executions", schema=None)
 
-    op.drop_index(op.f("ix_automation_rules_created_at"), table_name="automation_rules", schema="public")
-    op.drop_index(op.f("ix_automation_rules_is_active"), table_name="automation_rules", schema="public")
-    op.drop_index(op.f("ix_automation_rules_trigger_event"), table_name="automation_rules", schema="public")
-    op.drop_index(op.f("ix_automation_rules_branch_id"), table_name="automation_rules", schema="public")
-    op.drop_index(op.f("ix_automation_rules_company_id"), table_name="automation_rules", schema="public")
-    op.drop_index(op.f("ix_automation_rules_id"), table_name="automation_rules", schema="public")
-    op.drop_table("automation_rules", schema="public")
+    op.drop_index(op.f("ix_automation_rules_created_at"), table_name="automation_rules", schema=None)
+    op.drop_index(op.f("ix_automation_rules_is_active"), table_name="automation_rules", schema=None)
+    op.drop_index(op.f("ix_automation_rules_trigger_event"), table_name="automation_rules", schema=None)
+    op.drop_index(op.f("ix_automation_rules_branch_id"), table_name="automation_rules", schema=None)
+    op.drop_index(op.f("ix_automation_rules_company_id"), table_name="automation_rules", schema=None)
+    op.drop_index(op.f("ix_automation_rules_id"), table_name="automation_rules", schema=None)
+    op.drop_table("automation_rules", schema=None)
 
-    op.drop_index(op.f("ix_dead_letter_events_created_at"), table_name="dead_letter_events", schema="public")
-    op.drop_index(op.f("ix_dead_letter_events_resolved_by"), table_name="dead_letter_events", schema="public")
-    op.drop_index(op.f("ix_dead_letter_events_resolution_status"), table_name="dead_letter_events", schema="public")
-    op.drop_index(op.f("ix_dead_letter_events_event_log_id"), table_name="dead_letter_events", schema="public")
-    op.drop_index(op.f("ix_dead_letter_events_id"), table_name="dead_letter_events", schema="public")
-    op.drop_table("dead_letter_events", schema="public")
+    op.drop_index(op.f("ix_dead_letter_events_created_at"), table_name="dead_letter_events", schema=None)
+    op.drop_index(op.f("ix_dead_letter_events_resolved_by"), table_name="dead_letter_events", schema=None)
+    op.drop_index(op.f("ix_dead_letter_events_resolution_status"), table_name="dead_letter_events", schema=None)
+    op.drop_index(op.f("ix_dead_letter_events_event_log_id"), table_name="dead_letter_events", schema=None)
+    op.drop_index(op.f("ix_dead_letter_events_id"), table_name="dead_letter_events", schema=None)
+    op.drop_table("dead_letter_events", schema=None)
 
-    op.drop_index(op.f("ix_event_handlers_status"), table_name="event_handlers", schema="public")
-    op.drop_index(op.f("ix_event_handlers_event_log_id"), table_name="event_handlers", schema="public")
-    op.drop_index(op.f("ix_event_handlers_id"), table_name="event_handlers", schema="public")
-    op.drop_table("event_handlers", schema="public")
+    op.drop_index(op.f("ix_event_handlers_status"), table_name="event_handlers", schema=None)
+    op.drop_index(op.f("ix_event_handlers_event_log_id"), table_name="event_handlers", schema=None)
+    op.drop_index(op.f("ix_event_handlers_id"), table_name="event_handlers", schema=None)
+    op.drop_table("event_handlers", schema=None)
 
-    op.drop_index(op.f("ix_event_log_created_at"), table_name="event_log", schema="public")
-    op.drop_index(op.f("ix_event_log_status"), table_name="event_log", schema="public")
-    op.drop_index(op.f("ix_event_log_correlation_id"), table_name="event_log", schema="public")
-    op.drop_index(op.f("ix_event_log_source_module"), table_name="event_log", schema="public")
-    op.drop_index(op.f("ix_event_log_event_name"), table_name="event_log", schema="public")
-    op.drop_index(op.f("ix_event_log_branch_id"), table_name="event_log", schema="public")
-    op.drop_index(op.f("ix_event_log_company_id"), table_name="event_log", schema="public")
-    op.drop_index(op.f("ix_event_log_id"), table_name="event_log", schema="public")
-    op.drop_table("event_log", schema="public")
+    op.drop_index(op.f("ix_event_log_created_at"), table_name="event_log", schema=None)
+    op.drop_index(op.f("ix_event_log_status"), table_name="event_log", schema=None)
+    op.drop_index(op.f("ix_event_log_correlation_id"), table_name="event_log", schema=None)
+    op.drop_index(op.f("ix_event_log_source_module"), table_name="event_log", schema=None)
+    op.drop_index(op.f("ix_event_log_event_name"), table_name="event_log", schema=None)
+    op.drop_index(op.f("ix_event_log_branch_id"), table_name="event_log", schema=None)
+    op.drop_index(op.f("ix_event_log_company_id"), table_name="event_log", schema=None)
+    op.drop_index(op.f("ix_event_log_id"), table_name="event_log", schema=None)
+    op.drop_table("event_log", schema=None)
 
-    op.drop_index(op.f("ix_event_subscriptions_created_at"), table_name="event_subscriptions", schema="public")
-    op.drop_index(op.f("ix_event_subscriptions_is_active"), table_name="event_subscriptions", schema="public")
-    op.drop_index(op.f("ix_event_subscriptions_event_name"), table_name="event_subscriptions", schema="public")
-    op.drop_index(op.f("ix_event_subscriptions_company_id"), table_name="event_subscriptions", schema="public")
-    op.drop_index(op.f("ix_event_subscriptions_id"), table_name="event_subscriptions", schema="public")
-    op.drop_table("event_subscriptions", schema="public")
+    op.drop_index(op.f("ix_event_subscriptions_created_at"), table_name="event_subscriptions", schema=None)
+    op.drop_index(op.f("ix_event_subscriptions_is_active"), table_name="event_subscriptions", schema=None)
+    op.drop_index(op.f("ix_event_subscriptions_event_name"), table_name="event_subscriptions", schema=None)
+    op.drop_index(op.f("ix_event_subscriptions_company_id"), table_name="event_subscriptions", schema=None)
+    op.drop_index(op.f("ix_event_subscriptions_id"), table_name="event_subscriptions", schema=None)
+    op.drop_table("event_subscriptions", schema=None)
 
-    op.drop_index(op.f("ix_event_definitions_category"), table_name="event_definitions", schema="public")
-    op.drop_index(op.f("ix_event_definitions_event_name"), table_name="event_definitions", schema="public")
-    op.drop_index(op.f("ix_event_definitions_company_id"), table_name="event_definitions", schema="public")
-    op.drop_index(op.f("ix_event_definitions_id"), table_name="event_definitions", schema="public")
-    op.drop_table("event_definitions", schema="public")
+    op.drop_index(op.f("ix_event_definitions_category"), table_name="event_definitions", schema=None)
+    op.drop_index(op.f("ix_event_definitions_event_name"), table_name="event_definitions", schema=None)
+    op.drop_index(op.f("ix_event_definitions_company_id"), table_name="event_definitions", schema=None)
+    op.drop_index(op.f("ix_event_definitions_id"), table_name="event_definitions", schema=None)
+    op.drop_table("event_definitions", schema=None)
 
     # -- Drop tables: MEDIA module (8) ---------------------------------------
-    op.drop_index(op.f("ix_ai_image_analysis_company_id"), table_name="ai_image_analysis", schema="public")
-    op.drop_index(op.f("ix_ai_image_analysis_media_id"), table_name="ai_image_analysis", schema="public")
-    op.drop_index(op.f("ix_ai_image_analysis_id"), table_name="ai_image_analysis", schema="public")
-    op.drop_table("ai_image_analysis", schema="public")
+    op.drop_index(op.f("ix_ai_image_analysis_company_id"), table_name="ai_image_analysis", schema=None)
+    op.drop_index(op.f("ix_ai_image_analysis_media_id"), table_name="ai_image_analysis", schema=None)
+    op.drop_index(op.f("ix_ai_image_analysis_id"), table_name="ai_image_analysis", schema=None)
+    op.drop_table("ai_image_analysis", schema=None)
 
-    op.drop_index(op.f("ix_media_analytics_media_id"), table_name="media_analytics", schema="public")
-    op.drop_index(op.f("ix_media_analytics_id"), table_name="media_analytics", schema="public")
-    op.drop_table("media_analytics", schema="public")
+    op.drop_index(op.f("ix_media_analytics_media_id"), table_name="media_analytics", schema=None)
+    op.drop_index(op.f("ix_media_analytics_id"), table_name="media_analytics", schema=None)
+    op.drop_table("media_analytics", schema=None)
 
-    op.drop_table("media_collection_items", schema="public")
+    op.drop_table("media_collection_items", schema=None)
 
-    op.drop_index(op.f("ix_media_collections_branch_id"), table_name="media_collections", schema="public")
-    op.drop_index(op.f("ix_media_collections_company_id"), table_name="media_collections", schema="public")
-    op.drop_index(op.f("ix_media_collections_id"), table_name="media_collections", schema="public")
-    op.drop_table("media_collections", schema="public")
+    op.drop_index(op.f("ix_media_collections_branch_id"), table_name="media_collections", schema=None)
+    op.drop_index(op.f("ix_media_collections_company_id"), table_name="media_collections", schema=None)
+    op.drop_index(op.f("ix_media_collections_id"), table_name="media_collections", schema=None)
+    op.drop_table("media_collections", schema=None)
 
-    op.drop_table("media_tag_mappings", schema="public")
+    op.drop_table("media_tag_mappings", schema=None)
 
-    op.drop_index(op.f("ix_media_tags_name"), table_name="media_tags", schema="public")
-    op.drop_index(op.f("ix_media_tags_company_id"), table_name="media_tags", schema="public")
-    op.drop_index(op.f("ix_media_tags_id"), table_name="media_tags", schema="public")
-    op.drop_table("media_tags", schema="public")
+    op.drop_index(op.f("ix_media_tags_name"), table_name="media_tags", schema=None)
+    op.drop_index(op.f("ix_media_tags_company_id"), table_name="media_tags", schema=None)
+    op.drop_index(op.f("ix_media_tags_id"), table_name="media_tags", schema=None)
+    op.drop_table("media_tags", schema=None)
 
-    op.drop_index(op.f("ix_media_variants_media_id"), table_name="media_variants", schema="public")
-    op.drop_table("media_variants", schema="public")
+    op.drop_index(op.f("ix_media_variants_media_id"), table_name="media_variants", schema=None)
+    op.drop_table("media_variants", schema=None)
 
-    op.drop_index(op.f("ix_media_assets_created_at"), table_name="media_assets", schema="public")
-    op.drop_index(op.f("ix_media_assets_status"), table_name="media_assets", schema="public")
-    op.drop_index(op.f("ix_media_assets_category"), table_name="media_assets", schema="public")
-    op.drop_index(op.f("ix_media_assets_mime_type"), table_name="media_assets", schema="public")
-    op.drop_index(op.f("ix_media_assets_filename"), table_name="media_assets", schema="public")
-    op.drop_index(op.f("ix_media_assets_branch_id"), table_name="media_assets", schema="public")
-    op.drop_index(op.f("ix_media_assets_company_id"), table_name="media_assets", schema="public")
-    op.drop_index(op.f("ix_media_assets_id"), table_name="media_assets", schema="public")
-    op.drop_table("media_assets", schema="public")
+    op.drop_index(op.f("ix_media_assets_created_at"), table_name="media_assets", schema=None)
+    op.drop_index(op.f("ix_media_assets_status"), table_name="media_assets", schema=None)
+    op.drop_index(op.f("ix_media_assets_category"), table_name="media_assets", schema=None)
+    op.drop_index(op.f("ix_media_assets_mime_type"), table_name="media_assets", schema=None)
+    op.drop_index(op.f("ix_media_assets_filename"), table_name="media_assets", schema=None)
+    op.drop_index(op.f("ix_media_assets_branch_id"), table_name="media_assets", schema=None)
+    op.drop_index(op.f("ix_media_assets_company_id"), table_name="media_assets", schema=None)
+    op.drop_index(op.f("ix_media_assets_id"), table_name="media_assets", schema=None)
+    op.drop_table("media_assets", schema=None)
 
     # -- Drop tables: SOCIAL module (7) --------------------------------------
-    op.drop_index(op.f("ix_social_webhooks_created_at"), table_name="social_webhooks", schema="public")
-    op.drop_index("ix_social_webhooks_platform_event", table_name="social_webhooks", schema="public")
-    op.drop_index("ix_social_webhooks_company_processed", table_name="social_webhooks", schema="public")
-    op.drop_index(op.f("ix_social_webhooks_processed"), table_name="social_webhooks", schema="public")
-    op.drop_index(op.f("ix_social_webhooks_event_type"), table_name="social_webhooks", schema="public")
-    op.drop_index(op.f("ix_social_webhooks_platform"), table_name="social_webhooks", schema="public")
-    op.drop_index(op.f("ix_social_webhooks_account_id"), table_name="social_webhooks", schema="public")
-    op.drop_index(op.f("ix_social_webhooks_company_id"), table_name="social_webhooks", schema="public")
-    op.drop_index(op.f("ix_social_webhooks_id"), table_name="social_webhooks", schema="public")
-    op.drop_table("social_webhooks", schema="public")
+    op.drop_index(op.f("ix_social_webhooks_created_at"), table_name="social_webhooks", schema=None)
+    op.drop_index("ix_social_webhooks_platform_event", table_name="social_webhooks", schema=None)
+    op.drop_index("ix_social_webhooks_company_processed", table_name="social_webhooks", schema=None)
+    op.drop_index(op.f("ix_social_webhooks_processed"), table_name="social_webhooks", schema=None)
+    op.drop_index(op.f("ix_social_webhooks_event_type"), table_name="social_webhooks", schema=None)
+    op.drop_index(op.f("ix_social_webhooks_platform"), table_name="social_webhooks", schema=None)
+    op.drop_index(op.f("ix_social_webhooks_account_id"), table_name="social_webhooks", schema=None)
+    op.drop_index(op.f("ix_social_webhooks_company_id"), table_name="social_webhooks", schema=None)
+    op.drop_index(op.f("ix_social_webhooks_id"), table_name="social_webhooks", schema=None)
+    op.drop_table("social_webhooks", schema=None)
 
-    op.drop_index(op.f("ix_social_competitors_created_at"), table_name="social_competitors", schema="public")
-    op.drop_index("ix_social_competitors_company", table_name="social_competitors", schema="public")
-    op.drop_index(op.f("ix_social_competitors_platform"), table_name="social_competitors", schema="public")
-    op.drop_index(op.f("ix_social_competitors_branch_id"), table_name="social_competitors", schema="public")
-    op.drop_index(op.f("ix_social_competitors_company_id"), table_name="social_competitors", schema="public")
-    op.drop_index(op.f("ix_social_competitors_id"), table_name="social_competitors", schema="public")
-    op.drop_table("social_competitors", schema="public")
+    op.drop_index(op.f("ix_social_competitors_created_at"), table_name="social_competitors", schema=None)
+    op.drop_index("ix_social_competitors_company", table_name="social_competitors", schema=None)
+    op.drop_index(op.f("ix_social_competitors_platform"), table_name="social_competitors", schema=None)
+    op.drop_index(op.f("ix_social_competitors_branch_id"), table_name="social_competitors", schema=None)
+    op.drop_index(op.f("ix_social_competitors_company_id"), table_name="social_competitors", schema=None)
+    op.drop_index(op.f("ix_social_competitors_id"), table_name="social_competitors", schema=None)
+    op.drop_table("social_competitors", schema=None)
 
-    op.drop_index(op.f("ix_social_analytics_created_at"), table_name="social_analytics", schema="public")
-    op.drop_index("ix_social_analytics_company_date", table_name="social_analytics", schema="public")
-    op.drop_index("ix_social_analytics_account_date", table_name="social_analytics", schema="public")
-    op.drop_index(op.f("ix_social_analytics_metric_date"), table_name="social_analytics", schema="public")
-    op.drop_index(op.f("ix_social_analytics_account_id"), table_name="social_analytics", schema="public")
-    op.drop_index(op.f("ix_social_analytics_branch_id"), table_name="social_analytics", schema="public")
-    op.drop_index(op.f("ix_social_analytics_company_id"), table_name="social_analytics", schema="public")
-    op.drop_index(op.f("ix_social_analytics_id"), table_name="social_analytics", schema="public")
-    op.drop_table("social_analytics", schema="public")
+    op.drop_index(op.f("ix_social_analytics_created_at"), table_name="social_analytics", schema=None)
+    op.drop_index("ix_social_analytics_company_date", table_name="social_analytics", schema=None)
+    op.drop_index("ix_social_analytics_account_date", table_name="social_analytics", schema=None)
+    op.drop_index(op.f("ix_social_analytics_metric_date"), table_name="social_analytics", schema=None)
+    op.drop_index(op.f("ix_social_analytics_account_id"), table_name="social_analytics", schema=None)
+    op.drop_index(op.f("ix_social_analytics_branch_id"), table_name="social_analytics", schema=None)
+    op.drop_index(op.f("ix_social_analytics_company_id"), table_name="social_analytics", schema=None)
+    op.drop_index(op.f("ix_social_analytics_id"), table_name="social_analytics", schema=None)
+    op.drop_table("social_analytics", schema=None)
 
-    op.drop_index(op.f("ix_social_messages_created_at"), table_name="social_messages", schema="public")
-    op.drop_index("ix_social_messages_account_created", table_name="social_messages", schema="public")
-    op.drop_index("ix_social_messages_company_conv", table_name="social_messages", schema="public")
-    op.drop_index(op.f("ix_social_messages_status"), table_name="social_messages", schema="public")
-    op.drop_index(op.f("ix_social_messages_external_message_id"), table_name="social_messages", schema="public")
-    op.drop_index(op.f("ix_social_messages_external_conversation_id"), table_name="social_messages", schema="public")
-    op.drop_index(op.f("ix_social_messages_account_id"), table_name="social_messages", schema="public")
-    op.drop_index(op.f("ix_social_messages_branch_id"), table_name="social_messages", schema="public")
-    op.drop_index(op.f("ix_social_messages_company_id"), table_name="social_messages", schema="public")
-    op.drop_index(op.f("ix_social_messages_id"), table_name="social_messages", schema="public")
-    op.drop_table("social_messages", schema="public")
+    op.drop_index(op.f("ix_social_messages_created_at"), table_name="social_messages", schema=None)
+    op.drop_index("ix_social_messages_account_created", table_name="social_messages", schema=None)
+    op.drop_index("ix_social_messages_company_conv", table_name="social_messages", schema=None)
+    op.drop_index(op.f("ix_social_messages_status"), table_name="social_messages", schema=None)
+    op.drop_index(op.f("ix_social_messages_external_message_id"), table_name="social_messages", schema=None)
+    op.drop_index(op.f("ix_social_messages_external_conversation_id"), table_name="social_messages", schema=None)
+    op.drop_index(op.f("ix_social_messages_account_id"), table_name="social_messages", schema=None)
+    op.drop_index(op.f("ix_social_messages_branch_id"), table_name="social_messages", schema=None)
+    op.drop_index(op.f("ix_social_messages_company_id"), table_name="social_messages", schema=None)
+    op.drop_index(op.f("ix_social_messages_id"), table_name="social_messages", schema=None)
+    op.drop_table("social_messages", schema=None)
 
-    op.drop_index(op.f("ix_social_comments_created_at"), table_name="social_comments", schema="public")
-    op.drop_index("ix_social_comments_post_created", table_name="social_comments", schema="public")
-    op.drop_index("ix_social_comments_company_status", table_name="social_comments", schema="public")
-    op.drop_index(op.f("ix_social_comments_status"), table_name="social_comments", schema="public")
-    op.drop_index(op.f("ix_social_comments_external_comment_id"), table_name="social_comments", schema="public")
-    op.drop_index(op.f("ix_social_comments_post_id"), table_name="social_comments", schema="public")
-    op.drop_index(op.f("ix_social_comments_account_id"), table_name="social_comments", schema="public")
-    op.drop_index(op.f("ix_social_comments_branch_id"), table_name="social_comments", schema="public")
-    op.drop_index(op.f("ix_social_comments_company_id"), table_name="social_comments", schema="public")
-    op.drop_index(op.f("ix_social_comments_id"), table_name="social_comments", schema="public")
-    op.drop_table("social_comments", schema="public")
+    op.drop_index(op.f("ix_social_comments_created_at"), table_name="social_comments", schema=None)
+    op.drop_index("ix_social_comments_post_created", table_name="social_comments", schema=None)
+    op.drop_index("ix_social_comments_company_status", table_name="social_comments", schema=None)
+    op.drop_index(op.f("ix_social_comments_status"), table_name="social_comments", schema=None)
+    op.drop_index(op.f("ix_social_comments_external_comment_id"), table_name="social_comments", schema=None)
+    op.drop_index(op.f("ix_social_comments_post_id"), table_name="social_comments", schema=None)
+    op.drop_index(op.f("ix_social_comments_account_id"), table_name="social_comments", schema=None)
+    op.drop_index(op.f("ix_social_comments_branch_id"), table_name="social_comments", schema=None)
+    op.drop_index(op.f("ix_social_comments_company_id"), table_name="social_comments", schema=None)
+    op.drop_index(op.f("ix_social_comments_id"), table_name="social_comments", schema=None)
+    op.drop_table("social_comments", schema=None)
 
-    op.drop_index(op.f("ix_social_posts_created_at"), table_name="social_posts", schema="public")
-    op.drop_index("ix_social_posts_account_status", table_name="social_posts", schema="public")
-    op.drop_index("ix_social_posts_company_status", table_name="social_posts", schema="public")
-    op.drop_index(op.f("ix_social_posts_scheduled_at"), table_name="social_posts", schema="public")
-    op.drop_index(op.f("ix_social_posts_status"), table_name="social_posts", schema="public")
-    op.drop_index(op.f("ix_social_posts_external_post_id"), table_name="social_posts", schema="public")
-    op.drop_index(op.f("ix_social_posts_account_id"), table_name="social_posts", schema="public")
-    op.drop_index(op.f("ix_social_posts_branch_id"), table_name="social_posts", schema="public")
-    op.drop_index(op.f("ix_social_posts_company_id"), table_name="social_posts", schema="public")
-    op.drop_index(op.f("ix_social_posts_id"), table_name="social_posts", schema="public")
-    op.drop_table("social_posts", schema="public")
+    op.drop_index(op.f("ix_social_posts_created_at"), table_name="social_posts", schema=None)
+    op.drop_index("ix_social_posts_account_status", table_name="social_posts", schema=None)
+    op.drop_index("ix_social_posts_company_status", table_name="social_posts", schema=None)
+    op.drop_index(op.f("ix_social_posts_scheduled_at"), table_name="social_posts", schema=None)
+    op.drop_index(op.f("ix_social_posts_status"), table_name="social_posts", schema=None)
+    op.drop_index(op.f("ix_social_posts_external_post_id"), table_name="social_posts", schema=None)
+    op.drop_index(op.f("ix_social_posts_account_id"), table_name="social_posts", schema=None)
+    op.drop_index(op.f("ix_social_posts_branch_id"), table_name="social_posts", schema=None)
+    op.drop_index(op.f("ix_social_posts_company_id"), table_name="social_posts", schema=None)
+    op.drop_index(op.f("ix_social_posts_id"), table_name="social_posts", schema=None)
+    op.drop_table("social_posts", schema=None)
 
-    op.drop_index(op.f("ix_social_accounts_created_at"), table_name="social_accounts", schema="public")
-    op.drop_index("ix_social_accounts_branch", table_name="social_accounts", schema="public")
-    op.drop_index("ix_social_accounts_company_platform", table_name="social_accounts", schema="public")
-    op.drop_index(op.f("ix_social_accounts_status"), table_name="social_accounts", schema="public")
-    op.drop_index(op.f("ix_social_accounts_platform"), table_name="social_accounts", schema="public")
-    op.drop_index(op.f("ix_social_accounts_branch_id"), table_name="social_accounts", schema="public")
-    op.drop_index(op.f("ix_social_accounts_company_id"), table_name="social_accounts", schema="public")
-    op.drop_index(op.f("ix_social_accounts_id"), table_name="social_accounts", schema="public")
-    op.drop_table("social_accounts", schema="public")
+    op.drop_index(op.f("ix_social_accounts_created_at"), table_name="social_accounts", schema=None)
+    op.drop_index("ix_social_accounts_branch", table_name="social_accounts", schema=None)
+    op.drop_index("ix_social_accounts_company_platform", table_name="social_accounts", schema=None)
+    op.drop_index(op.f("ix_social_accounts_status"), table_name="social_accounts", schema=None)
+    op.drop_index(op.f("ix_social_accounts_platform"), table_name="social_accounts", schema=None)
+    op.drop_index(op.f("ix_social_accounts_branch_id"), table_name="social_accounts", schema=None)
+    op.drop_index(op.f("ix_social_accounts_company_id"), table_name="social_accounts", schema=None)
+    op.drop_index(op.f("ix_social_accounts_id"), table_name="social_accounts", schema=None)
+    op.drop_table("social_accounts", schema=None)
 
     # -- Drop tables: AI module (7) ------------------------------------------
-    op.drop_index(op.f("ix_ai_cache_created_at"), table_name="ai_cache", schema="public")
-    op.drop_index(op.f("ix_ai_cache_expires_at"), table_name="ai_cache", schema="public")
-    op.drop_index(op.f("ix_ai_cache_prompt_hash"), table_name="ai_cache", schema="public")
-    op.drop_index(op.f("ix_ai_cache_cache_key"), table_name="ai_cache", schema="public")
-    op.drop_index(op.f("ix_ai_cache_id"), table_name="ai_cache", schema="public")
-    op.drop_table("ai_cache", schema="public")
+    op.drop_index(op.f("ix_ai_cache_created_at"), table_name="ai_cache", schema=None)
+    op.drop_index(op.f("ix_ai_cache_expires_at"), table_name="ai_cache", schema=None)
+    op.drop_index(op.f("ix_ai_cache_prompt_hash"), table_name="ai_cache", schema=None)
+    op.drop_index(op.f("ix_ai_cache_cache_key"), table_name="ai_cache", schema=None)
+    op.drop_index(op.f("ix_ai_cache_id"), table_name="ai_cache", schema=None)
+    op.drop_table("ai_cache", schema=None)
 
-    op.drop_index(op.f("ix_ai_usage_logs_created_at"), table_name="ai_usage_logs", schema="public")
-    op.drop_index(op.f("ix_ai_usage_logs_status"), table_name="ai_usage_logs", schema="public")
-    op.drop_index(op.f("ix_ai_usage_logs_user_id"), table_name="ai_usage_logs", schema="public")
-    op.drop_index(op.f("ix_ai_usage_logs_company_id"), table_name="ai_usage_logs", schema="public")
-    op.drop_index(op.f("ix_ai_usage_logs_id"), table_name="ai_usage_logs", schema="public")
-    op.drop_table("ai_usage_logs", schema="public")
+    op.drop_index(op.f("ix_ai_usage_logs_created_at"), table_name="ai_usage_logs", schema=None)
+    op.drop_index(op.f("ix_ai_usage_logs_status"), table_name="ai_usage_logs", schema=None)
+    op.drop_index(op.f("ix_ai_usage_logs_user_id"), table_name="ai_usage_logs", schema=None)
+    op.drop_index(op.f("ix_ai_usage_logs_company_id"), table_name="ai_usage_logs", schema=None)
+    op.drop_index(op.f("ix_ai_usage_logs_id"), table_name="ai_usage_logs", schema=None)
+    op.drop_table("ai_usage_logs", schema=None)
 
-    op.drop_index(op.f("ix_ai_recommendations_created_at"), table_name="ai_recommendations", schema="public")
-    op.drop_index(op.f("ix_ai_recommendations_status"), table_name="ai_recommendations", schema="public")
-    op.drop_index(op.f("ix_ai_recommendations_category"), table_name="ai_recommendations", schema="public")
-    op.drop_index(op.f("ix_ai_recommendations_branch_id"), table_name="ai_recommendations", schema="public")
-    op.drop_index(op.f("ix_ai_recommendations_company_id"), table_name="ai_recommendations", schema="public")
-    op.drop_index(op.f("ix_ai_recommendations_id"), table_name="ai_recommendations", schema="public")
-    op.drop_table("ai_recommendations", schema="public")
+    op.drop_index(op.f("ix_ai_recommendations_created_at"), table_name="ai_recommendations", schema=None)
+    op.drop_index(op.f("ix_ai_recommendations_status"), table_name="ai_recommendations", schema=None)
+    op.drop_index(op.f("ix_ai_recommendations_category"), table_name="ai_recommendations", schema=None)
+    op.drop_index(op.f("ix_ai_recommendations_branch_id"), table_name="ai_recommendations", schema=None)
+    op.drop_index(op.f("ix_ai_recommendations_company_id"), table_name="ai_recommendations", schema=None)
+    op.drop_index(op.f("ix_ai_recommendations_id"), table_name="ai_recommendations", schema=None)
+    op.drop_table("ai_recommendations", schema=None)
 
-    op.drop_index(op.f("ix_ai_suggestions_created_at"), table_name="ai_suggestions", schema="public")
-    op.drop_index(op.f("ix_ai_suggestions_trigger_type"), table_name="ai_suggestions", schema="public")
-    op.drop_index(op.f("ix_ai_suggestions_branch_id"), table_name="ai_suggestions", schema="public")
-    op.drop_index(op.f("ix_ai_suggestions_company_id"), table_name="ai_suggestions", schema="public")
-    op.drop_index(op.f("ix_ai_suggestions_id"), table_name="ai_suggestions", schema="public")
-    op.drop_table("ai_suggestions", schema="public")
+    op.drop_index(op.f("ix_ai_suggestions_created_at"), table_name="ai_suggestions", schema=None)
+    op.drop_index(op.f("ix_ai_suggestions_trigger_type"), table_name="ai_suggestions", schema=None)
+    op.drop_index(op.f("ix_ai_suggestions_branch_id"), table_name="ai_suggestions", schema=None)
+    op.drop_index(op.f("ix_ai_suggestions_company_id"), table_name="ai_suggestions", schema=None)
+    op.drop_index(op.f("ix_ai_suggestions_id"), table_name="ai_suggestions", schema=None)
+    op.drop_table("ai_suggestions", schema=None)
 
-    op.drop_index(op.f("ix_ai_messages_created_at"), table_name="ai_messages", schema="public")
-    op.drop_index(op.f("ix_ai_messages_conversation_id"), table_name="ai_messages", schema="public")
-    op.drop_index(op.f("ix_ai_messages_id"), table_name="ai_messages", schema="public")
-    op.drop_table("ai_messages", schema="public")
+    op.drop_index(op.f("ix_ai_messages_created_at"), table_name="ai_messages", schema=None)
+    op.drop_index(op.f("ix_ai_messages_conversation_id"), table_name="ai_messages", schema=None)
+    op.drop_index(op.f("ix_ai_messages_id"), table_name="ai_messages", schema=None)
+    op.drop_table("ai_messages", schema=None)
 
-    op.drop_index(op.f("ix_ai_conversations_created_at"), table_name="ai_conversations", schema="public")
-    op.drop_index(op.f("ix_ai_conversations_session_id"), table_name="ai_conversations", schema="public")
-    op.drop_index(op.f("ix_ai_conversations_prompt_id"), table_name="ai_conversations", schema="public")
-    op.drop_index(op.f("ix_ai_conversations_user_id"), table_name="ai_conversations", schema="public")
-    op.drop_index(op.f("ix_ai_conversations_branch_id"), table_name="ai_conversations", schema="public")
-    op.drop_index(op.f("ix_ai_conversations_company_id"), table_name="ai_conversations", schema="public")
-    op.drop_index(op.f("ix_ai_conversations_id"), table_name="ai_conversations", schema="public")
-    op.drop_table("ai_conversations", schema="public")
+    op.drop_index(op.f("ix_ai_conversations_created_at"), table_name="ai_conversations", schema=None)
+    op.drop_index(op.f("ix_ai_conversations_session_id"), table_name="ai_conversations", schema=None)
+    op.drop_index(op.f("ix_ai_conversations_prompt_id"), table_name="ai_conversations", schema=None)
+    op.drop_index(op.f("ix_ai_conversations_user_id"), table_name="ai_conversations", schema=None)
+    op.drop_index(op.f("ix_ai_conversations_branch_id"), table_name="ai_conversations", schema=None)
+    op.drop_index(op.f("ix_ai_conversations_company_id"), table_name="ai_conversations", schema=None)
+    op.drop_index(op.f("ix_ai_conversations_id"), table_name="ai_conversations", schema=None)
+    op.drop_table("ai_conversations", schema=None)
 
-    op.drop_index(op.f("ix_ai_prompts_created_at"), table_name="ai_prompts", schema="public")
-    op.drop_index(op.f("ix_ai_prompts_name"), table_name="ai_prompts", schema="public")
-    op.drop_index(op.f("ix_ai_prompts_branch_id"), table_name="ai_prompts", schema="public")
-    op.drop_index(op.f("ix_ai_prompts_company_id"), table_name="ai_prompts", schema="public")
-    op.drop_index(op.f("ix_ai_prompts_id"), table_name="ai_prompts", schema="public")
-    op.drop_table("ai_prompts", schema="public")
+    op.drop_index(op.f("ix_ai_prompts_created_at"), table_name="ai_prompts", schema=None)
+    op.drop_index(op.f("ix_ai_prompts_name"), table_name="ai_prompts", schema=None)
+    op.drop_index(op.f("ix_ai_prompts_branch_id"), table_name="ai_prompts", schema=None)
+    op.drop_index(op.f("ix_ai_prompts_company_id"), table_name="ai_prompts", schema=None)
+    op.drop_index(op.f("ix_ai_prompts_id"), table_name="ai_prompts", schema=None)
+    op.drop_table("ai_prompts", schema=None)
 
     # ========================================================================
     # 8. DROP ENUM TYPES (reverse order)

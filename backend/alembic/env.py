@@ -94,13 +94,17 @@ def do_run_migrations(connection: Connection) -> None:
     """
     Synchronous migration runner called via connection.run_sync().
     """
+    # MySQL compatibility: no schema support
+    url = config.get_main_option("sqlalchemy.url") or os.environ.get("DATABASE_URL", "")
+    is_mysql = url.startswith("mysql")
+
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
         compare_type=True,
         compare_server_default=True,
-        include_schemas=True,
-        version_table_schema="public",
+        include_schemas=not is_mysql,
+        version_table_schema=None if is_mysql else "public",
         render_as_batch=True,  # Required for MySQL compatibility
     )
 

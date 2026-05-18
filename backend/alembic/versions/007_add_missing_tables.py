@@ -36,7 +36,7 @@ def upgrade() -> None:
         sa.Column("status", sa.String(50), nullable=False, index=True, server_default=sa.text("'active'")),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- ad_audiences (AdAudience) ---
@@ -54,7 +54,7 @@ def upgrade() -> None:
         sa.Column("performance_score", sa.Numeric(5, 2), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- ad_budget_recommendations (AdBudgetRecommendation) ---
@@ -72,7 +72,7 @@ def upgrade() -> None:
         sa.Column("confidence_score", sa.Numeric(4, 3), nullable=False),
         sa.Column("applied", sa.Boolean(), nullable=False, server_default=sa.text('FALSE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- ad_campaigns (AdCampaign) ---
@@ -96,7 +96,7 @@ def upgrade() -> None:
         sa.Column("ai_optimized", sa.Boolean(), nullable=False, server_default=sa.text('FALSE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- ad_creative_analysis (AdCreativeAnalysis) ---
@@ -110,7 +110,7 @@ def upgrade() -> None:
         sa.Column("ai_insights", sa.Text(), nullable=True),
         sa.Column("recommendations", sa.JSON(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- ad_creatives (AdCreative) ---
@@ -130,7 +130,7 @@ def upgrade() -> None:
         sa.Column("status", sa.String(50), nullable=False, index=True, server_default=sa.text("'active'")),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- ad_metrics (AdMetric) ---
@@ -153,7 +153,7 @@ def upgrade() -> None:
         sa.Column("quality_score", sa.Numeric(4, 2), nullable=True),
         sa.Column("raw_data", sa.JSON(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- ad_platforms (AdPlatformAccount) ---
@@ -175,7 +175,7 @@ def upgrade() -> None:
         sa.Column("settings", sa.JSON(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- ai_audience_recommendations (AIAudienceRecommendation) ---
@@ -200,7 +200,7 @@ def upgrade() -> None:
         sa.Column("generated_at", sa.DateTime(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_ai_rec_company", "ai_audience_recommendations", ["company_id", "recommendation_type"])
@@ -209,7 +209,7 @@ def upgrade() -> None:
     # --- ai_reply_audit_logs (AIReplyAuditLog) ---
     op.create_table(
         "ai_reply_audit_logs",
-        schema='public',
+        schema=None,
     )
 
     # --- analytics_snapshots (AnalyticsSnapshot) ---
@@ -228,7 +228,7 @@ def upgrade() -> None:
         sa.Column("is_stale", sa.Integer(), nullable=False, index=True, server_default=sa.text('0'), comment='0=fresh, 1=stale (needs refresh)'),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("uq_analytics_snapshots_company_branch_report_date", "analytics_snapshots", ["company_id", "branch_id", "report_type", "snapshot_date"], unique=True)
@@ -248,7 +248,7 @@ def upgrade() -> None:
         sa.Column("edited_data", sa.JSON(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     # --- audience_demographics (AudienceDemographics) ---
@@ -278,7 +278,7 @@ def upgrade() -> None:
         sa.Column("raw_data", sa.JSON(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_audience_demo_account", "audience_demographics", ["account_id", "analysis_date"])
@@ -309,7 +309,7 @@ def upgrade() -> None:
         sa.Column("reviewed", sa.Boolean(), nullable=False, server_default=sa.text('FALSE')),
         sa.Column("review_result", sa.String(50), nullable=False, server_default=sa.text("'pending'")),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_bot_patterns_company_risk", "bot_patterns", ["company_id", "risk_level"])
@@ -338,7 +338,7 @@ def upgrade() -> None:
         sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.text('TRUE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("uq_branch_brand_identity", "branch_brand_identities", ["branch_id"], unique=True)
@@ -358,7 +358,7 @@ def upgrade() -> None:
         sa.Column("source", sa.String(256), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("uq_brand_color", "brand_colors", ["company_id", "branch_id", "hex_code", "usage_area"], unique=True)
@@ -378,7 +378,7 @@ def upgrade() -> None:
         sa.Column("extra_data", sa.JSON(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_brand_company_type", "brand_profiles", ["company_id", "attribute_type"])
@@ -417,7 +417,7 @@ def upgrade() -> None:
         sa.Column("extra_data", sa.JSON(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_campaign_company_type", "campaign_insights", ["company_id", "campaign_type"])
@@ -442,7 +442,7 @@ def upgrade() -> None:
         sa.Column("similar_media_ids", sa.JSON(), nullable=True),
         sa.Column("audit_metadata", sa.JSON(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("uq_creative_audit_media", "creative_audits", ["media_id"], unique=True)
@@ -471,7 +471,7 @@ def upgrade() -> None:
         sa.Column("tier", sa.String(50), nullable=False, server_default=sa.text("'average'")),
         sa.Column("factors", sa.JSON(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_engagement_quality_account_period", "engagement_qualities", ["account_id", "period_start"])
@@ -480,7 +480,7 @@ def upgrade() -> None:
     # --- escalation_rules (EscalationRule) ---
     op.create_table(
         "escalation_rules",
-        schema='public',
+        schema=None,
     )
 
     # --- export_jobs (ExportJob) ---
@@ -505,7 +505,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=False, index=True, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("started_at", sa.DateTime(), nullable=True),
         sa.Column("completed_at", sa.DateTime(), nullable=True),
-        schema='public',
+        schema=None,
     )
 
     # --- follower_health_scores (FollowerHealthScore) ---
@@ -530,7 +530,7 @@ def upgrade() -> None:
         sa.Column("score_date", sa.DateTime(), nullable=False, index=True),
         sa.Column("recommendations", sa.JSON(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_follower_health_account_date", "follower_health_scores", ["account_id", "score_date"])
@@ -560,7 +560,7 @@ def upgrade() -> None:
         sa.Column("analyzed_at", sa.DateTime(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_follower_insights_account", "follower_insights", ["account_id", "analyzed_at"])
@@ -582,7 +582,7 @@ def upgrade() -> None:
         sa.Column("snapshot_date", sa.DateTime(), nullable=False, index=True),
         sa.Column("raw_data", sa.JSON(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_follower_snapshots_account_date", "follower_snapshots", ["account_id", "snapshot_date"])
@@ -606,7 +606,7 @@ def upgrade() -> None:
         sa.Column("completed_at", sa.DateTime(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_job_status_type", "ingestion_jobs", ["status", "job_type"])
@@ -615,13 +615,13 @@ def upgrade() -> None:
     # --- knowledge_base_articles (KnowledgeBaseArticle) ---
     op.create_table(
         "knowledge_base_articles",
-        schema='public',
+        schema=None,
     )
 
     # --- knowledge_base_categories (KnowledgeBaseCategory) ---
     op.create_table(
         "knowledge_base_categories",
-        schema='public',
+        schema=None,
     )
 
     # --- knowledge_bases (KnowledgeBase) ---
@@ -646,7 +646,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("created_by", sa.Integer(), nullable=True),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_kb_company_branch", "knowledge_bases", ["company_id", "branch_id"])
@@ -672,7 +672,7 @@ def upgrade() -> None:
         sa.Column("source_section", sa.String(256), nullable=True),
         sa.Column("source_heading", sa.String(256), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_chunk_kb_seq", "knowledge_chunks", ["knowledge_base_id", "sequence"])
@@ -691,7 +691,7 @@ def upgrade() -> None:
         sa.Column("vector_json", sa.JSON(), nullable=False),
         sa.Column("similarity_score", sa.Float(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_emb_company_model", "knowledge_embeddings", ["company_id", "embedding_model"])
@@ -713,7 +713,7 @@ def upgrade() -> None:
         sa.Column("last_analyzed_at", sa.DateTime(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_hashtag_intel_company", "social_hashtag_intelligence", ["company_id", "platform"])
@@ -735,7 +735,7 @@ def upgrade() -> None:
         sa.Column("settings", sa.JSON(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_social_listening_company", "social_listening", ["company_id", "is_active"])
@@ -762,7 +762,7 @@ def upgrade() -> None:
         sa.Column("date_range", sa.JSON(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_social_company_tone", "social_post_learning", ["company_id", "tone_label"])
@@ -786,7 +786,7 @@ def upgrade() -> None:
         sa.Column("rate_limit_delay", sa.Integer(), nullable=False, server_default=sa.text('60')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_publishing_queue_company_status", "social_publishing_queue", ["company_id", "status"])
@@ -795,25 +795,25 @@ def upgrade() -> None:
     # --- support_analytics (SupportAnalytics) ---
     op.create_table(
         "support_analytics",
-        schema='public',
+        schema=None,
     )
 
     # --- support_macros (SupportMacro) ---
     op.create_table(
         "support_macros",
-        schema='public',
+        schema=None,
     )
 
     # --- support_messages (SupportMessage) ---
     op.create_table(
         "support_messages",
-        schema='public',
+        schema=None,
     )
 
     # --- support_tickets (SupportTicket) ---
     op.create_table(
         "support_tickets",
-        schema='public',
+        schema=None,
     )
 
     # --- suspicious_activities (SuspiciousActivity) ---
@@ -836,7 +836,7 @@ def upgrade() -> None:
         sa.Column("end_date", sa.DateTime(), nullable=True),
         sa.Column("resolved", sa.Boolean(), nullable=False, server_default=sa.text('FALSE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_suspicious_activity_company", "suspicious_activities", ["company_id", "alert_type"])
@@ -866,7 +866,7 @@ def upgrade() -> None:
         sa.Column("extra_data", sa.JSON(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("analyzed_at", sa.DateTime(), nullable=True),
-        schema='public',
+        schema=None,
     )
 
     op.create_index("ix_visual_company_brand", "visual_assets", ["company_id", "is_brand_asset"])
@@ -877,44 +877,44 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Drop all created tables (reverse order)."""
 
-    op.drop_table("visual_assets", schema="public")
-    op.drop_table("suspicious_activities", schema="public")
-    op.drop_table("support_tickets", schema="public")
-    op.drop_table("support_messages", schema="public")
-    op.drop_table("support_macros", schema="public")
-    op.drop_table("support_analytics", schema="public")
-    op.drop_table("social_publishing_queue", schema="public")
-    op.drop_table("social_post_learning", schema="public")
-    op.drop_table("social_listening", schema="public")
-    op.drop_table("social_hashtag_intelligence", schema="public")
-    op.drop_table("knowledge_embeddings", schema="public")
-    op.drop_table("knowledge_chunks", schema="public")
-    op.drop_table("knowledge_bases", schema="public")
-    op.drop_table("knowledge_base_categories", schema="public")
-    op.drop_table("knowledge_base_articles", schema="public")
-    op.drop_table("ingestion_jobs", schema="public")
-    op.drop_table("follower_snapshots", schema="public")
-    op.drop_table("follower_insights", schema="public")
-    op.drop_table("follower_health_scores", schema="public")
-    op.drop_table("export_jobs", schema="public")
-    op.drop_table("escalation_rules", schema="public")
-    op.drop_table("engagement_qualities", schema="public")
-    op.drop_table("creative_audits", schema="public")
-    op.drop_table("campaign_insights", schema="public")
-    op.drop_table("brand_profiles", schema="public")
-    op.drop_table("brand_colors", schema="public")
-    op.drop_table("branch_brand_identities", schema="public")
-    op.drop_table("bot_patterns", schema="public")
-    op.drop_table("audience_demographics", schema="public")
-    op.drop_table("approval_requests", schema="public")
-    op.drop_table("analytics_snapshots", schema="public")
-    op.drop_table("ai_reply_audit_logs", schema="public")
-    op.drop_table("ai_audience_recommendations", schema="public")
-    op.drop_table("ad_platforms", schema="public")
-    op.drop_table("ad_metrics", schema="public")
-    op.drop_table("ad_creatives", schema="public")
-    op.drop_table("ad_creative_analysis", schema="public")
-    op.drop_table("ad_campaigns", schema="public")
-    op.drop_table("ad_budget_recommendations", schema="public")
-    op.drop_table("ad_audiences", schema="public")
-    op.drop_table("ad_adsets", schema="public")
+    op.drop_table("visual_assets", schema=None)
+    op.drop_table("suspicious_activities", schema=None)
+    op.drop_table("support_tickets", schema=None)
+    op.drop_table("support_messages", schema=None)
+    op.drop_table("support_macros", schema=None)
+    op.drop_table("support_analytics", schema=None)
+    op.drop_table("social_publishing_queue", schema=None)
+    op.drop_table("social_post_learning", schema=None)
+    op.drop_table("social_listening", schema=None)
+    op.drop_table("social_hashtag_intelligence", schema=None)
+    op.drop_table("knowledge_embeddings", schema=None)
+    op.drop_table("knowledge_chunks", schema=None)
+    op.drop_table("knowledge_bases", schema=None)
+    op.drop_table("knowledge_base_categories", schema=None)
+    op.drop_table("knowledge_base_articles", schema=None)
+    op.drop_table("ingestion_jobs", schema=None)
+    op.drop_table("follower_snapshots", schema=None)
+    op.drop_table("follower_insights", schema=None)
+    op.drop_table("follower_health_scores", schema=None)
+    op.drop_table("export_jobs", schema=None)
+    op.drop_table("escalation_rules", schema=None)
+    op.drop_table("engagement_qualities", schema=None)
+    op.drop_table("creative_audits", schema=None)
+    op.drop_table("campaign_insights", schema=None)
+    op.drop_table("brand_profiles", schema=None)
+    op.drop_table("brand_colors", schema=None)
+    op.drop_table("branch_brand_identities", schema=None)
+    op.drop_table("bot_patterns", schema=None)
+    op.drop_table("audience_demographics", schema=None)
+    op.drop_table("approval_requests", schema=None)
+    op.drop_table("analytics_snapshots", schema=None)
+    op.drop_table("ai_reply_audit_logs", schema=None)
+    op.drop_table("ai_audience_recommendations", schema=None)
+    op.drop_table("ad_platforms", schema=None)
+    op.drop_table("ad_metrics", schema=None)
+    op.drop_table("ad_creatives", schema=None)
+    op.drop_table("ad_creative_analysis", schema=None)
+    op.drop_table("ad_campaigns", schema=None)
+    op.drop_table("ad_budget_recommendations", schema=None)
+    op.drop_table("ad_audiences", schema=None)
+    op.drop_table("ad_adsets", schema=None)

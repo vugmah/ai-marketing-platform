@@ -31,9 +31,9 @@ def upgrade() -> None:
     op.create_table(
         "follower_delta_events",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("company_id", sa.Integer, sa.ForeignKey("public.companies.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("branch_id", sa.Integer, sa.ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("account_id", sa.Integer, sa.ForeignKey("public.social_accounts.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("company_id", sa.Integer, sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("branch_id", sa.Integer, sa.ForeignKey("branches.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("account_id", sa.Integer, sa.ForeignKey("social_accounts.id", ondelete="CASCADE"), nullable=False),
         sa.Column("platform", sa.String(20), nullable=False),
         sa.Column("event_type", sa.String(50), nullable=False),
         sa.Column("previous_snapshot_id", sa.Integer, nullable=False),
@@ -47,11 +47,11 @@ def upgrade() -> None:
         sa.Column("event_date", sa.DateTime, nullable=False),
         sa.Column("details", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
-        schema="public",
+        schema=None,
     )
-    op.create_index("ix_delta_event_account_date", "follower_delta_events", ["account_id", "event_date"], schema="public")
-    op.create_index("ix_delta_event_company_type", "follower_delta_events", ["company_id", "event_type"], schema="public")
-    op.create_index("ix_delta_event_platform", "follower_delta_events", ["company_id", "platform", "event_date"], schema="public")
+    op.create_index("ix_delta_event_account_date", "follower_delta_events", ["account_id", "event_date"], schema=None)
+    op.create_index("ix_delta_event_company_type", "follower_delta_events", ["company_id", "event_type"], schema=None)
+    op.create_index("ix_delta_event_platform", "follower_delta_events", ["company_id", "platform", "event_date"], schema=None)
 
     # ================================================================
     # engagement_events
@@ -59,9 +59,9 @@ def upgrade() -> None:
     op.create_table(
         "engagement_events",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("company_id", sa.Integer, sa.ForeignKey("public.companies.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("branch_id", sa.Integer, sa.ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("account_id", sa.Integer, sa.ForeignKey("public.social_accounts.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("company_id", sa.Integer, sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("branch_id", sa.Integer, sa.ForeignKey("branches.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("account_id", sa.Integer, sa.ForeignKey("social_accounts.id", ondelete="CASCADE"), nullable=False),
         sa.Column("platform", sa.String(20), nullable=False),
         sa.Column("event_type", sa.String(50), nullable=False),
         sa.Column("follower_account_id", sa.String(255), nullable=True),
@@ -75,11 +75,11 @@ def upgrade() -> None:
         sa.Column("event_date", sa.DateTime, nullable=False),
         sa.Column("raw_data", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
-        schema="public",
+        schema=None,
     )
-    op.create_index("ix_engagement_event_account_date", "engagement_events", ["account_id", "event_date"], schema="public")
-    op.create_index("ix_engagement_event_type", "engagement_events", ["company_id", "event_type", "event_date"], schema="public")
-    op.create_index("ix_engagement_event_follower", "engagement_events", ["follower_account_id", "event_date"], schema="public")
+    op.create_index("ix_engagement_event_account_date", "engagement_events", ["account_id", "event_date"], schema=None)
+    op.create_index("ix_engagement_event_type", "engagement_events", ["company_id", "event_type", "event_date"], schema=None)
+    op.create_index("ix_engagement_event_follower", "engagement_events", ["follower_account_id", "event_date"], schema=None)
 
     # ================================================================
     # reengagement_recommendations
@@ -87,9 +87,9 @@ def upgrade() -> None:
     op.create_table(
         "reengagement_recommendations",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("company_id", sa.Integer, sa.ForeignKey("public.companies.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("branch_id", sa.Integer, sa.ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("account_id", sa.Integer, sa.ForeignKey("public.social_accounts.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("company_id", sa.Integer, sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("branch_id", sa.Integer, sa.ForeignKey("branches.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("account_id", sa.Integer, sa.ForeignKey("social_accounts.id", ondelete="CASCADE"), nullable=False),
         sa.Column("platform", sa.String(20), nullable=False),
         sa.Column("reengagement_type", sa.String(50), nullable=False),
         sa.Column("target_follower_id", sa.String(255), nullable=True),
@@ -100,7 +100,7 @@ def upgrade() -> None:
         sa.Column("confidence_score", sa.Numeric(4, 3), server_default=sa.text("0.0"), nullable=False),
         sa.Column("expected_response_rate", sa.Numeric(5, 2), server_default=sa.text("0.0"), nullable=False),
         sa.Column("approval_status", sa.String(20), server_default=sa.text("'pending'"), nullable=False),
-        sa.Column("approved_by", sa.Integer, sa.ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("approved_by", sa.Integer, sa.ForeignKey("users.id", ondelete="SET NULL"), nullable=True),
         sa.Column("approved_at", sa.DateTime, nullable=True),
         sa.Column("rejection_reason", sa.String(255), nullable=True),
         sa.Column("sent_at", sa.DateTime, nullable=True),
@@ -108,11 +108,11 @@ def upgrade() -> None:
         sa.Column("expires_at", sa.DateTime, nullable=True),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
         sa.Column("updated_at", sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
-        schema="public",
+        schema=None,
     )
-    op.create_index("ix_reengagement_account", "reengagement_recommendations", ["account_id", "created_at"], schema="public")
-    op.create_index("ix_reengagement_company_type", "reengagement_recommendations", ["company_id", "reengagement_type"], schema="public")
-    op.create_index("ix_reengagement_status", "reengagement_recommendations", ["approval_status"], schema="public")
+    op.create_index("ix_reengagement_account", "reengagement_recommendations", ["account_id", "created_at"], schema=None)
+    op.create_index("ix_reengagement_company_type", "reengagement_recommendations", ["company_id", "reengagement_type"], schema=None)
+    op.create_index("ix_reengagement_status", "reengagement_recommendations", ["approval_status"], schema=None)
 
     # ================================================================
     # safe_message_templates
@@ -120,8 +120,8 @@ def upgrade() -> None:
     op.create_table(
         "safe_message_templates",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("company_id", sa.Integer, sa.ForeignKey("public.companies.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("branch_id", sa.Integer, sa.ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("company_id", sa.Integer, sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("branch_id", sa.Integer, sa.ForeignKey("branches.id", ondelete="SET NULL"), nullable=True),
         sa.Column("platform", sa.String(20), nullable=False),
         sa.Column("template_type", sa.String(50), nullable=False),
         sa.Column("name", sa.String(255), nullable=False),
@@ -133,13 +133,13 @@ def upgrade() -> None:
         sa.Column("is_active", sa.Boolean, server_default=sa.text("TRUE"), nullable=False),
         sa.Column("use_count", sa.Integer, server_default=sa.text("0"), nullable=False),
         sa.Column("avg_response_rate", sa.Numeric(5, 2), server_default=sa.text("0.0"), nullable=False),
-        sa.Column("created_by", sa.Integer, sa.ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("created_by", sa.Integer, sa.ForeignKey("users.id", ondelete="SET NULL"), nullable=True),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
         sa.Column("updated_at", sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
-        schema="public",
+        schema=None,
     )
-    op.create_index("ix_safe_template_company_platform", "safe_message_templates", ["company_id", "platform"], schema="public")
-    op.create_index("ix_safe_template_type", "safe_message_templates", ["template_type", "platform"], schema="public")
+    op.create_index("ix_safe_template_company_platform", "safe_message_templates", ["company_id", "platform"], schema=None)
+    op.create_index("ix_safe_template_type", "safe_message_templates", ["template_type", "platform"], schema=None)
 
     # ================================================================
     # outreach_approval_requests
@@ -147,9 +147,9 @@ def upgrade() -> None:
     op.create_table(
         "outreach_approval_requests",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("company_id", sa.Integer, sa.ForeignKey("public.companies.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("branch_id", sa.Integer, sa.ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("reengagement_id", sa.Integer, sa.ForeignKey("public.reengagement_recommendations.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("company_id", sa.Integer, sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("branch_id", sa.Integer, sa.ForeignKey("branches.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("reengagement_id", sa.Integer, sa.ForeignKey("reengagement_recommendations.id", ondelete="SET NULL"), nullable=True),
         sa.Column("platform", sa.String(20), nullable=False),
         sa.Column("recipient_account_id", sa.String(255), nullable=True),
         sa.Column("recipient_username", sa.String(255), nullable=True),
@@ -159,22 +159,22 @@ def upgrade() -> None:
         sa.Column("status", sa.String(20), server_default=sa.text("'pending'"), nullable=False),
         sa.Column("policy_check_result", sa.String(50), server_default=sa.text("'needs_review'"), nullable=False),
         sa.Column("policy_check_details", sa.Text, nullable=True),
-        sa.Column("requested_by", sa.Integer, sa.ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("requested_by", sa.Integer, sa.ForeignKey("users.id", ondelete="SET NULL"), nullable=True),
         sa.Column("requested_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
-        sa.Column("reviewed_by", sa.Integer, sa.ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("reviewed_by", sa.Integer, sa.ForeignKey("users.id", ondelete="SET NULL"), nullable=True),
         sa.Column("reviewed_at", sa.DateTime, nullable=True),
         sa.Column("review_notes", sa.String(500), nullable=True),
         sa.Column("sent_at", sa.DateTime, nullable=True),
-        sa.Column("sent_by", sa.Integer, sa.ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("sent_by", sa.Integer, sa.ForeignKey("users.id", ondelete="SET NULL"), nullable=True),
         sa.Column("send_result", sa.String(255), nullable=True),
         sa.Column("rate_limit_applied", sa.Boolean, server_default=sa.text("FALSE"), nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
         sa.Column("updated_at", sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
-        schema="public",
+        schema=None,
     )
-    op.create_index("ix_outreach_approval_company", "outreach_approval_requests", ["company_id", "status"], schema="public")
-    op.create_index("ix_outreach_approval_requester", "outreach_approval_requests", ["requested_by", "created_at"], schema="public")
-    op.create_index("ix_outreach_approval_platform", "outreach_approval_requests", ["platform", "status"], schema="public")
+    op.create_index("ix_outreach_approval_company", "outreach_approval_requests", ["company_id", "status"], schema=None)
+    op.create_index("ix_outreach_approval_requester", "outreach_approval_requests", ["requested_by", "created_at"], schema=None)
+    op.create_index("ix_outreach_approval_platform", "outreach_approval_requests", ["platform", "status"], schema=None)
 
     # ================================================================
     # audience_loss_estimates
@@ -182,9 +182,9 @@ def upgrade() -> None:
     op.create_table(
         "audience_loss_estimates",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("company_id", sa.Integer, sa.ForeignKey("public.companies.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("branch_id", sa.Integer, sa.ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("account_id", sa.Integer, sa.ForeignKey("public.social_accounts.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("company_id", sa.Integer, sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("branch_id", sa.Integer, sa.ForeignKey("branches.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("account_id", sa.Integer, sa.ForeignKey("social_accounts.id", ondelete="CASCADE"), nullable=False),
         sa.Column("platform", sa.String(20), nullable=False),
         sa.Column("loss_type", sa.String(50), nullable=False),
         sa.Column("estimated_loss_count", sa.Integer, server_default=sa.text("0"), nullable=False),
@@ -199,10 +199,10 @@ def upgrade() -> None:
         sa.Column("estimate_date", sa.DateTime, nullable=False),
         sa.Column("details", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
-        schema="public",
+        schema=None,
     )
-    op.create_index("ix_audience_loss_account_date", "audience_loss_estimates", ["account_id", "estimate_date"], schema="public")
-    op.create_index("ix_audience_loss_company_type", "audience_loss_estimates", ["company_id", "loss_type"], schema="public")
+    op.create_index("ix_audience_loss_account_date", "audience_loss_estimates", ["account_id", "estimate_date"], schema=None)
+    op.create_index("ix_audience_loss_company_type", "audience_loss_estimates", ["company_id", "loss_type"], schema=None)
 
     # ================================================================
     # follower_retention_metrics
@@ -210,9 +210,9 @@ def upgrade() -> None:
     op.create_table(
         "follower_retention_metrics",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("company_id", sa.Integer, sa.ForeignKey("public.companies.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("branch_id", sa.Integer, sa.ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("account_id", sa.Integer, sa.ForeignKey("public.social_accounts.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("company_id", sa.Integer, sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("branch_id", sa.Integer, sa.ForeignKey("branches.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("account_id", sa.Integer, sa.ForeignKey("social_accounts.id", ondelete="CASCADE"), nullable=False),
         sa.Column("platform", sa.String(20), nullable=False),
         sa.Column("period_start", sa.DateTime, nullable=False),
         sa.Column("period_end", sa.DateTime, nullable=False),
@@ -233,10 +233,10 @@ def upgrade() -> None:
         sa.Column("branch_comparison", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
         sa.Column("details", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
-        schema="public",
+        schema=None,
     )
-    op.create_index("ix_retention_account_period", "follower_retention_metrics", ["account_id", "period_start"], schema="public")
-    op.create_index("ix_retention_company_platform", "follower_retention_metrics", ["company_id", "platform", "period_start"], schema="public")
+    op.create_index("ix_retention_account_period", "follower_retention_metrics", ["account_id", "period_start"], schema=None)
+    op.create_index("ix_retention_company_platform", "follower_retention_metrics", ["company_id", "platform", "period_start"], schema=None)
 
     # ================================================================
     # follower_value_scores
@@ -244,9 +244,9 @@ def upgrade() -> None:
     op.create_table(
         "follower_value_scores",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True),
-        sa.Column("company_id", sa.Integer, sa.ForeignKey("public.companies.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("branch_id", sa.Integer, sa.ForeignKey("public.branches.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("account_id", sa.Integer, sa.ForeignKey("public.social_accounts.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("company_id", sa.Integer, sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("branch_id", sa.Integer, sa.ForeignKey("branches.id", ondelete="SET NULL"), nullable=True),
+        sa.Column("account_id", sa.Integer, sa.ForeignKey("social_accounts.id", ondelete="CASCADE"), nullable=False),
         sa.Column("platform", sa.String(20), nullable=False),
         sa.Column("follower_account_id", sa.String(255), nullable=False),
         sa.Column("follower_username", sa.String(255), nullable=True),
@@ -263,18 +263,18 @@ def upgrade() -> None:
         sa.Column("scored_at", sa.DateTime, nullable=False),
         sa.Column("details", sa.JSON, server_default=sa.text("'{}'"), nullable=False),
         sa.Column("created_at", sa.DateTime, server_default=sa.func.now(), nullable=False),
-        schema="public",
+        schema=None,
     )
-    op.create_index("ix_value_score_account", "follower_value_scores", ["account_id", "value_tier"], schema="public")
-    op.create_index("ix_value_score_follower", "follower_value_scores", ["follower_account_id", "scored_at"], schema="public")
+    op.create_index("ix_value_score_account", "follower_value_scores", ["account_id", "value_tier"], schema=None)
+    op.create_index("ix_value_score_follower", "follower_value_scores", ["follower_account_id", "scored_at"], schema=None)
 
 
 def downgrade() -> None:
-    op.drop_table("follower_value_scores", schema="public")
-    op.drop_table("follower_retention_metrics", schema="public")
-    op.drop_table("audience_loss_estimates", schema="public")
-    op.drop_table("outreach_approval_requests", schema="public")
-    op.drop_table("safe_message_templates", schema="public")
-    op.drop_table("reengagement_recommendations", schema="public")
-    op.drop_table("engagement_events", schema="public")
-    op.drop_table("follower_delta_events", schema="public")
+    op.drop_table("follower_value_scores", schema=None)
+    op.drop_table("follower_retention_metrics", schema=None)
+    op.drop_table("audience_loss_estimates", schema=None)
+    op.drop_table("outreach_approval_requests", schema=None)
+    op.drop_table("safe_message_templates", schema=None)
+    op.drop_table("reengagement_recommendations", schema=None)
+    op.drop_table("engagement_events", schema=None)
+    op.drop_table("follower_delta_events", schema=None)

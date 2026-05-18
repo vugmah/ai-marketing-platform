@@ -38,7 +38,7 @@ def upgrade() -> None:
         sa.Column("active", sa.Boolean(), nullable=False, server_default=sa.text('TRUE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_ab_company", "ai_budgets", ["company_id"])
     op.create_index("ix_ab_branch", "ai_budgets", ["branch_id"])
@@ -55,7 +55,7 @@ def upgrade() -> None:
         sa.Column("auto_block_if_unverified", sa.Boolean(), nullable=False, server_default=sa.text('TRUE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_acap_company", "ai_critical_action_policies", ["company_id"])
 
@@ -77,7 +77,7 @@ def upgrade() -> None:
         sa.Column("approved_at", sa.DateTime(), nullable=True),
         sa.Column("blocking_reason", sa.Text(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_afcl_conversation", "ai_fact_check_logs", ["conversation_id"])
     op.create_index("ix_afcl_status", "ai_fact_check_logs", ["verification_status"])
@@ -94,7 +94,7 @@ def upgrade() -> None:
         sa.Column("quality_tier", sa.String(20), nullable=False),
         sa.Column("active", sa.Boolean(), nullable=False, server_default=sa.text('TRUE')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_amp_model", "ai_model_pricing", ["model_name"])
 
@@ -108,7 +108,7 @@ def upgrade() -> None:
         sa.Column("user_prompt_template", sa.String(4000), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_apt_key_lang", "ai_prompt_templates", ["template_key", "language"])
 
@@ -129,7 +129,7 @@ def upgrade() -> None:
         sa.Column("priority", sa.String(20), nullable=False, server_default=sa.text("'normal'")),
         sa.Column("cached", sa.Boolean(), nullable=False, server_default=sa.text('FALSE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_atu_company", "ai_token_usage", ["company_id"])
     op.create_index("ix_atu_branch", "ai_token_usage", ["branch_id"])
@@ -150,7 +150,7 @@ def upgrade() -> None:
         sa.Column("announced_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("effective_at", sa.DateTime(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_acl_version", "api_changelog", ["version"])
     op.create_index("ix_acl_company", "api_changelog", ["company_id"])
@@ -165,7 +165,7 @@ def upgrade() -> None:
         sa.Column("query_params", sa.JSON(), nullable=True),
         sa.Column("headers", sa.JSON(), nullable=True),
         sa.Column("snapshot_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_acs_endpoint", "api_contract_snapshots", ["endpoint_id"])
 
@@ -187,7 +187,7 @@ def upgrade() -> None:
         sa.Column("notification_sent", sa.Boolean(), nullable=False, server_default=sa.text('FALSE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_ael_endpoint", "api_endpoint_lifecycles", ["method", "path"])
     op.create_index("ix_ael_status", "api_endpoint_lifecycles", ["lifecycle_status"])
@@ -204,7 +204,7 @@ def upgrade() -> None:
         sa.Column("auto_add_headers", sa.Boolean(), nullable=False, server_default=sa.text('TRUE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_avp_company", "api_version_policies", ["company_id"])
 
@@ -224,7 +224,7 @@ def upgrade() -> None:
         sa.Column("first_day_of_week", sa.Integer(), nullable=False, server_default=sa.text('1')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_bls_branch", "branch_locale_settings", ["branch_id"])
 
@@ -237,7 +237,7 @@ def upgrade() -> None:
         sa.Column("module", sa.String(50), nullable=False, server_default=sa.text("'general'")),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_ls_key_lang", "localization_strings", ["key", "language"])
     op.create_index("ix_ls_module", "localization_strings", ["module"])
@@ -255,7 +255,7 @@ def upgrade() -> None:
         sa.Column("satisfaction_score", sa.Numeric(3, 2), nullable=True),
         sa.Column("last_assigned_at", sa.DateTime(), nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_ow_operator", "operator_workloads", ["operator_id"])
 
@@ -269,7 +269,7 @@ def upgrade() -> None:
         sa.Column("description", sa.String(500), nullable=True),
         sa.Column("requires_approval", sa.Boolean(), nullable=False, server_default=sa.text('FALSE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_pd_scope", "permission_definitions", ["scope"])
 
@@ -282,7 +282,7 @@ def upgrade() -> None:
         sa.Column("granted", sa.Boolean(), nullable=False, server_default=sa.text('TRUE')),
         sa.Column("branch_scope", sa.String(20), nullable=False, server_default=sa.text("'all'")),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_rp_role_perm", "role_permissions", ["role_id", "permission_id"])
     op.create_index("ix_rp_company", "role_permissions", ["company_id"])
@@ -301,7 +301,7 @@ def upgrade() -> None:
         sa.Column("ai_handled_count", sa.Integer(), nullable=False, server_default=sa.text('0')),
         sa.Column("escalated_count", sa.Integer(), nullable=False, server_default=sa.text('0')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_sad_company_date", "support_analytics_daily", ["company_id", "date"])
 
@@ -319,7 +319,7 @@ def upgrade() -> None:
         sa.Column("active", sa.Boolean(), nullable=False, server_default=sa.text('TRUE')),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
         sa.Column("updated_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP'), onupdate=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_ser_company", "support_escalation_rules", ["company_id"])
 
@@ -333,7 +333,7 @@ def upgrade() -> None:
         sa.Column("expires_at", sa.DateTime(), nullable=True),
         sa.Column("created_by", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text('CURRENT_TIMESTAMP')),
-        schema='public',
+        schema=None,
     )
     op.create_index("ix_upo_user_perm", "user_permission_overrides", ["user_id", "permission_id"])
 
@@ -342,21 +342,21 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Drop stabilization tables."""
 
-    op.drop_table("user_permission_overrides", schema="public")
-    op.drop_table("support_escalation_rules", schema="public")
-    op.drop_table("support_analytics_daily", schema="public")
-    op.drop_table("role_permissions", schema="public")
-    op.drop_table("permission_definitions", schema="public")
-    op.drop_table("operator_workloads", schema="public")
-    op.drop_table("localization_strings", schema="public")
-    op.drop_table("branch_locale_settings", schema="public")
-    op.drop_table("api_version_policies", schema="public")
-    op.drop_table("api_endpoint_lifecycles", schema="public")
-    op.drop_table("api_contract_snapshots", schema="public")
-    op.drop_table("api_changelog", schema="public")
-    op.drop_table("ai_token_usage", schema="public")
-    op.drop_table("ai_prompt_templates", schema="public")
-    op.drop_table("ai_model_pricing", schema="public")
-    op.drop_table("ai_fact_check_logs", schema="public")
-    op.drop_table("ai_critical_action_policies", schema="public")
-    op.drop_table("ai_budgets", schema="public")
+    op.drop_table("user_permission_overrides", schema=None)
+    op.drop_table("support_escalation_rules", schema=None)
+    op.drop_table("support_analytics_daily", schema=None)
+    op.drop_table("role_permissions", schema=None)
+    op.drop_table("permission_definitions", schema=None)
+    op.drop_table("operator_workloads", schema=None)
+    op.drop_table("localization_strings", schema=None)
+    op.drop_table("branch_locale_settings", schema=None)
+    op.drop_table("api_version_policies", schema=None)
+    op.drop_table("api_endpoint_lifecycles", schema=None)
+    op.drop_table("api_contract_snapshots", schema=None)
+    op.drop_table("api_changelog", schema=None)
+    op.drop_table("ai_token_usage", schema=None)
+    op.drop_table("ai_prompt_templates", schema=None)
+    op.drop_table("ai_model_pricing", schema=None)
+    op.drop_table("ai_fact_check_logs", schema=None)
+    op.drop_table("ai_critical_action_policies", schema=None)
+    op.drop_table("ai_budgets", schema=None)
