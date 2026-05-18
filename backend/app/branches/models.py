@@ -85,7 +85,7 @@ class Branch(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_branches_company_id",
@@ -194,7 +194,7 @@ class BranchConfig(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_branch_configs_branch_id",
@@ -260,7 +260,7 @@ class AIPromptOverride(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_prompt_overrides_branch_id",
@@ -352,7 +352,7 @@ class SocialAccountConfig(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_social_account_configs_branch_id",
@@ -461,7 +461,7 @@ class ERPConnectionConfig(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_connection_configs_branch_id",

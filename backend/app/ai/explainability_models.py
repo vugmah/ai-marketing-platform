@@ -40,7 +40,7 @@ class AIScoringFactor(Base):
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    recommendation_id = Column(Integer, ForeignKey("public.ai_recommendation_explanations.id"), nullable=False)
+    recommendation_id = Column(Integer, ForeignKey("ai_recommendation_explanations.id"), nullable=False)
     factor_name = Column(String(200), nullable=False)
     factor_category = Column(String(50), nullable=False)  # engagement, reach, cost, timing, audience
     weight = Column(Numeric(5, 4), nullable=False, default=0.0)

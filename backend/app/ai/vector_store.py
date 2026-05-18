@@ -150,13 +150,13 @@ class VectorEmbedding(Base):
     entity_id = Column(Integer, nullable=False, index=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )

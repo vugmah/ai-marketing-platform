@@ -128,13 +128,13 @@ class SocialAccount(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -257,19 +257,19 @@ class SocialPost(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -348,25 +348,25 @@ class SocialComment(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     post_id = Column(
         Integer,
-        ForeignKey("public.social_posts.id", ondelete="CASCADE"),
+        ForeignKey("social_posts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -431,19 +431,19 @@ class SocialMessage(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -522,19 +522,19 @@ class SocialAnalytic(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -590,13 +590,13 @@ class SocialCompetitor(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -667,23 +667,23 @@ class PublishingQueue(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=False,
     )
     post_id = Column(
         Integer,
-        ForeignKey("public.social_posts.id", ondelete="CASCADE"),
+        ForeignKey("social_posts.id", ondelete="CASCADE"),
         nullable=False,
     )
     platform = Column(
@@ -745,13 +745,13 @@ class SocialListening(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
     )
     platform = Column(
@@ -809,13 +809,13 @@ class HashtagIntelligence(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
     )
     platform = Column(
@@ -871,13 +871,13 @@ class SocialWebhook(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     account_id = Column(
         Integer,
-        ForeignKey("public.social_accounts.id", ondelete="CASCADE"),
+        ForeignKey("social_accounts.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
     )

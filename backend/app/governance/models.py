@@ -60,19 +60,19 @@ class GDPRExportRequest(Base):
 
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     user_id = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     requested_by = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="SET NULL"),
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
         comment="Admin who initiated the export (null if self-service)",
@@ -138,19 +138,19 @@ class GDPRDeletionRequest(Base):
 
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     user_id = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     requested_by = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="SET NULL"),
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )

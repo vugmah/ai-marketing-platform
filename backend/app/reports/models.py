@@ -41,7 +41,7 @@ class ExportJob(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_export_jobs_company_id",
@@ -52,7 +52,7 @@ class ExportJob(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_export_jobs_branch_id",
@@ -101,7 +101,7 @@ class ExportJob(Base):
     created_by = Column(
         Integer,
         ForeignKey(
-            "public.users.id",
+            "users.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_export_jobs_created_by",

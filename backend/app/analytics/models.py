@@ -58,7 +58,7 @@ class AnalyticsSnapshot(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_analytics_snapshots_company_id",
@@ -69,7 +69,7 @@ class AnalyticsSnapshot(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_analytics_snapshots_branch_id",

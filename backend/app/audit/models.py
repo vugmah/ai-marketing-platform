@@ -126,19 +126,19 @@ class AuditLog(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
     user_id = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="SET NULL"),
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -191,7 +191,7 @@ class SecurityEvent(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
     )
@@ -210,7 +210,7 @@ class SecurityEvent(Base):
     source_ip = Column(String(45), nullable=True, index=True)
     user_id = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="SET NULL"),
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -218,7 +218,7 @@ class SecurityEvent(Base):
 
     # Resolution tracking
     resolved = Column(Boolean, default=False, nullable=False, index=True)
-    resolved_by = Column(Integer, ForeignKey("public.users.id", ondelete="SET NULL"), nullable=True)
+    resolved_by = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     resolved_at = Column(DateTime, nullable=True)
 
     created_at = Column(
@@ -245,7 +245,7 @@ class LoginAttempt(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=True,
         index=True,
     )
@@ -284,13 +284,13 @@ class APIKey(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     user_id = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -333,13 +333,13 @@ class DataAccessLog(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True, index=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     user_id = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="SET NULL"),
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )

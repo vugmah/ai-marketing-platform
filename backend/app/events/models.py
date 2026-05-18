@@ -51,7 +51,7 @@ class EventDefinition(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_event_definitions_company_id",
@@ -121,7 +121,7 @@ class EventSubscription(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_event_subscriptions_company_id",
@@ -204,7 +204,7 @@ class EventLog(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_event_log_company_id",
@@ -215,7 +215,7 @@ class EventLog(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_event_log_branch_id",
@@ -243,7 +243,7 @@ class EventLog(Base):
     source_user_id = Column(
         Integer,
         ForeignKey(
-            "public.users.id",
+            "users.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_event_log_source_user_id",
@@ -330,7 +330,7 @@ class EventHandler(Base):
     event_log_id = Column(
         Integer,
         ForeignKey(
-            "public.event_log.id",
+            "event_log.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_event_handlers_event_log_id",
@@ -403,7 +403,7 @@ class DeadLetterEvent(Base):
     event_log_id = Column(
         Integer,
         ForeignKey(
-            "public.event_log.id",
+            "event_log.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_dead_letter_events_event_log_id",
@@ -446,7 +446,7 @@ class DeadLetterEvent(Base):
     resolved_by = Column(
         Integer,
         ForeignKey(
-            "public.users.id",
+            "users.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_dead_letter_events_resolved_by",
@@ -494,7 +494,7 @@ class AutomationRule(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_automation_rules_company_id",
@@ -505,7 +505,7 @@ class AutomationRule(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_automation_rules_branch_id",
@@ -597,7 +597,7 @@ class AutomationExecution(Base):
     rule_id = Column(
         Integer,
         ForeignKey(
-            "public.automation_rules.id",
+            "automation_rules.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_automation_executions_rule_id",
@@ -608,7 +608,7 @@ class AutomationExecution(Base):
     trigger_event_id = Column(
         Integer,
         ForeignKey(
-            "public.event_log.id",
+            "event_log.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_automation_executions_trigger_event_id",

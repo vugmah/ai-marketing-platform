@@ -167,7 +167,7 @@ class AdPlatformAccount(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_platforms_company_id",
@@ -178,7 +178,7 @@ class AdPlatformAccount(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ad_platforms_branch_id",
@@ -272,7 +272,7 @@ class AdCampaign(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_campaigns_company_id",
@@ -283,7 +283,7 @@ class AdCampaign(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ad_campaigns_branch_id",
@@ -296,7 +296,7 @@ class AdCampaign(Base):
     platform_account_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_platforms.id",
+            "ad_platforms.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ad_campaigns_platform_account_id",
@@ -420,7 +420,7 @@ class AdAdset(Base):
     campaign_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_campaigns.id",
+            "ad_campaigns.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_adsets_campaign_id",
@@ -498,7 +498,7 @@ class AdCreative(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_creatives_company_id",
@@ -509,7 +509,7 @@ class AdCreative(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ad_creatives_branch_id",
@@ -522,7 +522,7 @@ class AdCreative(Base):
     campaign_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_campaigns.id",
+            "ad_campaigns.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_creatives_campaign_id",
@@ -612,7 +612,7 @@ class AdMetric(Base):
     campaign_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_campaigns.id",
+            "ad_campaigns.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_metrics_campaign_id",
@@ -623,7 +623,7 @@ class AdMetric(Base):
     adset_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_adsets.id",
+            "ad_adsets.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_metrics_adset_id",
@@ -634,7 +634,7 @@ class AdMetric(Base):
     creative_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_creatives.id",
+            "ad_creatives.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_metrics_creative_id",
@@ -705,7 +705,7 @@ class AdAudience(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_audiences_company_id",
@@ -716,7 +716,7 @@ class AdAudience(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ad_audiences_branch_id",
@@ -729,7 +729,7 @@ class AdAudience(Base):
     platform_account_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_platforms.id",
+            "ad_platforms.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ad_audiences_platform_account_id",
@@ -811,7 +811,7 @@ class AdBudgetRecommendation(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_budget_rec_company_id",
@@ -822,7 +822,7 @@ class AdBudgetRecommendation(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ad_budget_rec_branch_id",
@@ -839,7 +839,7 @@ class AdBudgetRecommendation(Base):
     campaign_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_campaigns.id",
+            "ad_campaigns.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_budget_rec_campaign_id",
@@ -901,7 +901,7 @@ class AdCreativeAnalysis(Base):
     creative_id = Column(
         Integer,
         ForeignKey(
-            "public.ad_creatives.id",
+            "ad_creatives.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_creative_analysis_creative_id",
@@ -912,7 +912,7 @@ class AdCreativeAnalysis(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ad_creative_analysis_company_id",

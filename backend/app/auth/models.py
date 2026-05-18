@@ -92,7 +92,7 @@ class User(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_users_company_id",
@@ -103,7 +103,7 @@ class User(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_users_branch_id",

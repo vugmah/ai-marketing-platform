@@ -85,7 +85,7 @@ class APIContractSnapshot(Base):
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    endpoint_id = Column(Integer, ForeignKey("public.api_endpoint_lifecycles.id"), nullable=False)
+    endpoint_id = Column(Integer, ForeignKey("api_endpoint_lifecycles.id"), nullable=False)
     snapshot_hash = Column(String(64), nullable=False)
     request_schema = Column(JSON, nullable=True)
     response_schema = Column(JSON, nullable=True)

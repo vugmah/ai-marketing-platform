@@ -230,7 +230,7 @@ class AIConversation(Base):
     prompt_id = Column(
         Integer,
         ForeignKey(
-            "public.ai_prompts.id",
+            "ai_prompts.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_ai_conversations_prompt_id",
@@ -306,7 +306,7 @@ class AIMessage(Base):
     conversation_id = Column(
         Integer,
         ForeignKey(
-            "public.ai_conversations.id",
+            "ai_conversations.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_ai_messages_conversation_id",

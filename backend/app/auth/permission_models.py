@@ -35,7 +35,7 @@ class RolePermission(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(Integer, nullable=False, index=True)
     role_id = Column(Integer, nullable=False, index=True)
-    permission_id = Column(Integer, ForeignKey("public.permission_definitions.id"), nullable=False)
+    permission_id = Column(Integer, ForeignKey("permission_definitions.id"), nullable=False)
     granted = Column(Boolean, nullable=False, default=True)
     branch_scope = Column(String(20), nullable=False, default="all")  # all, assigned, none
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
@@ -51,7 +51,7 @@ class UserPermissionOverride(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, nullable=False, index=True)
-    permission_id = Column(Integer, ForeignKey("public.permission_definitions.id"), nullable=False)
+    permission_id = Column(Integer, ForeignKey("permission_definitions.id"), nullable=False)
     granted = Column(Boolean, nullable=False)  # True=grant, False=deny
     expires_at = Column(DateTime, nullable=True)
     created_by = Column(Integer, nullable=False)

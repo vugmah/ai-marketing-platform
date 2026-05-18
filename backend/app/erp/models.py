@@ -117,7 +117,7 @@ class ERPConnection(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_connections_company_id",
@@ -128,7 +128,7 @@ class ERPConnection(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_connections_branch_id",
@@ -267,7 +267,7 @@ class ERPSyncJob(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_sync_jobs_company_id",
@@ -278,7 +278,7 @@ class ERPSyncJob(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_sync_jobs_branch_id",
@@ -289,7 +289,7 @@ class ERPSyncJob(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_sync_jobs_connection_id",
@@ -375,7 +375,7 @@ class ERPSyncLog(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_sync_logs_company_id",
@@ -386,7 +386,7 @@ class ERPSyncLog(Base):
     job_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_sync_jobs.id",
+            "erp_sync_jobs.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_sync_logs_job_id",
@@ -397,7 +397,7 @@ class ERPSyncLog(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_sync_logs_connection_id",
@@ -458,7 +458,7 @@ class ERPFieldMapping(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_field_mappings_company_id",
@@ -469,7 +469,7 @@ class ERPFieldMapping(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_field_mappings_connection_id",
@@ -535,7 +535,7 @@ class ERPProduct(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_products_company_id",
@@ -546,7 +546,7 @@ class ERPProduct(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_products_branch_id",
@@ -557,7 +557,7 @@ class ERPProduct(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_products_connection_id",
@@ -639,7 +639,7 @@ class ERPInventory(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_inventory_company_id",
@@ -650,7 +650,7 @@ class ERPInventory(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_inventory_branch_id",
@@ -661,7 +661,7 @@ class ERPInventory(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_inventory_connection_id",
@@ -672,7 +672,7 @@ class ERPInventory(Base):
     product_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_products.id",
+            "erp_products.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_inventory_product_id",
@@ -742,7 +742,7 @@ class ERPSalesOrder(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_sales_orders_company_id",
@@ -753,7 +753,7 @@ class ERPSalesOrder(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_sales_orders_branch_id",
@@ -764,7 +764,7 @@ class ERPSalesOrder(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_sales_orders_connection_id",
@@ -847,7 +847,7 @@ class ERPCustomer(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_customers_company_id",
@@ -858,7 +858,7 @@ class ERPCustomer(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_customers_branch_id",
@@ -869,7 +869,7 @@ class ERPCustomer(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_customers_connection_id",
@@ -944,7 +944,7 @@ class ERPInvoice(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_invoices_company_id",
@@ -955,7 +955,7 @@ class ERPInvoice(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_invoices_branch_id",
@@ -966,7 +966,7 @@ class ERPInvoice(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_invoices_connection_id",
@@ -977,7 +977,7 @@ class ERPInvoice(Base):
     sales_order_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_sales_orders.id",
+            "erp_sales_orders.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_invoices_sales_order_id",
@@ -1060,7 +1060,7 @@ class ERPPayment(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_payments_company_id",
@@ -1071,7 +1071,7 @@ class ERPPayment(Base):
     branch_id = Column(
         Integer,
         ForeignKey(
-            "public.branches.id",
+            "branches.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_payments_branch_id",
@@ -1082,7 +1082,7 @@ class ERPPayment(Base):
     connection_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_connections.id",
+            "erp_connections.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_erp_payments_connection_id",
@@ -1093,7 +1093,7 @@ class ERPPayment(Base):
     invoice_id = Column(
         Integer,
         ForeignKey(
-            "public.erp_invoices.id",
+            "erp_invoices.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_erp_payments_invoice_id",

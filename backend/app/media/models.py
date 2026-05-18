@@ -158,13 +158,13 @@ class MediaAsset(Base):
     )
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -204,7 +204,7 @@ class MediaAsset(Base):
     )
     created_by = Column(
         Integer,
-        ForeignKey("public.users.id", ondelete="SET NULL"),
+        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
     created_at = Column(
@@ -348,7 +348,7 @@ class MediaTag(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -434,13 +434,13 @@ class MediaCollection(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -611,13 +611,13 @@ class AIImageAnalysis(Base):
     )
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )
@@ -684,13 +684,13 @@ class BranchBrandIdentity(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="CASCADE"),
+        ForeignKey("branches.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
@@ -783,13 +783,13 @@ class CreativeAudit(Base):
     )
     company_id = Column(
         Integer,
-        ForeignKey("public.companies.id", ondelete="CASCADE"),
+        ForeignKey("companies.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
     branch_id = Column(
         Integer,
-        ForeignKey("public.branches.id", ondelete="SET NULL"),
+        ForeignKey("branches.id", ondelete="SET NULL"),
         nullable=True,
         index=True,
     )

@@ -197,7 +197,7 @@ class CompanySubscription(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_company_subscriptions_company_id",
@@ -208,7 +208,7 @@ class CompanySubscription(Base):
     plan_id = Column(
         Integer,
         ForeignKey(
-            "public.subscription_plans.id",
+            "subscription_plans.id",
             ondelete="RESTRICT",
             onupdate="CASCADE",
             name="fk_company_subscriptions_plan_id",
@@ -277,7 +277,7 @@ class UsageRecord(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_usage_records_company_id",
@@ -335,7 +335,7 @@ class UsageQuota(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_usage_quotas_company_id",
@@ -397,7 +397,7 @@ class Invoice(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_invoices_company_id",
@@ -473,7 +473,7 @@ class FeatureFlag(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_feature_flags_company_id",
@@ -490,7 +490,7 @@ class FeatureFlag(Base):
     enabled_by = Column(
         Integer,
         ForeignKey(
-            "public.users.id",
+            "users.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_feature_flags_enabled_by",
@@ -539,7 +539,7 @@ class BillingEvent(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_billing_events_company_id",
@@ -590,7 +590,7 @@ class ApprovalRequest(Base):
     company_id = Column(
         Integer,
         ForeignKey(
-            "public.companies.id",
+            "companies.id",
             ondelete="CASCADE",
             onupdate="CASCADE",
             name="fk_approval_requests_company_id",
@@ -607,7 +607,7 @@ class ApprovalRequest(Base):
     requested_by = Column(
         Integer,
         ForeignKey(
-            "public.users.id",
+            "users.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_approval_requests_requested_by",
@@ -626,7 +626,7 @@ class ApprovalRequest(Base):
     approved_by = Column(
         Integer,
         ForeignKey(
-            "public.users.id",
+            "users.id",
             ondelete="SET NULL",
             onupdate="CASCADE",
             name="fk_approval_requests_approved_by",
