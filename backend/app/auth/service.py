@@ -57,61 +57,58 @@ def _user_to_response(user: User) -> UserResponse:
 
 
 async def register_user(data: UserRegister) -> UserResponse:
-    """Register a new user with real database operations.
-
-    Args:
-        data: User registration data.
-
-    Returns:
-        Created user response.
-
-    Raises:
-        AlreadyExistsError: If a user with the same email already exists.
-    """
+    """Register a new user with real database operations."""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     email = data.email.lower().strip()
+    
+    try:
+        async with get_db_context() as db:
+            # Check if user already exists
+            result = await db.execute(select(User).where(User.email == email))
+            existing_user = result.scalar_one_or_none()
 
-    async with get_db_context() as db:
-        # Check if user already exists
-        result = await db.execute(select(User).where(User.email == email))
-        existing_user = result.scalar_one_or_none()
+            if existing_user is not None:
+                raise AlreadyExistsError(
+                    detail=f"User with email '{email}' already exists"
+                )
 
-        if existing_user is not None:
-            raise AlreadyExistsError(
-                detail=f"User with email '{email}' already exists"
+            # Create new user
+            user = User(
+                email=email,
+                password_hash=hash_password(data.password),
+                first_name=data.first_name,
+                last_name=data.last_name,
+                role="user",
+                company_id=None,
+                branch_id=None,
+                is_active=True,
+                created_at=datetime.now(timezone.utc),
             )
 
-        # Create new user
-        user = User(
-            email=email,
-            password_hash=hash_password(data.password),
-            first_name=data.first_name,
-            last_name=data.last_name,
-            role="user",
-            company_id=None,
-            branch_id=None,
-            is_active=True,
-            created_at=datetime.now(timezone.utc),
-        )
+            db.add(user)
+            await db.commit()
+            await db.refresh(user)
 
-        db.add(user)
-        await db.commit()
-        await db.refresh(user)
+            # Store in mock users dict for test compatibility
+            _mock_users[email] = {
+                "id": str(user.id),
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "role": user.role,
+                "company_id": user.company_id,
+                "branch_id": user.branch_id,
+                "is_active": user.is_active,
+                "password": data.password,
+                "created_at": user.created_at,
+            }
 
-        # Store in mock users dict for test compatibility
-        _mock_users[email] = {
-            "id": str(user.id),
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "role": user.role,
-            "company_id": user.company_id,
-            "branch_id": user.branch_id,
-            "is_active": user.is_active,
-            "password": data.password,
-            "created_at": user.created_at,
-        }
-
-        return _user_to_response(user)
+            return _user_to_response(user)
+    except Exception as e:
+        logger.exception(f"[AUTH DEBUG] register_user error: {type(e).__name__}: {e}")
+        raise
 
 
 async def login_user(email: str, password: str) -> TokenResponse:

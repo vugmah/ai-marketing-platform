@@ -292,6 +292,19 @@ class AdCampaign(Base):
         index=True,
     )
 
+    # Parent ad platform account
+    platform_account_id = Column(
+        Integer,
+        ForeignKey(
+            "public.ad_platforms.id",
+            ondelete="SET NULL",
+            onupdate="CASCADE",
+            name="fk_ad_campaigns_platform_account_id",
+        ),
+        nullable=True,
+        index=True,
+    )
+
     # Platform
     platform = Column(
         Enum(AdPlatform, name="adcampaignplatform", create_type=True),
@@ -712,6 +725,19 @@ class AdAudience(Base):
         index=True,
     )
 
+    # Parent ad platform account
+    platform_account_id = Column(
+        Integer,
+        ForeignKey(
+            "public.ad_platforms.id",
+            ondelete="SET NULL",
+            onupdate="CASCADE",
+            name="fk_ad_audiences_platform_account_id",
+        ),
+        nullable=True,
+        index=True,
+    )
+
     # Platform
     platform = Column(
         Enum(AdPlatform, name="ad_audience_platform", create_type=True),
@@ -750,9 +776,7 @@ class AdAudience(Base):
     # Relationships
     platform_account = relationship(
         "AdPlatformAccount",
-        primaryjoin="and_(AdAudience.company_id == AdPlatformAccount.company_id, "
-                    "AdAudience.platform == AdPlatformAccount.platform)",
-        viewonly=True,
+        back_populates="audiences",
     )
 
     def __repr__(self) -> str:

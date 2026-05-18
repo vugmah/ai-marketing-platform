@@ -148,7 +148,7 @@ async def init_db() -> None:
             await conn.run_sync(Base.metadata.create_all, checkfirst=True)
         logger.info(f"[DB] Tables OK")
     except Exception as e:
-        logger.debug(f"[DB] init: {type(e).__name__}")
+        logger.exception(f"[DB] init failed: {type(e).__name__}: {e}")
 
 
 async def close_db() -> None:
