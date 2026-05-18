@@ -1,20 +1,13 @@
 """Authentication utilities: JWT tokens, password hashing, and refresh token rotation."""
 
+import bcrypt
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 
 import jwt
-from passlib.context import CryptContext
 
 from app.config import settings
-
-# Password hashing context with bcrypt (argon2 requires argon2-cffi which may not be available)
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__rounds=12,
-)
 
 
 def create_access_token(data: Dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -105,29 +98,29 @@ def verify_token(token: str) -> Dict:
 
 
 def hash_password(password: str) -> str:
-    """Hash a password using Argon2.
+    """Hash a password using bcrypt.
 
     Args:
         password: Plain text password.
 
     Returns:
-        Argon2 hashed password string.
+        bcrypt hashed password string.
     """
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds=12)).decode("utf-8")
 
 
 def verify_password(password: str, hashed: str) -> bool:
-    """Verify a password against its Argon2 hash.
+    """Verify a password against its bcrypt hash.
 
     Args:
         password: Plain text password to verify.
-        hashed: Stored Argon2 hash.
+        hashed: Stored bcrypt hash.
 
     Returns:
         True if the password matches, False otherwise.
     """
     try:
-        return pwd_context.verify(password, hashed)
+        return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
     except Exception:
         return False
 
