@@ -19,23 +19,24 @@ def import_all_models():
     This ensures cross-module ForeignKeys resolve correctly during mapper
     configuration (e.g. follower_snapshots.account_id -> social_accounts.id).
     """
+    # Order matters: target FK tables must be imported before referencing tables
     modules = [
-        "app.auth.models",
-        "app.companies.models",
-        "app.branches.models",
-        "app.social.models",
-        "app.followers.models",
-        "app.ai.models",
-        "app.ads.models",
-        "app.billing.models",
-        "app.media.models",
-        "app.analytics.models",
-        "app.reports.models",
-        "app.governance.models",
-        "app.support.models",
-        "app.events.models",
-        "app.erp.models",
-        "app.knowledge.models",
+        "app.auth.models",          # users, roles, permissions
+        "app.companies.models",     # companies
+        "app.branches.models",      # branches
+        "app.social.models",        # social_accounts ← MUST be before followers
+        "app.ai.models",            # ai_prompts, ai_conversations, ai_messages
+        "app.ads.models",           # ad_platforms, ad_campaigns, ad_audiences
+        "app.billing.models",       # subscription_plans, invoices
+        "app.media.models",         # media_assets
+        "app.analytics.models",     # analytics_snapshots
+        "app.followers.models",     # followers, follower_snapshots (refs social_accounts)
+        "app.reports.models",       # report_templates
+        "app.governance.models",    # gdpr_export_requests
+        "app.support.models",       # support_tickets
+        "app.events.models",        # event_log
+        "app.erp.models",           # erp_connections
+        "app.knowledge.models",     # knowledge_base_articles
     ]
 
     imported = 0
