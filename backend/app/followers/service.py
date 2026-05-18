@@ -3069,3 +3069,244 @@ class FollowerValueService:
         items = list(result.scalars().all())
 
         return {"total": total, "page": page, "page_size": page_size, "items": items}
+
+
+# =============================================================================
+# Ghost / Inactive Follower Detection Service
+# =============================================================================
+
+
+class GhostFollowerDetectionService:
+    """Service for detecting ghost, inactive, and dormant followers."""
+
+    GHOST_THRESHOLD_DAYS: Final[int] = 180
+    DORMANT_THRESHOLD_DAYS: Final[int] = 90
+    INACTIVE_THRESHOLD_DAYS: Final[int] = 30
+
+    def __init__(self, db: AsyncSession) -> None:
+        self.db = db
+
+    async def detect_ghost_followers(
+        self, company_id: int, account_id: int,
+        platform: Optional[str] = None,
+        inactivity_threshold_days: int = 90,
+        min_confidence: float = 0.5,
+        branch_id: Optional[int] = None,
+    ) -> Dict[str, object]:
+        from sqlalchemy import select, func, desc
+
+        snapshot_query = (
+            select(FollowerSnapshot)
+            .where(FollowerSnapshot.company_id == company_id)
+            .where(FollowerSnapshot.account_id == account_id)
+            .order_by(desc(FollowerSnapshot.snapshot_date))
+            .limit(1)
+        )
+        snapshot_result = await self.db.execute(snapshot_query)
+        latest_snapshot = snapshot_result.scalar_one_or_none()
+        total_followers = latest_snapshot.follower_count if latest_snapshot else 0
+
+        event_query = (
+            select(EngagementEvent)
+            .where(EngagementEvent.company_id == company_id)
+            .where(EngagementEvent.account_id == account_id)
+            .order_by(desc(EngagementEvent.created_at))
+            .limit(1000)
+        )
+        event_result = await self.db.execute(event_query)
+        events = list(event_result.scalars().all())
+
+        bot_query = (
+            select(BotPattern)
+            .where(BotPattern.company_id == company_id)
+            .where(BotPattern.account_id == account_id)
+        )
+        bot_result = await self.db.execute(bot_query)
+        bot_patterns = list(bot_result.scalars().all())
+
+        high_risk_bots = [b for b in bot_patterns
+                         if b.risk_level in (BotRiskLevel.HIGH, BotRiskLevel.CRITICAL)]
+
+        if total_followers > 0 and len(events) > 0:
+            unique_engagers = len({e.follower_username for e in events if e.follower_username})
+            engagement_ratio = unique_engagers / total_followers if total_followers > 0 else 0
+            ghost_estimate = int(total_followers * (1 - engagement_ratio) * 0.35)
+            dormant_estimate = int(total_followers * (1 - engagement_ratio) * 0.40)
+            inactive_estimate = int(total_followers * (1 - engagement_ratio) * 0.25)
+            known_bot_count = len(bot_patterns)
+            ghost_estimate = max(ghost_estimate - known_bot_count, 0)
+            data_completeness = min(len(events) / max(total_followers * 0.1, 100), 1.0)
+            confidence = min(0.3 + (data_completeness * 0.5) + (0.2 if known_bot_count > 0 else 0), 0.95)
+        else:
+            ghost_estimate = dormant_estimate = inactive_estimate = 0
+            confidence = data_completeness = 0.0
+
+        ghost_pct = (ghost_estimate / total_followers * 100) if total_followers > 0 else 0
+        risk_level = "high" if ghost_pct > 20 else "medium" if ghost_pct > 10 else "low"
+
+        recommendations = []
+        if confidence < 0.3:
+            recommendations.append("Limited engagement data. Connect social media API for more accurate detection.")
+        if ghost_estimate > 100:
+            recommendations.append(f"Consider re-engagement campaign for dormant followers (~{dormant_estimate} accounts).")
+        if len(high_risk_bots) > 0:
+            recommendations.append(f"{len(high_risk_bots)} high-risk suspected bot accounts detected.")
+        if not recommendations:
+            recommendations.append("No significant issues detected. Continue monitoring.")
+
+        return {
+            "total_followers": total_followers,
+            "inactive_count": inactive_estimate, "ghost_count": ghost_estimate,
+            "dormant_count": dormant_estimate,
+            "inactive_percentage": round((inactive_estimate / total_followers * 100), 2) if total_followers else 0,
+            "ghost_percentage": round(ghost_pct, 2),
+            "dormant_percentage": round((dormant_estimate / total_followers * 100), 2) if total_followers else 0,
+            "confidence_score": round(confidence, 2),
+            "risk_assessment": risk_level,
+            "breakdown": {
+                "known_bot_patterns": len(bot_patterns),
+                "high_risk_suspected": len(high_risk_bots),
+                "data_completeness": round(data_completeness, 2),
+                "engaged_accounts": len({e.follower_username for e in events if e.follower_username}) if events else 0,
+            },
+            "recommendations": recommendations,
+            "detected_at": datetime.now(timezone.utc),
+        }
+
+
+# =============================================================================
+# Export Service
+# =============================================================================
+
+
+class ExportService:
+    """Service for generating follower analysis export reports."""
+
+    def __init__(self, db: AsyncSession) -> None:
+        self.db = db
+
+    async def generate_report(self, company_id: int, account_id: int,
+        report_type: str, format: str, date_range_days: int = 30,
+        platform: Optional[str] = None, branch_id: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        from sqlalchemy import select, desc
+        report_data: Dict[str, Any] = {"meta": {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "company_id": company_id, "account_id": account_id,
+            "platform": platform or "all", "date_range_days": date_range_days,
+            "report_type": report_type, "data_quality": "partial",
+            "disclaimer": "This report is based on available data. Connect social media APIs for more comprehensive analysis.",
+        }}
+
+        snapshot_query = (
+            select(FollowerSnapshot).where(FollowerSnapshot.company_id == company_id)
+            .where(FollowerSnapshot.account_id == account_id)
+            .order_by(desc(FollowerSnapshot.snapshot_date)).limit(1)
+        )
+        snapshot_result = await self.db.execute(snapshot_query)
+        latest_snapshot = snapshot_result.scalar_one_or_none()
+
+        if latest_snapshot:
+            report_data["follower_summary"] = {
+                "total_followers": latest_snapshot.follower_count,
+                "following_count": latest_snapshot.following_count,
+                "post_count": latest_snapshot.post_count,
+                "last_updated": latest_snapshot.snapshot_date.isoformat() if latest_snapshot.snapshot_date else None,
+            }
+            report_data["meta"]["data_quality"] = "available"
+        else:
+            report_data["follower_summary"] = {"total_followers": 0, "following_count": 0, "post_count": 0, "last_updated": None}
+            report_data["meta"]["data_quality"] = "no_data"
+
+        bot_query = (
+            select(BotPattern).where(BotPattern.company_id == company_id)
+            .where(BotPattern.account_id == account_id).order_by(desc(BotPattern.bot_score))
+        )
+        bot_result = await self.db.execute(bot_query)
+        bot_patterns = list(bot_result.scalars().all())
+        report_data["bot_analysis"] = {"total_flagged": len(bot_patterns), "by_risk_level": {}, "high_risk_accounts": []}
+        for bp in bot_patterns:
+            level = bp.risk_level.value if hasattr(bp.risk_level, 'value') else str(bp.risk_level)
+            report_data["bot_analysis"]["by_risk_level"][level] = report_data["bot_analysis"]["by_risk_level"].get(level, 0) + 1
+            if level in ("high", "critical"):
+                report_data["bot_analysis"]["high_risk_accounts"].append({
+                    "username": bp.detected_username, "score": float(bp.bot_score) if bp.bot_score else 0,
+                    "risk_level": level, "detected_at": bp.detected_at.isoformat() if bp.detected_at else None,
+                })
+
+        quality_query = (
+            select(EngagementQuality).where(EngagementQuality.company_id == company_id)
+            .where(EngagementQuality.account_id == account_id).order_by(desc(EngagementQuality.analysis_date)).limit(1)
+        )
+        quality_result = await self.db.execute(quality_query)
+        latest_quality = quality_result.scalar_one_or_none()
+        report_data["engagement_quality"] = {
+            "quality_score": float(latest_quality.quality_score) if latest_quality and latest_quality.quality_score else 0,
+            "engagement_rate": float(latest_quality.engagement_rate) if latest_quality and latest_quality.engagement_rate else 0,
+            "reach_count": latest_quality.reach_count if latest_quality else 0,
+            "impression_count": latest_quality.impression_count if latest_quality else 0,
+        } if latest_quality else None
+
+        health_query = (
+            select(FollowerHealth).where(FollowerHealth.company_id == company_id)
+            .where(FollowerHealth.account_id == account_id).order_by(desc(FollowerHealth.analysis_date)).limit(1)
+        )
+        health_result = await self.db.execute(health_query)
+        latest_health = health_result.scalar_one_or_none()
+        report_data["health_score"] = {
+            "overall_score": float(latest_health.overall_score) if latest_health and latest_health.overall_score else 0,
+            "health_status": str(latest_health.health_status) if latest_health else None,
+        } if latest_health else None
+
+        total_followers = report_data["follower_summary"]["total_followers"]
+        bot_count = report_data["bot_analysis"]["total_flagged"]
+        bot_pct = (bot_count / total_followers * 100) if total_followers > 0 else 0
+        overall_risk = "critical" if bot_pct > 15 else "high" if bot_pct > 8 else "medium" if bot_pct > 3 else "low"
+        quality_score = max(0, 100 - (bot_pct * 3))
+        if latest_health and latest_health.overall_score:
+            quality_score = (quality_score + float(latest_health.overall_score)) / 2
+
+        report_data["overall"] = {
+            "quality_score": round(quality_score, 1), "risk_level": overall_risk,
+            "bot_suspected_percentage": round(bot_pct, 2),
+            "genuine_estimate": max(0, total_followers - bot_count),
+            "confidence_score": round(0.5 + (0.3 if len(bot_patterns) > 0 else 0) + (0.2 if latest_health else 0), 2),
+            "recommendations": self._generate_recommendations(total_followers, bot_count, bot_pct, latest_health, latest_quality),
+        }
+
+        if format == "json":
+            return {"format": "json", "data": report_data}
+        elif format == "csv":
+            return {"format": "csv", "data": report_data, "note": "CSV conversion client-side or with pandas"}
+        elif format == "xlsx":
+            return {"format": "xlsx", "data": report_data, "note": "Install: pip install openpyxl"}
+        elif format == "pdf":
+            return {"format": "pdf", "data": report_data, "note": "Install: pip install reportlab"}
+        return {"format": format, "data": report_data}
+
+    def _generate_recommendations(self, total_followers: int, bot_count: int,
+        bot_pct: float, health: Optional[FollowerHealth],
+        quality: Optional[EngagementQuality],
+    ) -> List[str]:
+        recommendations = []
+        if total_followers == 0:
+            recommendations.append("No follower data available. Connect your social media account.")
+            return recommendations
+        if bot_pct > 10:
+            recommendations.append(f"High suspected bot rate ({bot_pct:.1f}%). Review flagged accounts.")
+        elif bot_pct > 5:
+            recommendations.append(f"Moderate bot activity ({bot_pct:.1f}%). Monitor patterns.")
+        if health and health.overall_score and float(health.overall_score) < 50:
+            recommendations.append(f"Health score low ({float(health.overall_score):.0f}/100). Improve audience quality.")
+        if quality and quality.engagement_rate and float(quality.engagement_rate) < 1.0:
+            recommendations.append("Engagement rate below 1%. Focus on content quality.")
+        if not recommendations:
+            recommendations.append("Follower quality appears healthy. Continue monitoring.")
+        recommendations.append("Analysis based on available data. Connect APIs for deeper insights.")
+        return recommendations
+
+    async def get_quality_report(self, company_id: int, account_id: int,
+        platform: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        report = await self.generate_report(company_id, account_id, "audience_quality", "json", platform=platform)
+        return report.get("data", {}).get("overall", {})

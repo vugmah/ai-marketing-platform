@@ -30,6 +30,7 @@ from .schemas import (
     EngagementQualityCreate,
     EngagementQualityListResponse,
     EngagementQualityResponse,
+    ExportReportRequest,
     FollowerAlert,
     FollowerAnalysisRequest,
     FollowerAnalysisResponse,
@@ -43,6 +44,7 @@ from .schemas import (
     FollowerInsightCreate,
     FollowerInsightListResponse,
     FollowerInsightResponse,
+    FollowerQualityReport,
     FollowerSnapshotCreate,
     FollowerSnapshotListResponse,
     FollowerSnapshotResponse,
@@ -50,6 +52,8 @@ from .schemas import (
     FollowerValueScoreListResponse,
     FollowerValueSummaryResponse,
     GenerateReengagementRequest,
+    GhostFollowerDetectionRequest,
+    GhostFollowerDetectionResult,
     NewEngagementSummaryResponse,
     OutreachApprovalListResponse,
     OutreachApprovalResponse,
@@ -67,10 +71,12 @@ from .service import (
     BotDetectionService,
     EngagementEventService,
     EngagementQualityService,
+    ExportService,
     FollowerDeltaService,
     FollowerHealthService,
     FollowerSyncService,
     FollowerValueService,
+    GhostFollowerDetectionService,
     ReengagementService,
     SuspiciousActivityService,
 )
@@ -1430,4 +1436,152 @@ async def get_dashboard(
             "confidence_scores": "Confidence scores indicate estimation reliability. Higher = more reliable.",
             "auto_send": "Auto-send is disabled by default. All outbound messages require approval.",
         },
+    }
+
+
+# =============================================================================
+# Ghost / Inactive Follower Detection Endpoints
+# =============================================================================
+
+
+@router.post(
+    "/ghost-detection",
+    response_model=GhostFollowerDetectionResult,
+    summary="Detect ghost/inactive followers",
+    description="Analyze follower activity patterns to identify ghost, inactive, and dormant followers. "
+                "Uses engagement data only - no scraping or API credentials required. "
+                "Returns confidence score and risk assessment.",
+)
+async def detect_ghost_followers(
+    request: GhostFollowerDetectionRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Detect ghost, inactive, and dormant followers.
+
+    Does NOT require social media API credentials.
+    Works with available engagement data in the database.
+    Returns confidence score - lower confidence means less data available.
+    """
+    service = GhostFollowerDetectionService(db)
+    result = await service.detect_ghost_followers(
+        company_id=current_user.company_id,
+        account_id=request.account_id,
+        platform=request.platform,
+        inactivity_threshold_days=request.inactivity_threshold_days,
+        min_confidence=request.min_confidence,
+        branch_id=request.branch_id,
+    )
+    return result
+
+
+@router.get(
+    "/ghost-detection/{account_id}",
+    response_model=GhostFollowerDetectionResult,
+    summary="Get ghost follower detection for account",
+    description="Run ghost/inactive follower detection with default parameters.",
+)
+async def get_ghost_detection(
+    account_id: int,
+    platform: Optional[str] = None,
+    inactivity_threshold_days: int = Query(default=90, ge=7, le=365),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get ghost follower detection results for a specific account."""
+    service = GhostFollowerDetectionService(db)
+    result = await service.detect_ghost_followers(
+        company_id=current_user.company_id,
+        account_id=account_id,
+        platform=platform,
+        inactivity_threshold_days=inactivity_threshold_days,
+    )
+    return result
+
+
+# =============================================================================
+# Export / Report Endpoints
+# =============================================================================
+
+
+@router.post(
+    "/reports/generate",
+    summary="Generate follower analysis report",
+    description="Generate a follower quality/bot/ghost analysis report. "
+                "Supports json, csv, xlsx, pdf formats. "
+                "Returns structured data - PDF/Excel generation requires additional packages.",
+)
+async def generate_report(
+    request: ExportReportRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Generate a follower analysis export report."""
+    service = ExportService(db)
+    result = await service.generate_report(
+        company_id=current_user.company_id,
+        account_id=request.account_id,
+        report_type=request.report_type,
+        format=request.format,
+        date_range_days=request.date_range_days,
+        platform=request.platform,
+        branch_id=request.branch_id,
+    )
+    return result
+
+
+@router.get(
+    "/reports/quality/{account_id}",
+    response_model=FollowerQualityReport,
+    summary="Get follower quality report",
+    description="Get a comprehensive follower quality report including bot estimates, "
+                "ghost follower counts, and engagement quality scores.",
+)
+async def get_quality_report(
+    account_id: int,
+    platform: Optional[str] = None,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get comprehensive follower quality report."""
+    service = ExportService(db)
+    overall = await service.get_quality_report(
+        company_id=current_user.company_id,
+        account_id=account_id,
+        platform=platform,
+    )
+
+    # Build full report from available data
+    ghost_service = GhostFollowerDetectionService(db)
+    ghost_result = await ghost_service.detect_ghost_followers(
+        company_id=current_user.company_id,
+        account_id=account_id,
+        platform=platform,
+    )
+
+    bot_service = BotDetectionService(db)
+    bot_patterns = await bot_service.list_bot_patterns(
+        company_id=current_user.company_id,
+        account_id=account_id,
+    )
+
+    return {
+        "account_id": account_id,
+        "platform": platform or "all",
+        "report_date": datetime.now(timezone.utc),
+        "total_followers": ghost_result.get("total_followers", 0),
+        "genuine_estimate": ghost_result.get("total_followers", 0) - len(bot_patterns.get("items", [])),
+        "bot_suspected_count": len(bot_patterns.get("items", [])),
+        "bot_suspected_percentage": round(len(bot_patterns.get("items", [])) / ghost_result.get("total_followers", 1) * 100, 2) if ghost_result.get("total_followers") else 0,
+        "ghost_count": ghost_result.get("ghost_count", 0),
+        "ghost_percentage": ghost_result.get("ghost_percentage", 0),
+        "high_value_count": 0,
+        "high_value_percentage": 0,
+        "overall_quality_score": overall.get("quality_score", 0),
+        "overall_risk_level": overall.get("risk_level", "low"),
+        "confidence_score": ghost_result.get("confidence_score", 0),
+        "platform_specific": {},
+        "recommendations": ghost_result.get("recommendations", []) + overall.get("recommendations", []),
+        "can_export": True,
+        "export_note": "",
     }

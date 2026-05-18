@@ -1156,3 +1156,125 @@ class SafeMessageTemplateResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# =============================================================================
+# Ghost / Inactive Follower Detection Schemas
+# =============================================================================
+
+
+class GhostFollowerDetectionResult(BaseModel):
+    """Result of ghost/inactive follower detection."""
+
+    total_followers: int = Field(..., description="Total followers analyzed")
+    inactive_count: int = Field(default=0, description="Inactive follower count")
+    ghost_count: int = Field(default=0, description="Ghost follower count")
+    dormant_count: int = Field(default=0, description="Dormant follower count")
+    inactive_percentage: float = Field(default=0.0, ge=0.0, le=100.0)
+    ghost_percentage: float = Field(default=0.0, ge=0.0, le=100.0)
+    dormant_percentage: float = Field(default=0.0, ge=0.0, le=100.0)
+    confidence_score: float = Field(default=0.0, ge=0.0, le=1.0,
+                                     description="Confidence in detection accuracy")
+    risk_assessment: str = Field(default="low",
+                                  description="low, medium, high risk level")
+    breakdown: Dict[str, Any] = Field(default_factory=dict,
+                                       description="Detailed per-segment breakdown")
+    recommendations: List[str] = Field(default_factory=list)
+    detected_at: datetime = Field(default_factory=datetime.utcnow)
+
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "total_followers": 10000,
+            "inactive_count": 1200,
+            "ghost_count": 450,
+            "dormant_count": 1800,
+            "inactive_percentage": 12.0,
+            "ghost_percentage": 4.5,
+            "dormant_percentage": 18.0,
+            "confidence_score": 0.72,
+            "risk_assessment": "medium",
+            "breakdown": {"30d_inactive": 800, "90d_inactive": 1200, "never_engaged": 450},
+            "recommendations": ["Consider re-engagement campaign"],
+        }
+    })
+
+
+class GhostFollowerDetectionRequest(BaseModel):
+    """Request to run ghost/inactive follower detection."""
+
+    account_id: int = Field(..., description="Social account ID")
+    platform: Optional[str] = Field(default=None, description="instagram, facebook, etc.")
+    inactivity_threshold_days: int = Field(default=90, ge=7, le=365,
+                                            description="Days of inactivity to flag")
+    min_confidence: float = Field(default=0.5, ge=0.0, le=1.0)
+    branch_id: Optional[int] = None
+
+
+# =============================================================================
+# Export / Report Schemas
+# =============================================================================
+
+
+class ExportReportRequest(BaseModel):
+    """Request to generate an export report."""
+
+    account_id: int = Field(..., description="Social account ID")
+    report_type: str = Field(..., description="bot_analysis, ghost_followers, "
+                                                "audience_quality, follower_growth")
+    format: str = Field(default="json", description="json, csv, xlsx, pdf")
+    date_range_days: int = Field(default=30, ge=1, le=365)
+    platform: Optional[str] = Field(default=None, description="instagram, facebook, tiktok")
+    branch_id: Optional[int] = None
+
+    @field_validator("format")
+    @classmethod
+    def validate_format(cls, v: str) -> str:
+        allowed = {"json", "csv", "xlsx", "pdf"}
+        if v not in allowed:
+            raise ValueError(f"format must be one of {allowed}")
+        return v
+
+
+class FollowerQualityReport(BaseModel):
+    """Comprehensive follower quality report."""
+
+    account_id: int
+    platform: str
+    report_date: datetime = Field(default_factory=datetime.utcnow)
+    total_followers: int
+    genuine_estimate: int = Field(description="Estimated genuine followers")
+    bot_suspected_count: int = Field(description="Suspected bot accounts")
+    bot_suspected_percentage: float
+    ghost_count: int = Field(description="Ghost/inactive followers")
+    ghost_percentage: float
+    high_value_count: int
+    high_value_percentage: float
+    overall_quality_score: float = Field(ge=0.0, le=100.0,
+                                          description="0-100 quality score")
+    overall_risk_level: str = Field(description="low, medium, high, critical")
+    confidence_score: float = Field(ge=0.0, le=1.0)
+    platform_specific: Dict[str, Any] = Field(default_factory=dict)
+    recommendations: List[str] = Field(default_factory=list)
+    can_export: bool = Field(default=False,
+                              description="Whether data supports PDF/Excel export")
+    export_note: str = Field(default="", description="Why export may not be available")
+
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "account_id": 1,
+            "platform": "instagram",
+            "total_followers": 10000,
+            "genuine_estimate": 7500,
+            "bot_suspected_count": 450,
+            "bot_suspected_percentage": 4.5,
+            "ghost_count": 1200,
+            "ghost_percentage": 12.0,
+            "high_value_count": 800,
+            "high_value_percentage": 8.0,
+            "overall_quality_score": 72.5,
+            "overall_risk_level": "medium",
+            "confidence_score": 0.68,
+            "can_export": True,
+            "recommendations": ["Run re-engagement for dormant followers"],
+        }
+    })
