@@ -77,7 +77,7 @@ def upgrade() -> None:
         "social_analytics", "social_competitors", "social_webhooks",
         "media_assets", "media_collections",
         "event_log", "event_subscriptions", "automation_rules",
-        "subscription_plans", "company_subscriptions", "usage_records",
+        "company_subscriptions", "usage_records",
         "usage_quotas", "invoices", "feature_flags", "billing_events",
         "audit_logs", "security_events", "login_attempts",
     ]
