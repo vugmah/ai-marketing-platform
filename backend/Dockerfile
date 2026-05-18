@@ -48,5 +48,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
 EXPOSE 8000
 
 # ONE-TIME MIGRATION: Run alembic upgrade before app start
-# After migration succeeds, restore to: CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers 2
-CMD bash -c "cd /app/backend && python -m alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers 2"
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers 2
