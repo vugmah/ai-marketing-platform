@@ -709,7 +709,7 @@ def upgrade() -> None:
         sa.Column("source_url", sa.String(2048), nullable=True),
         sa.Column("source_title", sa.String(512), nullable=True),
         sa.Column("source_description", sa.Text(), nullable=True),
-        sa.Column("raw_content", sa.LONGTEXT(), nullable=True),
+        sa.Column("raw_content", sa.Text(), nullable=True),
         sa.Column("raw_content_hash", sa.String(64), nullable=True, index=True),
         sa.Column("content_metadata", sa.JSON(), nullable=True),
         sa.Column("status", sa.String(32), nullable=False, server_default=sa.text("'pending'")),
