@@ -117,34 +117,13 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Logging config failed: {e}")
 
-    # Pre-register base models FIRST (companies, branches must be before ai)
+    # Import ALL models BEFORE init_db so cross-module FKs resolve correctly
     try:
-        from app.companies import models as _companies_models
-        from app.branches import models as _branches_models
-        logger.info("[INIT] Base models registered: companies, branches")
+        from app.models_registry import import_all_models
+        import_all_models()
+        logger.info("[INIT] All model modules imported via models_registry")
     except Exception as e:
-        logger.warning(f"[INIT] Base model registration failed: {e}")
-
-    # Pre-register social_accounts model for followers FK reference
-    try:
-        from app.social import models as _social_models
-        logger.info("[INIT] Social models registered")
-    except Exception as e:
-        logger.warning(f"[INIT] Social model registration failed: {e}")
-
-    # Pre-register followers models
-    try:
-        from app.followers import models as _followers_models
-        logger.info("[INIT] Followers models registered")
-    except Exception as e:
-        logger.warning(f"[INIT] Followers model registration failed: {e}")
-
-    # Pre-register AI models LAST (after companies/branches are in metadata)
-    try:
-        from app.ai import models as _ai_models
-        logger.info("[INIT] AI models registered")
-    except Exception as e:
-        logger.warning(f"[INIT] AI model registration failed: {e}")
+        logger.warning(f"[INIT] Model registry import failed: {e}")
 
     try:
         await init_db()
