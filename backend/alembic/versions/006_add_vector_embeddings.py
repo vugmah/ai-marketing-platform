@@ -20,7 +20,11 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    """Create the vector_embeddings table for pgvector."""
+    """Create the vector_embeddings table for pgvector (PostgreSQL only)."""
+    bind = op.get_bind()
+    if bind.dialect.name != "postgresql":
+        return  # Skip on MySQL - pgvector/ARRAY is PostgreSQL-only
+
     # Try to create pgvector extension
     try:
         op.execute("CREATE EXTENSION IF NOT EXISTS vector")
@@ -142,7 +146,10 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Drop the vector_embeddings table."""
+    """Drop the vector_embeddings table (PostgreSQL only)."""
+    bind = op.get_bind()
+    if bind.dialect.name != "postgresql":
+        return  # Skip on MySQL - table was never created
     op.drop_index(
         "ix_vector_embeddings_metadata",
         table_name="vector_embeddings",
