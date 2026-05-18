@@ -573,6 +573,12 @@ class MediaAnalytics(Base):
 # ---------------------------------------------------------------------------
 
 
+    account = relationship(
+        "app.social.models.SocialAccount",
+        back_populates="analytics",
+        lazy="selectin",
+    )
+
 class AIImageAnalysis(Base):
     """
     AI-generated analysis results for a media asset.

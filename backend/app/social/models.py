@@ -489,6 +489,12 @@ class SocialMessage(Base):
         )
 
 
+    conversation = relationship(
+        "app.ai.models.AIConversation",
+        back_populates="messages",
+        lazy="selectin",
+    )
+
 class SocialAnalytic(Base):
     """Daily social media analytics snapshots.
 
@@ -561,6 +567,12 @@ class SocialAnalytic(Base):
     def __repr__(self) -> str:
         return f"<SocialAnalytic(id={self.id}, account_id={self.account_id}, date='{self.metric_date}')>"
 
+
+    media = relationship(
+        "app.media.models.MediaAsset",
+        back_populates="analytics",
+        lazy="selectin",
+    )
 
 class SocialCompetitor(Base):
     """Tracked competitor accounts for competitive analysis.
