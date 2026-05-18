@@ -535,6 +535,13 @@ def upgrade() -> None:
     # --- escalation_rules (EscalationRule) ---
     _create_table_if_not_exists(
         "escalation_rules",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("company_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("name", sa.String(100), nullable=False),
+        sa.Column("conditions", sa.Text(), nullable=True),
+        sa.Column("action", sa.String(50), nullable=False),
+        sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.text("1")),
+        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
         schema=None,
     )
 
@@ -670,12 +677,25 @@ def upgrade() -> None:
     # --- knowledge_base_articles (KnowledgeBaseArticle) ---
     _create_table_if_not_exists(
         "knowledge_base_articles",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("company_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("category_id", sa.Integer(), nullable=True, index=True),
+        sa.Column("title", sa.String(200), nullable=False),
+        sa.Column("content", sa.Text(), nullable=True),
+        sa.Column("is_published", sa.Boolean(), nullable=False, server_default=sa.text("0")),
+        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
         schema=None,
     )
 
     # --- knowledge_base_categories (KnowledgeBaseCategory) ---
     _create_table_if_not_exists(
         "knowledge_base_categories",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("company_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("name", sa.String(100), nullable=False),
+        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("parent_id", sa.Integer(), nullable=True),
+        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
         schema=None,
     )
 
@@ -850,24 +870,51 @@ def upgrade() -> None:
     # --- support_analytics (SupportAnalytics) ---
     _create_table_if_not_exists(
         "support_analytics",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("company_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("metric_type", sa.String(50), nullable=False),
+        sa.Column("metric_value", sa.Float(), nullable=True),
+        sa.Column("period_start", sa.DateTime(), nullable=False),
+        sa.Column("period_end", sa.DateTime(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
         schema=None,
     )
 
     # --- support_macros (SupportMacro) ---
     _create_table_if_not_exists(
         "support_macros",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("company_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("name", sa.String(100), nullable=False),
+        sa.Column("shortcut", sa.String(50), nullable=False),
+        sa.Column("content", sa.Text(), nullable=False),
+        sa.Column("is_active", sa.Boolean(), nullable=False, server_default=sa.text("1")),
+        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
         schema=None,
     )
 
     # --- support_messages (SupportMessage) ---
     _create_table_if_not_exists(
         "support_messages",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("company_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("ticket_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("sender_type", sa.String(20), nullable=False),
+        sa.Column("content", sa.Text(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
         schema=None,
     )
 
     # --- support_tickets (SupportTicket) ---
     _create_table_if_not_exists(
         "support_tickets",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("company_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("subject", sa.String(200), nullable=False),
+        sa.Column("status", sa.String(20), nullable=False, server_default=sa.text("'open'")),
+        sa.Column("priority", sa.String(20), nullable=False, server_default=sa.text("'medium'")),
+        sa.Column("requester_email", sa.String(100), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
         schema=None,
     )
 
