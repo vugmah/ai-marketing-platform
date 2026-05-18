@@ -193,6 +193,12 @@ class BotPattern(Base):
         default=BotRiskLevel.LOW,
         nullable=False,
     )
+    # Relationship back to SocialAccount
+    account = relationship(
+        "app.social.models.SocialAccount",
+        back_populates="bot_patterns",
+        lazy="selectin",
+    )
     signals = Column(
         JSON,
         default=lambda: {
