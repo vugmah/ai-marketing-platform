@@ -142,13 +142,26 @@ async def get_db_context() -> AsyncSession:
 
 
 async def init_db() -> None:
-    """Create all tables. FK errors from ai models are silently ignored."""
-    try:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all, checkfirst=True)
-        logger.info(f"[DB] Tables OK")
-    except Exception as e:
-        logger.exception(f"[DB] init failed: {type(e).__name__}: {e}")
+    """Initialize database: connection check only in staging/prod;
+    create_all only in local/dev. Alembic is the source of truth."""
+    env = os.environ.get("ENVIRONMENT", "development").lower()
+
+    if env in ("staging", "production"):
+        # Staging/prod: create_all KAPALI; Alembic migration tek kaynak
+        try:
+            async with engine.begin() as conn:
+                await conn.execute(sa.text("SELECT 1"))
+            logger.info(f"[DB] Connection OK (create_all skipped in {env}; use Alembic migrations)")
+        except Exception as e:
+            logger.exception(f"[DB] Connection failed: {type(e).__name__}: {e}")
+    else:
+        # Local/dev: create_all açık (hızlı prototyping)
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+            logger.info(f"[DB] Tables OK (create_all in {env})")
+        except Exception as e:
+            logger.exception(f"[DB] init failed: {type(e).__name__}: {e}")
 
 
 async def close_db() -> None:
