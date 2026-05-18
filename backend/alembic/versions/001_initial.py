@@ -152,27 +152,27 @@ def upgrade() -> None:
         # Unique constraints
         sa.UniqueConstraint("slug", name=op.f("uq_companies_slug")),
         # Table args
-        schema="public",
+        schema=None,
         comment="Multi-tenant companies table",
     )
 
     # Indexes on companies
     op.create_index(
-        op.f("ix_companies_id"), "companies", ["id"], unique=False, schema="public"
+        op.f("ix_companies_id"), "companies", ["id"], unique=False, schema=None
     )
     op.create_index(
         op.f("ix_companies_slug"),
         "companies",
         ["slug"],
         unique=True,
-        schema="public",
+        schema=None,
     )
     op.create_index(
         op.f("ix_companies_created_at"),
         "companies",
         ["created_at"],
         unique=False,
-        schema="public",
+        schema=None,
     )
 
     # ------------------------------------------------------------------
@@ -253,7 +253,7 @@ def upgrade() -> None:
         # Foreign key to companies with CASCADE delete
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_branches_company_id"),
             ondelete="CASCADE",
             onupdate="CASCADE",
@@ -263,41 +263,41 @@ def upgrade() -> None:
             "company_id", "slug", name=op.f("uq_branch_company_slug")
         ),
         # Table args
-        schema="public",
+        schema=None,
         comment="Branches belonging to companies",
     )
 
     # Indexes on branches
     op.create_index(
-        op.f("ix_branches_id"), "branches", ["id"], unique=False, schema="public"
+        op.f("ix_branches_id"), "branches", ["id"], unique=False, schema=None
     )
     op.create_index(
         op.f("ix_branches_company_id"),
         "branches",
         ["company_id"],
         unique=False,
-        schema="public",
+        schema=None,
     )
     op.create_index(
         op.f("ix_branches_type"),
         "branches",
         ["type"],
         unique=False,
-        schema="public",
+        schema=None,
     )
     op.create_index(
         op.f("ix_branches_status"),
         "branches",
         ["status"],
         unique=False,
-        schema="public",
+        schema=None,
     )
     op.create_index(
         op.f("ix_branches_created_at"),
         "branches",
         ["created_at"],
         unique=False,
-        schema="public",
+        schema=None,
     )
 
     # ------------------------------------------------------------------
@@ -366,54 +366,54 @@ def upgrade() -> None:
         # Foreign keys
         sa.ForeignKeyConstraint(
             ["company_id"],
-            ["public.companies.id"],
+            ["companies.id"],
             name=op.f("fk_users_company_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         sa.ForeignKeyConstraint(
             ["branch_id"],
-            ["public.branches.id"],
+            ["branches.id"],
             name=op.f("fk_users_branch_id"),
             ondelete="SET NULL",
             onupdate="CASCADE",
         ),
         # Table args
-        schema="public",
+        schema=None,
         comment="User accounts for authentication",
     )
 
     # Indexes on users
     op.create_index(
-        op.f("ix_users_id"), "users", ["id"], unique=False, schema="public"
+        op.f("ix_users_id"), "users", ["id"], unique=False, schema=None
     )
     op.create_index(
         op.f("ix_users_email"),
         "users",
         ["email"],
         unique=True,
-        schema="public",
+        schema=None,
     )
     op.create_index(
         op.f("ix_users_company_id"),
         "users",
         ["company_id"],
         unique=False,
-        schema="public",
+        schema=None,
     )
     op.create_index(
         op.f("ix_users_branch_id"),
         "users",
         ["branch_id"],
         unique=False,
-        schema="public",
+        schema=None,
     )
     op.create_index(
         op.f("ix_users_created_at"),
         "users",
         ["created_at"],
         unique=False,
-        schema="public",
+        schema=None,
     )
 
 
@@ -422,51 +422,51 @@ def downgrade() -> None:
 
     # 1. Drop users table and its indexes
     op.drop_index(
-        op.f("ix_users_created_at"), table_name="users", schema="public"
+        op.f("ix_users_created_at"), table_name="users", schema=None
     )
     op.drop_index(
-        op.f("ix_users_branch_id"), table_name="users", schema="public"
+        op.f("ix_users_branch_id"), table_name="users", schema=None
     )
     op.drop_index(
-        op.f("ix_users_company_id"), table_name="users", schema="public"
+        op.f("ix_users_company_id"), table_name="users", schema=None
     )
     op.drop_index(
-        op.f("ix_users_email"), table_name="users", schema="public"
+        op.f("ix_users_email"), table_name="users", schema=None
     )
     op.drop_index(
-        op.f("ix_users_id"), table_name="users", schema="public"
+        op.f("ix_users_id"), table_name="users", schema=None
     )
-    op.drop_table("users", schema="public")
+    op.drop_table("users", schema=None)
 
     # 2. Drop branches table and its indexes
     op.drop_index(
-        op.f("ix_branches_created_at"), table_name="branches", schema="public"
+        op.f("ix_branches_created_at"), table_name="branches", schema=None
     )
     op.drop_index(
-        op.f("ix_branches_status"), table_name="branches", schema="public"
+        op.f("ix_branches_status"), table_name="branches", schema=None
     )
     op.drop_index(
-        op.f("ix_branches_type"), table_name="branches", schema="public"
+        op.f("ix_branches_type"), table_name="branches", schema=None
     )
     op.drop_index(
-        op.f("ix_branches_company_id"), table_name="branches", schema="public"
+        op.f("ix_branches_company_id"), table_name="branches", schema=None
     )
     op.drop_index(
-        op.f("ix_branches_id"), table_name="branches", schema="public"
+        op.f("ix_branches_id"), table_name="branches", schema=None
     )
-    op.drop_table("branches", schema="public")
+    op.drop_table("branches", schema=None)
 
     # 3. Drop companies table and its indexes
     op.drop_index(
-        op.f("ix_companies_created_at"), table_name="companies", schema="public"
+        op.f("ix_companies_created_at"), table_name="companies", schema=None
     )
     op.drop_index(
-        op.f("ix_companies_slug"), table_name="companies", schema="public"
+        op.f("ix_companies_slug"), table_name="companies", schema=None
     )
     op.drop_index(
-        op.f("ix_companies_id"), table_name="companies", schema="public"
+        op.f("ix_companies_id"), table_name="companies", schema=None
     )
-    op.drop_table("companies", schema="public")
+    op.drop_table("companies", schema=None)
 
     # 4. Drop ENUM types
     sa.Enum(name="userstatus").drop(op.get_bind(), checkfirst=True)

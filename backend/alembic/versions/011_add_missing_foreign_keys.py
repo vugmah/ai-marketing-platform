@@ -26,7 +26,7 @@ def upgrade():
     op.add_column(
         "ad_campaigns",
         sa.Column("platform_account_id", sa.Integer(), nullable=True, index=True),
-        schema="public",
+        schema=None,
     )
     op.create_foreign_key(
         "fk_ad_campaigns_platform_account_id",
@@ -36,15 +36,15 @@ def upgrade():
         ["id"],
         ondelete="SET NULL",
         onupdate="CASCADE",
-        source_schema="public",
-        referent_schema="public",
+        source_schema=None,
+        referent_schema=None,
     )
 
     # 2. ad_audiences.platform_account_id
     op.add_column(
         "ad_audiences",
         sa.Column("platform_account_id", sa.Integer(), nullable=True, index=True),
-        schema="public",
+        schema=None,
     )
     op.create_foreign_key(
         "fk_ad_audiences_platform_account_id",
@@ -54,8 +54,8 @@ def upgrade():
         ["id"],
         ondelete="SET NULL",
         onupdate="CASCADE",
-        source_schema="public",
-        referent_schema="public",
+        source_schema=None,
+        referent_schema=None,
     )
 
     # 3. ai_conversations.prompt_id -> ai_prompts.id FK
@@ -67,8 +67,8 @@ def upgrade():
         ["id"],
         ondelete="SET NULL",
         onupdate="CASCADE",
-        source_schema="public",
-        referent_schema="public",
+        source_schema=None,
+        referent_schema=None,
     )
 
     # 4. ai_messages.conversation_id -> ai_conversations.id FK
@@ -80,8 +80,8 @@ def upgrade():
         ["id"],
         ondelete="CASCADE",
         onupdate="CASCADE",
-        source_schema="public",
-        referent_schema="public",
+        source_schema=None,
+        referent_schema=None,
     )
 
 
@@ -90,29 +90,29 @@ def downgrade():
     op.drop_constraint(
         "fk_ai_messages_conversation_id",
         "ai_messages",
-        schema="public",
+        schema=None,
         type_="foreignkey",
     )
     # 3
     op.drop_constraint(
         "fk_ai_conversations_prompt_id",
         "ai_conversations",
-        schema="public",
+        schema=None,
         type_="foreignkey",
     )
     # 2
     op.drop_constraint(
         "fk_ad_audiences_platform_account_id",
         "ad_audiences",
-        schema="public",
+        schema=None,
         type_="foreignkey",
     )
-    op.drop_column("ad_audiences", "platform_account_id", schema="public")
+    op.drop_column("ad_audiences", "platform_account_id", schema=None)
     # 1
     op.drop_constraint(
         "fk_ad_campaigns_platform_account_id",
         "ad_campaigns",
-        schema="public",
+        schema=None,
         type_="foreignkey",
     )
-    op.drop_column("ad_campaigns", "platform_account_id", schema="public")
+    op.drop_column("ad_campaigns", "platform_account_id", schema=None)

@@ -50,7 +50,7 @@ def upgrade() -> None:
             "company_id",
             sa.Integer,
             sa.ForeignKey(
-                "public.companies.id",
+                "companies.id",
                 ondelete="CASCADE",
                 name="fk_vector_embeddings_company_id",
             ),
@@ -60,7 +60,7 @@ def upgrade() -> None:
             "branch_id",
             sa.Integer,
             sa.ForeignKey(
-                "public.branches.id",
+                "branches.id",
                 ondelete="SET NULL",
                 name="fk_vector_embeddings_branch_id",
             ),
@@ -88,7 +88,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name="pk_vector_embeddings"),
         sa.UniqueConstraint("id", name="uq_vector_embeddings_id"),
-        schema="public",
+        schema=None,
     )
 
     # Create indexes
@@ -96,31 +96,31 @@ def upgrade() -> None:
         "ix_vector_embeddings_entity_type",
         "vector_embeddings",
         ["entity_type"],
-        schema="public",
+        schema=None,
     )
     op.create_index(
         "ix_vector_embeddings_entity_id",
         "vector_embeddings",
         ["entity_id"],
-        schema="public",
+        schema=None,
     )
     op.create_index(
         "ix_vector_embeddings_company_id",
         "vector_embeddings",
         ["company_id"],
-        schema="public",
+        schema=None,
     )
     op.create_index(
         "ix_vector_embeddings_branch_id",
         "vector_embeddings",
         ["branch_id"],
-        schema="public",
+        schema=None,
     )
     op.create_index(
         "ix_vector_embeddings_created_at",
         "vector_embeddings",
         ["created_at"],
-        schema="public",
+        schema=None,
     )
 
     # Composite index for common queries
@@ -128,14 +128,14 @@ def upgrade() -> None:
         "ix_vector_embeddings_company_entity",
         "vector_embeddings",
         ["company_id", "entity_type", "entity_id"],
-        schema="public",
+        schema=None,
     )
 
     # GIN index on metadata for JSON filtering
     op.execute(
         """
         CREATE INDEX IF NOT EXISTS ix_vector_embeddings_metadata
-        ON public.vector_embeddings
+        ON vector_embeddings
         USING GIN (metadata jsonb_path_ops)
         """
     )
@@ -146,36 +146,36 @@ def downgrade() -> None:
     op.drop_index(
         "ix_vector_embeddings_metadata",
         table_name="vector_embeddings",
-        schema="public",
+        schema=None,
     )
     op.drop_index(
         "ix_vector_embeddings_company_entity",
         table_name="vector_embeddings",
-        schema="public",
+        schema=None,
     )
     op.drop_index(
         "ix_vector_embeddings_created_at",
         table_name="vector_embeddings",
-        schema="public",
+        schema=None,
     )
     op.drop_index(
         "ix_vector_embeddings_branch_id",
         table_name="vector_embeddings",
-        schema="public",
+        schema=None,
     )
     op.drop_index(
         "ix_vector_embeddings_company_id",
         table_name="vector_embeddings",
-        schema="public",
+        schema=None,
     )
     op.drop_index(
         "ix_vector_embeddings_entity_id",
         table_name="vector_embeddings",
-        schema="public",
+        schema=None,
     )
     op.drop_index(
         "ix_vector_embeddings_entity_type",
         table_name="vector_embeddings",
-        schema="public",
+        schema=None,
     )
-    op.drop_table("vector_embeddings", schema="public")
+    op.drop_table("vector_embeddings", schema=None)
