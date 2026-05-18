@@ -440,6 +440,11 @@ class AudienceDemographics(Base):
         onupdate=func.now(),
         nullable=False,
     )
+    account = relationship(
+        "app.social.models.SocialAccount",
+        back_populates="demographics",
+        lazy="selectin",
+    )
 
     def __repr__(self) -> str:
         return (
@@ -548,6 +553,11 @@ class EngagementQuality(Base):
         nullable=False,
     )
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    account = relationship(
+        "app.social.models.SocialAccount",
+        back_populates="engagement_quality",
+        lazy="selectin",
+    )
 
     def __repr__(self) -> str:
         return (
@@ -645,6 +655,11 @@ class FollowerHealthScore(Base):
         nullable=False,
     )
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
+    account = relationship(
+        "app.social.models.SocialAccount",
+        back_populates="follower_health_scores",
+        lazy="selectin",
+    )
 
     def __repr__(self) -> str:
         return (
@@ -748,6 +763,11 @@ class FollowerInsight(Base):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False,
+    )
+    account = relationship(
+        "app.social.models.SocialAccount",
+        back_populates="follower_insights",
+        lazy="selectin",
     )
 
     def __repr__(self) -> str:
@@ -863,6 +883,11 @@ class AIAudienceRecommendation(Base):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False,
+    )
+    account = relationship(
+        "app.social.models.SocialAccount",
+        back_populates="ai_audience_recommendations",
+        lazy="selectin",
     )
 
     def __repr__(self) -> str:

@@ -170,6 +170,13 @@ class SocialAccount(Base):
     comments = relationship("SocialComment", back_populates="account", cascade="all, delete-orphan")
     messages = relationship("SocialMessage", back_populates="account", cascade="all, delete-orphan")
     analytics = relationship("SocialAnalytic", back_populates="account", cascade="all, delete-orphan")
+    demographics = relationship("AudienceDemographics", back_populates="account", lazy="selectin")
+    engagement_quality = relationship("EngagementQuality", back_populates="account", lazy="selectin")
+    follower_health_scores = relationship("FollowerHealthScore", back_populates="account", lazy="selectin")
+    ai_audience_recommendations = relationship("AIAudienceRecommendation", back_populates="account", lazy="selectin")
+    follower_insights = relationship("FollowerInsight", back_populates="account", lazy="selectin")
+    suspicious_activities = relationship("SuspiciousActivity", back_populates="account", lazy="selectin")
+    bot_patterns = relationship("BotPattern", back_populates="account", lazy="selectin")
 
     # Follower Intelligence relationships
     follower_snapshots = relationship(
@@ -488,12 +495,6 @@ class SocialMessage(Base):
             f"direction='{self.direction}')>"
         )
 
-
-    conversation = relationship(
-        "app.ai.models.AIConversation",
-        back_populates="messages",
-        lazy="selectin",
-    )
 
 class SocialAnalytic(Base):
     """Daily social media analytics snapshots.
