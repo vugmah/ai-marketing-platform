@@ -47,7 +47,7 @@ def upgrade() -> None:
     )
     op.add_column(
         "companies",
-        sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="false"),
+        sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
     )
     op.create_index(
@@ -77,7 +77,7 @@ def upgrade() -> None:
     )
     op.add_column(
         "branches",
-        sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="false"),
+        sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
     )
     op.add_column(
@@ -130,7 +130,7 @@ def upgrade() -> None:
     )
     op.add_column(
         "users",
-        sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="false"),
+        sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
     )
     op.create_index(
