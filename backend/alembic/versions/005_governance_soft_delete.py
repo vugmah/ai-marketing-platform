@@ -77,14 +77,14 @@ def _create_index_if_not_exists(index_name, table_name, columns, unique=False, s
     """Create an index only when it does not already exist."""
     if _index_exists(table_name, index_name, schema=schema):
         return
-    _create_index_if_not_exists(index_name, table_name, columns, unique=unique, schema=schema)
+    op.create_index(index_name, table_name, columns, unique=unique, schema=schema)
 
 
 def _drop_index_if_exists(index_name, table_name, schema=None):
     """Drop an index only when it exists."""
     if not _index_exists(table_name, index_name, schema=schema):
         return
-    _drop_index_if_exists(index_name, table_name, schema=schema)
+    op.drop_index(index_name, table_name=table_name, schema=schema)
 
 
 def upgrade() -> None:
