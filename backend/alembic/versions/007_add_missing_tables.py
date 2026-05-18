@@ -209,6 +209,14 @@ def upgrade() -> None:
     # --- ai_reply_audit_logs (AIReplyAuditLog) ---
     op.create_table(
         "ai_reply_audit_logs",
+        sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+        sa.Column("company_id", sa.Integer(), nullable=False, index=True),
+        sa.Column("content_type", sa.String(50), nullable=False),
+        sa.Column("original_content", sa.Text(), nullable=True),
+        sa.Column("ai_reply", sa.Text(), nullable=True),
+        sa.Column("model", sa.String(50), nullable=True),
+        sa.Column("tokens_used", sa.Integer(), nullable=True, server_default=sa.text("0")),
+        sa.Column("created_at", sa.DateTime(), nullable=False, server_default=sa.text("CURRENT_TIMESTAMP")),
         schema=None,
     )
 
