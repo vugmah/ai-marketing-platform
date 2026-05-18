@@ -80,7 +80,7 @@ async def register_user(data: UserRegister) -> UserResponse:
                 password_hash=hash_password(data.password),
                 first_name=data.first_name,
                 last_name=data.last_name,
-                role="user",
+                role="company_admin",
                 company_id=None,
                 branch_id=None,
                 is_active=True,
