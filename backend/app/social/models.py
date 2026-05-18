@@ -122,7 +122,7 @@ class SocialAccount(Base):
     __table_args__ = (
         Index("ix_social_accounts_company_platform", "company_id", "platform"),
         Index("ix_social_accounts_branch", "branch_id", "company_id"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -251,7 +251,7 @@ class SocialPost(Base):
     __table_args__ = (
         Index("ix_social_posts_company_status", "company_id", "status"),
         Index("ix_social_posts_account", "account_id", "status"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -342,7 +342,7 @@ class SocialComment(Base):
     __table_args__ = (
         Index("ix_social_comments_company_status", "company_id", "status"),
         Index("ix_social_comments_post", "post_id", "created_at"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -425,7 +425,7 @@ class SocialMessage(Base):
     __table_args__ = (
         Index("ix_social_messages_company_conv", "company_id", "external_conversation_id"),
         Index("ix_social_messages_account", "account_id", "created_at"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -516,7 +516,7 @@ class SocialAnalytic(Base):
     __table_args__ = (
         Index("ix_social_analytics_account_date", "account_id", "metric_date"),
         Index("ix_social_analytics_company_date", "company_id", "metric_date"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -584,7 +584,7 @@ class SocialCompetitor(Base):
     __tablename__ = "social_competitors"
     __table_args__ = (
         Index("ix_social_competitors_company", "company_id", "platform"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -661,7 +661,7 @@ class PublishingQueue(Base):
     __table_args__ = (
         Index("ix_publishing_queue_company_status", "company_id", "status"),
         Index("ix_publishing_queue_scheduled", "scheduled_at", "status"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -739,7 +739,7 @@ class SocialListening(Base):
     __table_args__ = (
         Index("ix_social_listening_company", "company_id", "is_active"),
         Index("ix_social_listening_target", "platform", "listen_type", "target"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -803,7 +803,7 @@ class HashtagIntelligence(Base):
     __table_args__ = (
         Index("ix_hashtag_intel_company", "company_id", "platform"),
         Index("ix_hashtag_intel_trend", "trend_direction", "engagement_avg"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -865,7 +865,7 @@ class SocialWebhook(Base):
     __table_args__ = (
         Index("ix_social_webhooks_company", "company_id", "processed"),
         Index("ix_social_webhooks_platform_event", "platform", "event_type"),
-        {"schema": "public"},
+        {"schema": None},
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
