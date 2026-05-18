@@ -26,28 +26,33 @@ branch_labels: Union[Sequence[str], None] = None
 depends_on: Union[Sequence[str], None] = None
 
 
-def _column_exists(table_name: str, column_name: str, schema=None) -> bool:
-    """Return True if *column_name* already exists on *table_name*."""
-    bind = op.get_bind()
-    try:
-        existing = [c["name"] for c in inspect(bind).get_columns(table_name, schema=schema)]
-    except Exception:
-        return False
-    return column_name in existing
+_col_cache: dict = {}
+
+
+def _get_existing_columns(table_name: str, schema=None) -> list:
+    """Return cached column names for *table_name* (one DB round-trip per table)."""
+    key = (table_name, schema)
+    if key not in _col_cache:
+        bind = op.get_bind()
+        try:
+            _col_cache[key] = [c["name"] for c in inspect(bind).get_columns(table_name, schema=schema)]
+        except Exception:
+            _col_cache[key] = []
+    return _col_cache[key]
 
 
 def _add_column_if_not_exists(table_name, column, schema=None):
     """Add a column only when it does not already exist."""
-    if _column_exists(table_name, column.name, schema=schema):
+    if column.name in _get_existing_columns(table_name, schema=schema):
         return
-    _add_column_if_not_exists(table_name, column, schema=schema)
+    op.add_column(table_name, column, schema=schema)
 
 
 def _drop_column_if_exists(table_name, column_name, schema=None):
     """Drop a column only when it exists."""
-    if not _column_exists(table_name, column_name, schema=schema):
+    if column_name not in _get_existing_columns(table_name, schema=schema):
         return
-    _drop_column_if_exists(table_name, column_name, schema=schema)
+    op.drop_column(table_name, column_name, schema=schema)
 
 
 def upgrade() -> None:
