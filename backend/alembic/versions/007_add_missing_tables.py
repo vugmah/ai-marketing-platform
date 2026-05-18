@@ -11,7 +11,7 @@ from typing import Sequence, Union
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 
 # revision identifiers, used by Alembic.
 revision: str = "007"
@@ -41,6 +41,30 @@ def _drop_table_if_exists(name, **kwargs):
     if not _table_exists(name):
         return
     op.drop_table(name, **kwargs)
+
+
+def _index_exists(table_name: str, index_name: str, schema=None) -> bool:
+    """Return True if *index_name* already exists on *table_name*."""
+    bind = op.get_bind()
+    try:
+        indexes = inspect(bind).get_indexes(table_name, schema=schema)
+    except Exception:
+        return False
+    return any(idx.get("name") == index_name for idx in indexes)
+
+
+def _create_index_if_not_exists(index_name, table_name, columns, unique=False, schema=None):
+    """Create an index only when it does not already exist."""
+    if _index_exists(table_name, index_name, schema=schema):
+        return
+    op.create_index(index_name, table_name, columns, unique=unique, schema=schema)
+
+
+def _drop_index_if_exists(index_name, table_name, schema=None):
+    """Drop an index only when it exists."""
+    if not _index_exists(table_name, index_name, schema=schema):
+        return
+    op.drop_index(index_name, table_name=table_name, schema=schema)
 
 
 def upgrade() -> None:
@@ -226,8 +250,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_ai_rec_company", "ai_audience_recommendations", ["company_id", "recommendation_type"])
-    op.create_index("ix_ai_rec_account", "ai_audience_recommendations", ["account_id", "generated_at"])
+    _create_index_if_not_exists("ix_ai_rec_company", "ai_audience_recommendations", ["company_id", "recommendation_type"])
+    _create_index_if_not_exists("ix_ai_rec_account", "ai_audience_recommendations", ["account_id", "generated_at"])
 
     # --- ai_reply_audit_logs (AIReplyAuditLog) ---
     _create_table_if_not_exists(
@@ -262,7 +286,7 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("uq_analytics_snapshots_company_branch_report_date", "analytics_snapshots", ["company_id", "branch_id", "report_type", "snapshot_date"], unique=True)
+    _create_index_if_not_exists("uq_analytics_snapshots_company_branch_report_date", "analytics_snapshots", ["company_id", "branch_id", "report_type", "snapshot_date"], unique=True)
 
     # --- approval_requests (ApprovalRequest) ---
     _create_table_if_not_exists(
@@ -312,8 +336,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_audience_demo_account", "audience_demographics", ["account_id", "analysis_date"])
-    op.create_index("ix_audience_demo_company", "audience_demographics", ["company_id", "platform"])
+    _create_index_if_not_exists("ix_audience_demo_account", "audience_demographics", ["account_id", "analysis_date"])
+    _create_index_if_not_exists("ix_audience_demo_company", "audience_demographics", ["company_id", "platform"])
 
     # --- bot_patterns (BotPattern) ---
     _create_table_if_not_exists(
@@ -343,9 +367,9 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_bot_patterns_company_risk", "bot_patterns", ["company_id", "risk_level"])
-    op.create_index("ix_bot_patterns_account", "bot_patterns", ["account_id", "detected_at"])
-    op.create_index("ix_bot_patterns_score", "bot_patterns", ["bot_score"])
+    _create_index_if_not_exists("ix_bot_patterns_company_risk", "bot_patterns", ["company_id", "risk_level"])
+    _create_index_if_not_exists("ix_bot_patterns_account", "bot_patterns", ["account_id", "detected_at"])
+    _create_index_if_not_exists("ix_bot_patterns_score", "bot_patterns", ["bot_score"])
 
     # --- branch_brand_identities (BranchBrandIdentity) ---
     _create_table_if_not_exists(
@@ -372,7 +396,7 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("uq_branch_brand_identity", "branch_brand_identities", ["branch_id"], unique=True)
+    _create_index_if_not_exists("uq_branch_brand_identity", "branch_brand_identities", ["branch_id"], unique=True)
 
     # --- brand_colors (BrandColor) ---
     _create_table_if_not_exists(
@@ -392,7 +416,7 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("uq_brand_color", "brand_colors", ["company_id", "branch_id", "hex_code", "usage_area"], unique=True)
+    _create_index_if_not_exists("uq_brand_color", "brand_colors", ["company_id", "branch_id", "hex_code", "usage_area"], unique=True)
 
     # --- brand_profiles (BrandProfile) ---
     _create_table_if_not_exists(
@@ -412,8 +436,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_brand_company_type", "brand_profiles", ["company_id", "attribute_type"])
-    op.create_index("uq_brand_attr", "brand_profiles", ["company_id", "branch_id", "attribute_type", "attribute_key"], unique=True)
+    _create_index_if_not_exists("ix_brand_company_type", "brand_profiles", ["company_id", "attribute_type"])
+    _create_index_if_not_exists("uq_brand_attr", "brand_profiles", ["company_id", "branch_id", "attribute_type", "attribute_key"], unique=True)
 
     # --- campaign_insights (CampaignInsight) ---
     _create_table_if_not_exists(
@@ -451,9 +475,9 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_campaign_company_type", "campaign_insights", ["company_id", "campaign_type"])
-    op.create_index("ix_campaign_platform", "campaign_insights", ["platform"])
-    op.create_index("ix_campaign_kb", "campaign_insights", ["knowledge_base_id"])
+    _create_index_if_not_exists("ix_campaign_company_type", "campaign_insights", ["company_id", "campaign_type"])
+    _create_index_if_not_exists("ix_campaign_platform", "campaign_insights", ["platform"])
+    _create_index_if_not_exists("ix_campaign_kb", "campaign_insights", ["knowledge_base_id"])
 
     # --- creative_audits (CreativeAudit) ---
     _create_table_if_not_exists(
@@ -476,7 +500,7 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("uq_creative_audit_media", "creative_audits", ["media_id"], unique=True)
+    _create_index_if_not_exists("uq_creative_audit_media", "creative_audits", ["media_id"], unique=True)
 
     # --- engagement_qualities (EngagementQuality) ---
     _create_table_if_not_exists(
@@ -505,8 +529,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_engagement_quality_account_period", "engagement_qualities", ["account_id", "period_start"])
-    op.create_index("ix_engagement_quality_post", "engagement_qualities", ["post_id"])
+    _create_index_if_not_exists("ix_engagement_quality_account_period", "engagement_qualities", ["account_id", "period_start"])
+    _create_index_if_not_exists("ix_engagement_quality_post", "engagement_qualities", ["post_id"])
 
     # --- escalation_rules (EscalationRule) ---
     _create_table_if_not_exists(
@@ -564,8 +588,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_follower_health_account_date", "follower_health_scores", ["account_id", "score_date"])
-    op.create_index("ix_follower_health_company_status", "follower_health_scores", ["company_id", "status"])
+    _create_index_if_not_exists("ix_follower_health_account_date", "follower_health_scores", ["account_id", "score_date"])
+    _create_index_if_not_exists("ix_follower_health_company_status", "follower_health_scores", ["company_id", "status"])
 
     # --- follower_insights (FollowerInsight) ---
     _create_table_if_not_exists(
@@ -594,9 +618,9 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_follower_insights_account", "follower_insights", ["account_id", "analyzed_at"])
-    op.create_index("ix_follower_insights_bot", "follower_insights", ["bot_score"])
-    op.create_index("ix_follower_insights_flagged", "follower_insights", ["is_flagged"])
+    _create_index_if_not_exists("ix_follower_insights_account", "follower_insights", ["account_id", "analyzed_at"])
+    _create_index_if_not_exists("ix_follower_insights_bot", "follower_insights", ["bot_score"])
+    _create_index_if_not_exists("ix_follower_insights_flagged", "follower_insights", ["is_flagged"])
 
     # --- follower_snapshots (FollowerSnapshot) ---
     _create_table_if_not_exists(
@@ -616,8 +640,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_follower_snapshots_account_date", "follower_snapshots", ["account_id", "snapshot_date"])
-    op.create_index("ix_follower_snapshots_company_platform", "follower_snapshots", ["company_id", "platform"])
+    _create_index_if_not_exists("ix_follower_snapshots_account_date", "follower_snapshots", ["account_id", "snapshot_date"])
+    _create_index_if_not_exists("ix_follower_snapshots_company_platform", "follower_snapshots", ["company_id", "platform"])
 
     # --- ingestion_jobs (IngestionJob) ---
     _create_table_if_not_exists(
@@ -640,8 +664,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_job_status_type", "ingestion_jobs", ["status", "job_type"])
-    op.create_index("ix_job_company", "ingestion_jobs", ["company_id"])
+    _create_index_if_not_exists("ix_job_status_type", "ingestion_jobs", ["status", "job_type"])
+    _create_index_if_not_exists("ix_job_company", "ingestion_jobs", ["company_id"])
 
     # --- knowledge_base_articles (KnowledgeBaseArticle) ---
     _create_table_if_not_exists(
@@ -680,9 +704,9 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_kb_company_branch", "knowledge_bases", ["company_id", "branch_id"])
-    op.create_index("ix_kb_status", "knowledge_bases", ["status"])
-    op.create_index("ix_kb_source_type", "knowledge_bases", ["source_type"])
+    _create_index_if_not_exists("ix_kb_company_branch", "knowledge_bases", ["company_id", "branch_id"])
+    _create_index_if_not_exists("ix_kb_status", "knowledge_bases", ["status"])
+    _create_index_if_not_exists("ix_kb_source_type", "knowledge_bases", ["source_type"])
 
     # --- knowledge_chunks (KnowledgeChunk) ---
     _create_table_if_not_exists(
@@ -706,8 +730,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_chunk_kb_seq", "knowledge_chunks", ["knowledge_base_id", "sequence"])
-    op.create_index("ix_chunk_company_type", "knowledge_chunks", ["company_id", "chunk_type"])
+    _create_index_if_not_exists("ix_chunk_kb_seq", "knowledge_chunks", ["knowledge_base_id", "sequence"])
+    _create_index_if_not_exists("ix_chunk_company_type", "knowledge_chunks", ["company_id", "chunk_type"])
 
     # --- knowledge_embeddings (KnowledgeEmbedding) ---
     _create_table_if_not_exists(
@@ -725,8 +749,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_emb_company_model", "knowledge_embeddings", ["company_id", "embedding_model"])
-    op.create_index("ix_emb_kb_id", "knowledge_embeddings", ["knowledge_base_id"])
+    _create_index_if_not_exists("ix_emb_company_model", "knowledge_embeddings", ["company_id", "embedding_model"])
+    _create_index_if_not_exists("ix_emb_kb_id", "knowledge_embeddings", ["knowledge_base_id"])
 
     # --- social_hashtag_intelligence (HashtagIntelligence) ---
     _create_table_if_not_exists(
@@ -747,8 +771,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_hashtag_intel_company", "social_hashtag_intelligence", ["company_id", "platform"])
-    op.create_index("ix_hashtag_intel_trend", "social_hashtag_intelligence", ["trend_direction", "engagement_avg"])
+    _create_index_if_not_exists("ix_hashtag_intel_company", "social_hashtag_intelligence", ["company_id", "platform"])
+    _create_index_if_not_exists("ix_hashtag_intel_trend", "social_hashtag_intelligence", ["trend_direction", "engagement_avg"])
 
     # --- social_listening (SocialListening) ---
     _create_table_if_not_exists(
@@ -769,8 +793,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_social_listening_company", "social_listening", ["company_id", "is_active"])
-    op.create_index("ix_social_listening_target", "social_listening", ["platform", "listen_type", "target"])
+    _create_index_if_not_exists("ix_social_listening_company", "social_listening", ["company_id", "is_active"])
+    _create_index_if_not_exists("ix_social_listening_target", "social_listening", ["platform", "listen_type", "target"])
 
     # --- social_post_learning (SocialPostLearning) ---
     _create_table_if_not_exists(
@@ -796,8 +820,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_social_company_tone", "social_post_learning", ["company_id", "tone_label"])
-    op.create_index("ix_social_platform", "social_post_learning", ["platform"])
+    _create_index_if_not_exists("ix_social_company_tone", "social_post_learning", ["company_id", "tone_label"])
+    _create_index_if_not_exists("ix_social_platform", "social_post_learning", ["platform"])
 
     # --- social_publishing_queue (PublishingQueue) ---
     _create_table_if_not_exists(
@@ -820,8 +844,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_publishing_queue_company_status", "social_publishing_queue", ["company_id", "status"])
-    op.create_index("ix_publishing_queue_scheduled", "social_publishing_queue", ["scheduled_at", "status"])
+    _create_index_if_not_exists("ix_publishing_queue_company_status", "social_publishing_queue", ["company_id", "status"])
+    _create_index_if_not_exists("ix_publishing_queue_scheduled", "social_publishing_queue", ["scheduled_at", "status"])
 
     # --- support_analytics (SupportAnalytics) ---
     _create_table_if_not_exists(
@@ -870,9 +894,9 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_suspicious_activity_company", "suspicious_activities", ["company_id", "alert_type"])
-    op.create_index("ix_suspicious_activity_account", "suspicious_activities", ["account_id", "start_date"])
-    op.create_index("ix_suspicious_activity_severity", "suspicious_activities", ["severity"])
+    _create_index_if_not_exists("ix_suspicious_activity_company", "suspicious_activities", ["company_id", "alert_type"])
+    _create_index_if_not_exists("ix_suspicious_activity_account", "suspicious_activities", ["account_id", "start_date"])
+    _create_index_if_not_exists("ix_suspicious_activity_severity", "suspicious_activities", ["severity"])
 
     # --- visual_assets (VisualAsset) ---
     _create_table_if_not_exists(
@@ -900,8 +924,8 @@ def upgrade() -> None:
         schema=None,
     )
 
-    op.create_index("ix_visual_company_brand", "visual_assets", ["company_id", "is_brand_asset"])
-    op.create_index("ix_visual_kb", "visual_assets", ["knowledge_base_id"])
+    _create_index_if_not_exists("ix_visual_company_brand", "visual_assets", ["company_id", "is_brand_asset"])
+    _create_index_if_not_exists("ix_visual_kb", "visual_assets", ["knowledge_base_id"])
 
 
 
