@@ -55,6 +55,38 @@ def _drop_column_if_exists(table_name, column_name, schema=None):
     op.drop_column(table_name, column_name, schema=schema)
 
 
+_idx_cache: dict = {}
+
+
+def _index_exists(table_name: str, index_name: str, schema=None) -> bool:
+    """Return True if *index_name* already exists on *table_name*."""
+    key = (table_name, index_name, schema)
+    if key not in _idx_cache:
+        bind = op.get_bind()
+        try:
+            _idx_cache[key] = any(
+                idx.get("name") == index_name
+                for idx in inspect(bind).get_indexes(table_name, schema=schema)
+            )
+        except Exception:
+            _idx_cache[key] = False
+    return _idx_cache[key]
+
+
+def _create_index_if_not_exists(index_name, table_name, columns, unique=False, schema=None):
+    """Create an index only when it does not already exist."""
+    if _index_exists(table_name, index_name, schema=schema):
+        return
+    _create_index_if_not_exists(index_name, table_name, columns, unique=unique, schema=schema)
+
+
+def _drop_index_if_exists(index_name, table_name, schema=None):
+    """Drop an index only when it exists."""
+    if not _index_exists(table_name, index_name, schema=schema):
+        return
+    _drop_index_if_exists(index_name, table_name, schema=schema)
+
+
 def upgrade() -> None:
     """Apply governance and soft-delete migration."""
     # -------------------------------------------------------------------------
@@ -80,10 +112,10 @@ def upgrade() -> None:
         sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_companies_deleted_at", "companies", ["deleted_at"], schema=None
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_companies_is_deleted", "companies", ["is_deleted"], schema=None
     )
 
@@ -130,13 +162,13 @@ def upgrade() -> None:
         sa.Column("is_archived", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_branches_deleted_at", "branches", ["deleted_at"], schema=None
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_branches_is_deleted", "branches", ["is_deleted"], schema=None
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_branches_is_archived", "branches", ["is_archived"], schema=None
     )
 
@@ -163,10 +195,10 @@ def upgrade() -> None:
         sa.Column("is_deleted", sa.Boolean(), nullable=False, server_default="0"),
         schema=None,
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_users_deleted_at", "users", ["deleted_at"], schema=None
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_users_is_deleted", "users", ["is_deleted"], schema=None
     )
 
@@ -220,19 +252,19 @@ def upgrade() -> None:
         schema=None,
         comment="GDPR/KVKK data export request tracking",
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_gdpr_export_requests_company_id",
         "gdpr_export_requests",
         ["company_id"],
         schema=None,
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_gdpr_export_requests_user_id",
         "gdpr_export_requests",
         ["user_id"],
         schema=None,
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_gdpr_export_requests_status",
         "gdpr_export_requests",
         ["status"],
@@ -289,19 +321,19 @@ def upgrade() -> None:
         schema=None,
         comment="GDPR/KVKK data deletion request tracking",
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_gdpr_deletion_requests_company_id",
         "gdpr_deletion_requests",
         ["company_id"],
         schema=None,
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_gdpr_deletion_requests_user_id",
         "gdpr_deletion_requests",
         ["user_id"],
         schema=None,
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_gdpr_deletion_requests_status",
         "gdpr_deletion_requests",
         ["status"],
@@ -332,13 +364,13 @@ def upgrade() -> None:
         schema=None,
         comment="Retention policy execution audit log",
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_retention_policy_runs_policy_name",
         "retention_policy_runs",
         ["policy_name"],
         schema=None,
     )
-    op.create_index(
+    _create_index_if_not_exists(
         "ix_retention_policy_runs_created_at",
         "retention_policy_runs",
         ["created_at"],
@@ -365,16 +397,16 @@ def downgrade() -> None:
     op.execute("DROP TYPE IF EXISTS retentionrunstatus CASCADE")
 
     # Remove soft-delete columns from users
-    op.drop_index("ix_users_is_deleted", table_name="users", schema=None)
-    op.drop_index("ix_users_deleted_at", table_name="users", schema=None)
+    _drop_index_if_exists("ix_users_is_deleted", "users", schema=None)
+    _drop_index_if_exists("ix_users_deleted_at", "users", schema=None)
     _drop_column_if_exists("users", "is_deleted", schema=None)
     _drop_column_if_exists("users", "deleted_by", schema=None)
     _drop_column_if_exists("users", "deleted_at", schema=None)
 
     # Remove soft-delete/archive columns from branches
-    op.drop_index("ix_branches_is_archived", table_name="branches", schema=None)
-    op.drop_index("ix_branches_is_deleted", table_name="branches", schema=None)
-    op.drop_index("ix_branches_deleted_at", table_name="branches", schema=None)
+    _drop_index_if_exists("ix_branches_is_archived", "branches", schema=None)
+    _drop_index_if_exists("ix_branches_is_deleted", "branches", schema=None)
+    _drop_index_if_exists("ix_branches_deleted_at", "branches", schema=None)
     _drop_column_if_exists("branches", "is_archived", schema=None)
     _drop_column_if_exists("branches", "archived_by", schema=None)
     _drop_column_if_exists("branches", "archived_at", schema=None)
@@ -383,8 +415,8 @@ def downgrade() -> None:
     _drop_column_if_exists("branches", "deleted_at", schema=None)
 
     # Remove soft-delete columns from companies
-    op.drop_index("ix_companies_is_deleted", table_name="companies", schema=None)
-    op.drop_index("ix_companies_deleted_at", table_name="companies", schema=None)
+    _drop_index_if_exists("ix_companies_is_deleted", "companies", schema=None)
+    _drop_index_if_exists("ix_companies_deleted_at", "companies", schema=None)
     _drop_column_if_exists("companies", "is_deleted", schema=None)
     _drop_column_if_exists("companies", "deleted_by", schema=None)
     _drop_column_if_exists("companies", "deleted_at", schema=None)
