@@ -19,24 +19,25 @@ def import_all_models():
     This ensures cross-module ForeignKeys resolve correctly during mapper
     configuration (e.g. follower_snapshots.account_id -> social_accounts.id).
     """
-    # Order matters: target FK tables must be imported before referencing tables
+    # Order matters: target FK tables must be imported BEFORE referencing tables.
+    # User references Company/Branch → Company/Branch must come BEFORE app.auth.
     modules = [
-        "app.auth.models",          # users, roles, permissions
-        "app.companies.models",     # companies
-        "app.branches.models",      # branches
-        "app.social.models",        # social_accounts ← MUST be before followers
-        "app.ai.models",            # ai_prompts, ai_conversations, ai_messages
-        "app.ads.models",           # ad_platforms, ad_campaigns, ad_audiences
-        "app.billing.models",       # subscription_plans, invoices
-        "app.media.models",         # media_assets
-        "app.analytics.models",     # analytics_snapshots
-        "app.followers.models",     # followers, follower_snapshots (refs social_accounts)
-        "app.reports.models",       # report_templates
-        "app.governance.models",    # gdpr_export_requests
-        "app.support.models",       # support_tickets
-        "app.events.models",        # event_log
-        "app.erp.models",           # erp_connections
-        "app.knowledge.models",     # knowledge_base_articles
+        "app.companies.models",     # Company (User.company FK refs this)
+        "app.branches.models",      # Branch (User.branch FK refs this)
+        "app.social.models",        # SocialAccount (followers FK refs this)
+        "app.ai.models",            # AIPrompt, AIConversation, AIMessage
+        "app.ads.models",           # AdPlatform, AdCampaign, AdAudience
+        "app.billing.models",       # SubscriptionPlan, Invoice
+        "app.media.models",         # MediaAsset
+        "app.analytics.models",     # AnalyticsSnapshot
+        "app.followers.models",     # Follower, FollowerSnapshot
+        "app.reports.models",       # ReportTemplate
+        "app.governance.models",    # GDPRExportRequest
+        "app.support.models",       # SupportTicket
+        "app.events.models",        # EventLog
+        "app.erp.models",           # ERPConnection
+        "app.knowledge.models",     # KnowledgeBaseArticle
+        "app.auth.models",          # User (refs Company, Branch) ← MUST be LAST
     ]
 
     imported = 0
