@@ -23,12 +23,53 @@ down_revision = "009"
 branch_labels = None
 depends_on = None
 
+def _table_exists(table_name: str, schema=None) -> bool:
+    bind = op.get_bind()
+    try:
+        return bind.dialect.has_table(bind, table_name, schema=schema)
+    except Exception:
+        return False
+
+
+def _create_table_if_not_exists(name, *args, **kwargs):
+    if _table_exists(name):
+        return
+    op.create_table(name, *args, **kwargs)
+
+
+def _drop_table_if_exists(name, **kwargs):
+    if not _table_exists(name):
+        return
+    op.drop_table(name, **kwargs)
+
+
+def _index_exists(table_name: str, index_name: str, schema=None) -> bool:
+    bind = op.get_bind()
+    try:
+        from sqlalchemy import inspect
+        indexes = inspect(bind).get_indexes(table_name, schema=schema)
+    except Exception:
+        return False
+    return any(idx.get("name") == index_name for idx in indexes)
+
+
+def _create_index_if_not_exists(index_name, table_name, columns, unique=False, schema=None):
+    if _index_exists(table_name, index_name, schema=schema):
+        return
+    op.create_index(index_name, table_name, columns, unique=unique, schema=schema)
+
+
+def _drop_index_if_exists(index_name, table_name, schema=None):
+    if not _index_exists(table_name, index_name, schema=schema):
+        return
+    op.drop_index(index_name, table_name=table_name, schema=schema)
+
 
 def upgrade() -> None:
     # ================================================================
     # follower_delta_events
     # ================================================================
-    op.create_table(
+    _create_table_if_not_exists(
         "follower_delta_events",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
@@ -49,14 +90,14 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
         schema=None,
     )
-    op.create_index("ix_delta_event_account_date", "follower_delta_events", ["account_id", "event_date"], schema=None)
-    op.create_index("ix_delta_event_company_type", "follower_delta_events", ["company_id", "event_type"], schema=None)
-    op.create_index("ix_delta_event_platform", "follower_delta_events", ["company_id", "platform", "event_date"], schema=None)
+    _create_index_if_not_exists("ix_delta_event_account_date", "follower_delta_events", ["account_id", "event_date"], schema=None)
+    _create_index_if_not_exists("ix_delta_event_company_type", "follower_delta_events", ["company_id", "event_type"], schema=None)
+    _create_index_if_not_exists("ix_delta_event_platform", "follower_delta_events", ["company_id", "platform", "event_date"], schema=None)
 
     # ================================================================
     # engagement_events
     # ================================================================
-    op.create_table(
+    _create_table_if_not_exists(
         "engagement_events",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
@@ -77,14 +118,14 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
         schema=None,
     )
-    op.create_index("ix_engagement_event_account_date", "engagement_events", ["account_id", "event_date"], schema=None)
-    op.create_index("ix_engagement_event_type", "engagement_events", ["company_id", "event_type", "event_date"], schema=None)
-    op.create_index("ix_engagement_event_follower", "engagement_events", ["follower_account_id", "event_date"], schema=None)
+    _create_index_if_not_exists("ix_engagement_event_account_date", "engagement_events", ["account_id", "event_date"], schema=None)
+    _create_index_if_not_exists("ix_engagement_event_type", "engagement_events", ["company_id", "event_type", "event_date"], schema=None)
+    _create_index_if_not_exists("ix_engagement_event_follower", "engagement_events", ["follower_account_id", "event_date"], schema=None)
 
     # ================================================================
     # reengagement_recommendations
     # ================================================================
-    op.create_table(
+    _create_table_if_not_exists(
         "reengagement_recommendations",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
@@ -110,14 +151,14 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
         schema=None,
     )
-    op.create_index("ix_reengagement_account", "reengagement_recommendations", ["account_id", "created_at"], schema=None)
-    op.create_index("ix_reengagement_company_type", "reengagement_recommendations", ["company_id", "reengagement_type"], schema=None)
-    op.create_index("ix_reengagement_status", "reengagement_recommendations", ["approval_status"], schema=None)
+    _create_index_if_not_exists("ix_reengagement_account", "reengagement_recommendations", ["account_id", "created_at"], schema=None)
+    _create_index_if_not_exists("ix_reengagement_company_type", "reengagement_recommendations", ["company_id", "reengagement_type"], schema=None)
+    _create_index_if_not_exists("ix_reengagement_status", "reengagement_recommendations", ["approval_status"], schema=None)
 
     # ================================================================
     # safe_message_templates
     # ================================================================
-    op.create_table(
+    _create_table_if_not_exists(
         "safe_message_templates",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
@@ -138,13 +179,13 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
         schema=None,
     )
-    op.create_index("ix_safe_template_company_platform", "safe_message_templates", ["company_id", "platform"], schema=None)
-    op.create_index("ix_safe_template_type", "safe_message_templates", ["template_type", "platform"], schema=None)
+    _create_index_if_not_exists("ix_safe_template_company_platform", "safe_message_templates", ["company_id", "platform"], schema=None)
+    _create_index_if_not_exists("ix_safe_template_type", "safe_message_templates", ["template_type", "platform"], schema=None)
 
     # ================================================================
     # outreach_approval_requests
     # ================================================================
-    op.create_table(
+    _create_table_if_not_exists(
         "outreach_approval_requests",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
@@ -172,14 +213,14 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False),
         schema=None,
     )
-    op.create_index("ix_outreach_approval_company", "outreach_approval_requests", ["company_id", "status"], schema=None)
-    op.create_index("ix_outreach_approval_requester", "outreach_approval_requests", ["requested_by", "created_at"], schema=None)
-    op.create_index("ix_outreach_approval_platform", "outreach_approval_requests", ["platform", "status"], schema=None)
+    _create_index_if_not_exists("ix_outreach_approval_company", "outreach_approval_requests", ["company_id", "status"], schema=None)
+    _create_index_if_not_exists("ix_outreach_approval_requester", "outreach_approval_requests", ["requested_by", "created_at"], schema=None)
+    _create_index_if_not_exists("ix_outreach_approval_platform", "outreach_approval_requests", ["platform", "status"], schema=None)
 
     # ================================================================
     # audience_loss_estimates
     # ================================================================
-    op.create_table(
+    _create_table_if_not_exists(
         "audience_loss_estimates",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
@@ -201,13 +242,13 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
         schema=None,
     )
-    op.create_index("ix_audience_loss_account_date", "audience_loss_estimates", ["account_id", "estimate_date"], schema=None)
-    op.create_index("ix_audience_loss_company_type", "audience_loss_estimates", ["company_id", "loss_type"], schema=None)
+    _create_index_if_not_exists("ix_audience_loss_account_date", "audience_loss_estimates", ["account_id", "estimate_date"], schema=None)
+    _create_index_if_not_exists("ix_audience_loss_company_type", "audience_loss_estimates", ["company_id", "loss_type"], schema=None)
 
     # ================================================================
     # follower_retention_metrics
     # ================================================================
-    op.create_table(
+    _create_table_if_not_exists(
         "follower_retention_metrics",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
@@ -235,13 +276,13 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
         schema=None,
     )
-    op.create_index("ix_retention_account_period", "follower_retention_metrics", ["account_id", "period_start"], schema=None)
-    op.create_index("ix_retention_company_platform", "follower_retention_metrics", ["company_id", "platform", "period_start"], schema=None)
+    _create_index_if_not_exists("ix_retention_account_period", "follower_retention_metrics", ["account_id", "period_start"], schema=None)
+    _create_index_if_not_exists("ix_retention_company_platform", "follower_retention_metrics", ["company_id", "platform", "period_start"], schema=None)
 
     # ================================================================
     # follower_value_scores
     # ================================================================
-    op.create_table(
+    _create_table_if_not_exists(
         "follower_value_scores",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), sa.ForeignKey("companies.id", ondelete="CASCADE"), nullable=False),
@@ -265,16 +306,36 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), server_default=sa.func.now(), nullable=False),
         schema=None,
     )
-    op.create_index("ix_value_score_account", "follower_value_scores", ["account_id", "value_tier"], schema=None)
-    op.create_index("ix_value_score_follower", "follower_value_scores", ["follower_account_id", "scored_at"], schema=None)
+    _create_index_if_not_exists("ix_value_score_account", "follower_value_scores", ["account_id", "value_tier"], schema=None)
+    _create_index_if_not_exists("ix_value_score_follower", "follower_value_scores", ["follower_account_id", "scored_at"], schema=None)
 
 
 def downgrade() -> None:
-    op.drop_table("follower_value_scores", schema=None)
-    op.drop_table("follower_retention_metrics", schema=None)
-    op.drop_table("audience_loss_estimates", schema=None)
-    op.drop_table("outreach_approval_requests", schema=None)
-    op.drop_table("safe_message_templates", schema=None)
-    op.drop_table("reengagement_recommendations", schema=None)
-    op.drop_table("engagement_events", schema=None)
-    op.drop_table("follower_delta_events", schema=None)
+    _drop_index_if_exists("ix_value_score_account", "follower_value_scores", schema=None)
+    _drop_index_if_exists("ix_value_score_follower", "follower_value_scores", schema=None)
+    _drop_table_if_exists("follower_value_scores", schema=None)
+    _drop_index_if_exists("ix_retention_account_period", "follower_retention_metrics", schema=None)
+    _drop_index_if_exists("ix_retention_company_platform", "follower_retention_metrics", schema=None)
+    _drop_table_if_exists("follower_retention_metrics", schema=None)
+    _drop_index_if_exists("ix_audience_loss_account_date", "audience_loss_estimates", schema=None)
+    _drop_index_if_exists("ix_audience_loss_company_type", "audience_loss_estimates", schema=None)
+    _drop_table_if_exists("audience_loss_estimates", schema=None)
+    _drop_index_if_exists("ix_outreach_approval_company", "outreach_approval_requests", schema=None)
+    _drop_index_if_exists("ix_outreach_approval_requester", "outreach_approval_requests", schema=None)
+    _drop_index_if_exists("ix_outreach_approval_platform", "outreach_approval_requests", schema=None)
+    _drop_table_if_exists("outreach_approval_requests", schema=None)
+    _drop_index_if_exists("ix_safe_template_company_platform", "safe_message_templates", schema=None)
+    _drop_index_if_exists("ix_safe_template_type", "safe_message_templates", schema=None)
+    _drop_table_if_exists("safe_message_templates", schema=None)
+    _drop_index_if_exists("ix_reengagement_account", "reengagement_recommendations", schema=None)
+    _drop_index_if_exists("ix_reengagement_company_type", "reengagement_recommendations", schema=None)
+    _drop_index_if_exists("ix_reengagement_status", "reengagement_recommendations", schema=None)
+    _drop_table_if_exists("reengagement_recommendations", schema=None)
+    _drop_index_if_exists("ix_engagement_event_account_date", "engagement_events", schema=None)
+    _drop_index_if_exists("ix_engagement_event_type", "engagement_events", schema=None)
+    _drop_index_if_exists("ix_engagement_event_follower", "engagement_events", schema=None)
+    _drop_table_if_exists("engagement_events", schema=None)
+    _drop_index_if_exists("ix_delta_event_account_date", "follower_delta_events", schema=None)
+    _drop_index_if_exists("ix_delta_event_company_type", "follower_delta_events", schema=None)
+    _drop_index_if_exists("ix_delta_event_platform", "follower_delta_events", schema=None)
+    _drop_table_if_exists("follower_delta_events", schema=None)
