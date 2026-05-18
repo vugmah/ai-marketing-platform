@@ -5,7 +5,7 @@ import os
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, select
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, select, text
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -150,7 +150,7 @@ async def init_db() -> None:
         # Staging/prod: create_all KAPALI; Alembic migration tek kaynak
         try:
             async with engine.begin() as conn:
-                await conn.execute(sa.text("SELECT 1"))
+                await conn.execute(text("SELECT 1"))
             logger.info(f"[DB] Connection OK (create_all skipped in {env}; use Alembic migrations)")
         except Exception as e:
             logger.exception(f"[DB] Connection failed: {type(e).__name__}: {e}")
