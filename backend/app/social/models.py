@@ -180,7 +180,7 @@ class SocialAccount(Base):
     )
     bot_patterns = relationship(
         "app.followers.models.BotPattern",
-        back_populates="account",
+        back_populates="bot_account",
         cascade="all, delete-orphan",
         lazy="selectin",
     )
