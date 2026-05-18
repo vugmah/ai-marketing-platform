@@ -316,6 +316,12 @@ class SuspiciousActivity(Base):
     deviation_pct = Column(Numeric(10, 2), nullable=True)
     evidence = Column(JSON, default=dict, nullable=False)
     start_date = Column(DateTime, nullable=False)
+    # Relationship back to SocialAccount
+    account = relationship(
+        "app.social.models.SocialAccount",
+        back_populates="suspicious_activities",
+        lazy="selectin",
+    )
     end_date = Column(DateTime, nullable=True)
     resolved = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
