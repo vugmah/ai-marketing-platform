@@ -9,13 +9,11 @@ from passlib.context import CryptContext
 
 from app.config import settings
 
-# Password hashing context with Argon2
+# Password hashing context with bcrypt (argon2 requires argon2-cffi which may not be available)
 pwd_context = CryptContext(
-    schemes=["argon2"],
+    schemes=["bcrypt"],
     deprecated="auto",
-    argon2__memory_cost=65536,
-    argon2__time_cost=3,
-    argon2__parallelism=4,
+    bcrypt__rounds=12,
 )
 
 
