@@ -35,6 +35,18 @@ def _index_exists(table_name: str, index_name: str, schema=None) -> bool:
     return any(idx.get("name") == index_name for idx in indexes)
 
 
+def _columns_exist(table_name: str, columns: list, schema=None) -> bool:
+    """Return True if all requested *columns* exist on *table_name*."""
+    bind = op.get_bind()
+    try:
+        inspector = inspect(bind)
+        cols = inspector.get_columns(table_name, schema=schema)
+    except Exception:
+        return False
+    existing = {c.get("name") for c in cols}
+    return all(col in existing for col in columns)
+
+
 def _create_index_if_not_exists(
     index_name: str,
     table_name: str,
@@ -42,8 +54,10 @@ def _create_index_if_not_exists(
     unique: bool = False,
     schema=None,
 ) -> None:
-    """Create an index only when it does not already exist."""
+    """Create an index only when it does not already exist and all columns are present."""
     if _index_exists(table_name, index_name, schema=schema):
+        return
+    if not _columns_exist(table_name, columns, schema=schema):
         return
     op.create_index(index_name, table_name, columns, unique=unique, schema=schema)
 
