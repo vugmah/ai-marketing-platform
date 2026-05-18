@@ -20,11 +20,34 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
+def _table_exists(table_name: str, schema=None) -> bool:
+    """Return True if *table_name* already exists."""
+    bind = op.get_bind()
+    try:
+        return bind.dialect.has_table(bind, table_name, schema=schema)
+    except Exception:
+        return False
+
+
+def _create_table_if_not_exists(name, *args, **kwargs):
+    """Create table only if it does not already exist."""
+    if _table_exists(name):
+        return
+    op.create_table(name, *args, **kwargs)
+
+
+def _drop_table_if_exists(name, **kwargs):
+    """Drop table only if it exists."""
+    if not _table_exists(name):
+        return
+    op.drop_table(name, **kwargs)
+
+
 def upgrade() -> None:
     """Create all missing tables."""
 
     # --- ad_adsets (AdAdset) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ad_adsets",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("campaign_id", sa.Integer(), nullable=False, index=True),
@@ -40,7 +63,7 @@ def upgrade() -> None:
     )
 
     # --- ad_audiences (AdAudience) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ad_audiences",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -58,7 +81,7 @@ def upgrade() -> None:
     )
 
     # --- ad_budget_recommendations (AdBudgetRecommendation) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ad_budget_recommendations",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -76,7 +99,7 @@ def upgrade() -> None:
     )
 
     # --- ad_campaigns (AdCampaign) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ad_campaigns",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -100,7 +123,7 @@ def upgrade() -> None:
     )
 
     # --- ad_creative_analysis (AdCreativeAnalysis) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ad_creative_analysis",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("creative_id", sa.Integer(), nullable=False, index=True),
@@ -114,7 +137,7 @@ def upgrade() -> None:
     )
 
     # --- ad_creatives (AdCreative) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ad_creatives",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -134,7 +157,7 @@ def upgrade() -> None:
     )
 
     # --- ad_metrics (AdMetric) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ad_metrics",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("campaign_id", sa.Integer(), nullable=False, index=True),
@@ -157,7 +180,7 @@ def upgrade() -> None:
     )
 
     # --- ad_platforms (AdPlatformAccount) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ad_platforms",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -179,7 +202,7 @@ def upgrade() -> None:
     )
 
     # --- ai_audience_recommendations (AIAudienceRecommendation) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ai_audience_recommendations",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -207,7 +230,7 @@ def upgrade() -> None:
     op.create_index("ix_ai_rec_account", "ai_audience_recommendations", ["account_id", "generated_at"])
 
     # --- ai_reply_audit_logs (AIReplyAuditLog) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ai_reply_audit_logs",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -221,7 +244,7 @@ def upgrade() -> None:
     )
 
     # --- analytics_snapshots (AnalyticsSnapshot) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "analytics_snapshots",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -242,7 +265,7 @@ def upgrade() -> None:
     op.create_index("uq_analytics_snapshots_company_branch_report_date", "analytics_snapshots", ["company_id", "branch_id", "report_type", "snapshot_date"], unique=True)
 
     # --- approval_requests (ApprovalRequest) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "approval_requests",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -260,7 +283,7 @@ def upgrade() -> None:
     )
 
     # --- audience_demographics (AudienceDemographics) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "audience_demographics",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -293,7 +316,7 @@ def upgrade() -> None:
     op.create_index("ix_audience_demo_company", "audience_demographics", ["company_id", "platform"])
 
     # --- bot_patterns (BotPattern) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "bot_patterns",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -325,7 +348,7 @@ def upgrade() -> None:
     op.create_index("ix_bot_patterns_score", "bot_patterns", ["bot_score"])
 
     # --- branch_brand_identities (BranchBrandIdentity) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "branch_brand_identities",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("branch_id", sa.Integer(), nullable=False, index=True),
@@ -352,7 +375,7 @@ def upgrade() -> None:
     op.create_index("uq_branch_brand_identity", "branch_brand_identities", ["branch_id"], unique=True)
 
     # --- brand_colors (BrandColor) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "brand_colors",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -372,7 +395,7 @@ def upgrade() -> None:
     op.create_index("uq_brand_color", "brand_colors", ["company_id", "branch_id", "hex_code", "usage_area"], unique=True)
 
     # --- brand_profiles (BrandProfile) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "brand_profiles",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -393,7 +416,7 @@ def upgrade() -> None:
     op.create_index("uq_brand_attr", "brand_profiles", ["company_id", "branch_id", "attribute_type", "attribute_key"], unique=True)
 
     # --- campaign_insights (CampaignInsight) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "campaign_insights",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -433,7 +456,7 @@ def upgrade() -> None:
     op.create_index("ix_campaign_kb", "campaign_insights", ["knowledge_base_id"])
 
     # --- creative_audits (CreativeAudit) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "creative_audits",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("media_id", sa.String(36), nullable=False, index=True),
@@ -456,7 +479,7 @@ def upgrade() -> None:
     op.create_index("uq_creative_audit_media", "creative_audits", ["media_id"], unique=True)
 
     # --- engagement_qualities (EngagementQuality) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "engagement_qualities",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -486,13 +509,13 @@ def upgrade() -> None:
     op.create_index("ix_engagement_quality_post", "engagement_qualities", ["post_id"])
 
     # --- escalation_rules (EscalationRule) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "escalation_rules",
         schema=None,
     )
 
     # --- export_jobs (ExportJob) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "export_jobs",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True, index=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -517,7 +540,7 @@ def upgrade() -> None:
     )
 
     # --- follower_health_scores (FollowerHealthScore) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "follower_health_scores",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -545,7 +568,7 @@ def upgrade() -> None:
     op.create_index("ix_follower_health_company_status", "follower_health_scores", ["company_id", "status"])
 
     # --- follower_insights (FollowerInsight) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "follower_insights",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -576,7 +599,7 @@ def upgrade() -> None:
     op.create_index("ix_follower_insights_flagged", "follower_insights", ["is_flagged"])
 
     # --- follower_snapshots (FollowerSnapshot) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "follower_snapshots",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -597,7 +620,7 @@ def upgrade() -> None:
     op.create_index("ix_follower_snapshots_company_platform", "follower_snapshots", ["company_id", "platform"])
 
     # --- ingestion_jobs (IngestionJob) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "ingestion_jobs",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("knowledge_base_id", sa.Integer(), nullable=False, index=True),
@@ -621,19 +644,19 @@ def upgrade() -> None:
     op.create_index("ix_job_company", "ingestion_jobs", ["company_id"])
 
     # --- knowledge_base_articles (KnowledgeBaseArticle) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "knowledge_base_articles",
         schema=None,
     )
 
     # --- knowledge_base_categories (KnowledgeBaseCategory) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "knowledge_base_categories",
         schema=None,
     )
 
     # --- knowledge_bases (KnowledgeBase) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "knowledge_bases",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -662,7 +685,7 @@ def upgrade() -> None:
     op.create_index("ix_kb_source_type", "knowledge_bases", ["source_type"])
 
     # --- knowledge_chunks (KnowledgeChunk) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "knowledge_chunks",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("knowledge_base_id", sa.Integer(), nullable=False, index=True),
@@ -687,7 +710,7 @@ def upgrade() -> None:
     op.create_index("ix_chunk_company_type", "knowledge_chunks", ["company_id", "chunk_type"])
 
     # --- knowledge_embeddings (KnowledgeEmbedding) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "knowledge_embeddings",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("knowledge_base_id", sa.Integer(), nullable=False, index=True),
@@ -706,7 +729,7 @@ def upgrade() -> None:
     op.create_index("ix_emb_kb_id", "knowledge_embeddings", ["knowledge_base_id"])
 
     # --- social_hashtag_intelligence (HashtagIntelligence) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "social_hashtag_intelligence",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -728,7 +751,7 @@ def upgrade() -> None:
     op.create_index("ix_hashtag_intel_trend", "social_hashtag_intelligence", ["trend_direction", "engagement_avg"])
 
     # --- social_listening (SocialListening) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "social_listening",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -750,7 +773,7 @@ def upgrade() -> None:
     op.create_index("ix_social_listening_target", "social_listening", ["platform", "listen_type", "target"])
 
     # --- social_post_learning (SocialPostLearning) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "social_post_learning",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -777,7 +800,7 @@ def upgrade() -> None:
     op.create_index("ix_social_platform", "social_post_learning", ["platform"])
 
     # --- social_publishing_queue (PublishingQueue) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "social_publishing_queue",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -801,31 +824,31 @@ def upgrade() -> None:
     op.create_index("ix_publishing_queue_scheduled", "social_publishing_queue", ["scheduled_at", "status"])
 
     # --- support_analytics (SupportAnalytics) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "support_analytics",
         schema=None,
     )
 
     # --- support_macros (SupportMacro) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "support_macros",
         schema=None,
     )
 
     # --- support_messages (SupportMessage) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "support_messages",
         schema=None,
     )
 
     # --- support_tickets (SupportTicket) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "support_tickets",
         schema=None,
     )
 
     # --- suspicious_activities (SuspiciousActivity) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "suspicious_activities",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -852,7 +875,7 @@ def upgrade() -> None:
     op.create_index("ix_suspicious_activity_severity", "suspicious_activities", ["severity"])
 
     # --- visual_assets (VisualAsset) ---
-    op.create_table(
+    _create_table_if_not_exists(
         "visual_assets",
         sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column("company_id", sa.Integer(), nullable=False, index=True),
@@ -885,44 +908,44 @@ def upgrade() -> None:
 def downgrade() -> None:
     """Drop all created tables (reverse order)."""
 
-    op.drop_table("visual_assets", schema=None)
-    op.drop_table("suspicious_activities", schema=None)
-    op.drop_table("support_tickets", schema=None)
-    op.drop_table("support_messages", schema=None)
-    op.drop_table("support_macros", schema=None)
-    op.drop_table("support_analytics", schema=None)
-    op.drop_table("social_publishing_queue", schema=None)
-    op.drop_table("social_post_learning", schema=None)
-    op.drop_table("social_listening", schema=None)
-    op.drop_table("social_hashtag_intelligence", schema=None)
-    op.drop_table("knowledge_embeddings", schema=None)
-    op.drop_table("knowledge_chunks", schema=None)
-    op.drop_table("knowledge_bases", schema=None)
-    op.drop_table("knowledge_base_categories", schema=None)
-    op.drop_table("knowledge_base_articles", schema=None)
-    op.drop_table("ingestion_jobs", schema=None)
-    op.drop_table("follower_snapshots", schema=None)
-    op.drop_table("follower_insights", schema=None)
-    op.drop_table("follower_health_scores", schema=None)
-    op.drop_table("export_jobs", schema=None)
-    op.drop_table("escalation_rules", schema=None)
-    op.drop_table("engagement_qualities", schema=None)
-    op.drop_table("creative_audits", schema=None)
-    op.drop_table("campaign_insights", schema=None)
-    op.drop_table("brand_profiles", schema=None)
-    op.drop_table("brand_colors", schema=None)
-    op.drop_table("branch_brand_identities", schema=None)
-    op.drop_table("bot_patterns", schema=None)
-    op.drop_table("audience_demographics", schema=None)
-    op.drop_table("approval_requests", schema=None)
-    op.drop_table("analytics_snapshots", schema=None)
-    op.drop_table("ai_reply_audit_logs", schema=None)
-    op.drop_table("ai_audience_recommendations", schema=None)
-    op.drop_table("ad_platforms", schema=None)
-    op.drop_table("ad_metrics", schema=None)
-    op.drop_table("ad_creatives", schema=None)
-    op.drop_table("ad_creative_analysis", schema=None)
-    op.drop_table("ad_campaigns", schema=None)
-    op.drop_table("ad_budget_recommendations", schema=None)
-    op.drop_table("ad_audiences", schema=None)
-    op.drop_table("ad_adsets", schema=None)
+    _drop_table_if_exists("visual_assets", schema=None)
+    _drop_table_if_exists("suspicious_activities", schema=None)
+    _drop_table_if_exists("support_tickets", schema=None)
+    _drop_table_if_exists("support_messages", schema=None)
+    _drop_table_if_exists("support_macros", schema=None)
+    _drop_table_if_exists("support_analytics", schema=None)
+    _drop_table_if_exists("social_publishing_queue", schema=None)
+    _drop_table_if_exists("social_post_learning", schema=None)
+    _drop_table_if_exists("social_listening", schema=None)
+    _drop_table_if_exists("social_hashtag_intelligence", schema=None)
+    _drop_table_if_exists("knowledge_embeddings", schema=None)
+    _drop_table_if_exists("knowledge_chunks", schema=None)
+    _drop_table_if_exists("knowledge_bases", schema=None)
+    _drop_table_if_exists("knowledge_base_categories", schema=None)
+    _drop_table_if_exists("knowledge_base_articles", schema=None)
+    _drop_table_if_exists("ingestion_jobs", schema=None)
+    _drop_table_if_exists("follower_snapshots", schema=None)
+    _drop_table_if_exists("follower_insights", schema=None)
+    _drop_table_if_exists("follower_health_scores", schema=None)
+    _drop_table_if_exists("export_jobs", schema=None)
+    _drop_table_if_exists("escalation_rules", schema=None)
+    _drop_table_if_exists("engagement_qualities", schema=None)
+    _drop_table_if_exists("creative_audits", schema=None)
+    _drop_table_if_exists("campaign_insights", schema=None)
+    _drop_table_if_exists("brand_profiles", schema=None)
+    _drop_table_if_exists("brand_colors", schema=None)
+    _drop_table_if_exists("branch_brand_identities", schema=None)
+    _drop_table_if_exists("bot_patterns", schema=None)
+    _drop_table_if_exists("audience_demographics", schema=None)
+    _drop_table_if_exists("approval_requests", schema=None)
+    _drop_table_if_exists("analytics_snapshots", schema=None)
+    _drop_table_if_exists("ai_reply_audit_logs", schema=None)
+    _drop_table_if_exists("ai_audience_recommendations", schema=None)
+    _drop_table_if_exists("ad_platforms", schema=None)
+    _drop_table_if_exists("ad_metrics", schema=None)
+    _drop_table_if_exists("ad_creatives", schema=None)
+    _drop_table_if_exists("ad_creative_analysis", schema=None)
+    _drop_table_if_exists("ad_campaigns", schema=None)
+    _drop_table_if_exists("ad_budget_recommendations", schema=None)
+    _drop_table_if_exists("ad_audiences", schema=None)
+    _drop_table_if_exists("ad_adsets", schema=None)
