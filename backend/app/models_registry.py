@@ -33,12 +33,9 @@ def import_all_models():
         "app.reports.models",
         "app.governance.models",
         "app.support.models",
-        "app.realtime.models",
-        "app.notifications.models",
         "app.events.models",
         "app.erp.models",
         "app.knowledge.models",
-        "app.localization.models",
     ]
 
     imported = 0
