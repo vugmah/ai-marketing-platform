@@ -124,7 +124,7 @@ class RBACMiddleware(BaseHTTPMiddleware):
         for path_prefix, required_role_or_group in PROTECTED_PATHS.items():
             if path.startswith(path_prefix):
                 user_role = user.get("role", "analyst") if isinstance(user, dict) else getattr(user, "role", "analyst")
-                user_level = ROLE_HIERARCHY.get(user_role, 0)
+                user_level = ROLE_HIERARCHY.get(str(user_role).lower(), 0)
 
                 # Resolve role group to minimum level
                 min_level = self._resolve_role_requirement(
@@ -179,7 +179,7 @@ def has_role(user_role: str, required_role_or_group: str) -> bool:
     Returns:
         True if the user has the required role or higher.
     """
-    user_level = ROLE_HIERARCHY.get(user_role, 0)
+    user_level = ROLE_HIERARCHY.get(str(user_role).lower(), 0)
 
     if required_role_or_group in ROLE_GROUPS:
         group_roles = ROLE_GROUPS[required_role_or_group]
@@ -200,6 +200,6 @@ def require_min_role(user_role: str, min_role: str) -> bool:
     Returns:
         True if user meets the minimum role requirement.
     """
-    user_level = ROLE_HIERARCHY.get(user_role, 0)
-    min_level = ROLE_HIERARCHY.get(min_role, 0)
+    user_level = ROLE_HIERARCHY.get(str(user_role).lower(), 0)
+    min_level = ROLE_HIERARCHY.get(str(min_role).lower(), 0)
     return user_level >= min_level

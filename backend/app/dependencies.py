@@ -137,7 +137,7 @@ def require_role(allowed_roles: List[str]):
     async def role_checker(
         user: User = Depends(get_current_user),
     ) -> User:
-        user_level = ROLE_HIERARCHY.get(user.role, 0)
+        user_level = ROLE_HIERARCHY.get(str(user.role).lower(), 0)
         if user_level < min_required_level:
             raise AuthorizationError(
                 detail=f"Access denied. Required role level: {min_required_level} "
@@ -161,10 +161,10 @@ def require_roles_exact(allowed_roles: List[str]):
     async def role_checker(
         user: User = Depends(get_current_user),
     ) -> User:
-        if user.role not in allowed_roles:
+        if str(user.role).lower() not in [r.lower() for r in allowed_roles]:
             raise AuthorizationError(
                 detail=f"Access denied. Required roles: {', '.join(allowed_roles)}. "
-                f"Your role: {user.role}."
+                f"Your role: {str(user.role).lower()}."
             )
         return user
 

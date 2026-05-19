@@ -253,7 +253,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         # Apply user role multiplier
         role = cls._get_user_role(request)
         if role:
-            multiplier = USER_ROLE_MULTIPLIERS.get(role, 1.0)
+            multiplier = USER_ROLE_MULTIPLIERS.get(str(role).lower(), 1.0)
         else:
             multiplier = UNAUTHENTICATED_MULTIPLIER
 
