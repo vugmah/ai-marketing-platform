@@ -14,7 +14,7 @@ from typing import Dict, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.models import User
+from app.auth.models import User, UserRole
 from app.auth.schemas import TokenResponse, UserRegister, UserResponse
 from app.auth.utils import (
     create_access_token,
@@ -81,7 +81,7 @@ async def register_user(data: UserRegister) -> UserResponse:
                 password_hash=hash_password(data.password),
                 first_name=data.first_name,
                 last_name=data.last_name,
-                role="company_admin",
+                role=UserRole.COMPANY_ADMIN,
                 company_id=None,
                 branch_id=None,
                 is_active=True,
