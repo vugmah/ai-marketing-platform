@@ -17,8 +17,19 @@ import os
 # Broker & Backend
 # ---------------------------------------------------------------------------
 
-broker_url = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/1")
-result_backend = os.environ.get("CELERY_RESULT_BACKEND", "redis://redis:6379/2")
+def _redis_url_with_db(env_url: str, db: int) -> str:
+    import re
+    if not env_url:
+        return f"redis://localhost:6379/{db}"
+    base = re.sub(r'/[0-9]+$', '', env_url)
+    return f"{base}/{db}"
+
+_broker = os.environ.get("CELERY_BROKER_URL", "")
+_backend = os.environ.get("CELERY_RESULT_BACKEND", "")
+_redis = os.environ.get("REDIS_URL", "")
+
+broker_url = _broker if _broker else (_redis_url_with_db(_redis, 1) if _redis else "redis://localhost:6379/1")
+result_backend = _backend if _backend else (_redis_url_with_db(_redis, 2) if _redis else "redis://localhost:6379/2")
 
 # ---------------------------------------------------------------------------
 # Serialization
@@ -114,37 +125,37 @@ beat_schedule = {
         "schedule": 60.0,
     },
 
-    # --- ERP Sync (every 5 minutes) ---
-    "erp-sync-inventory": {
-        "task": "app.erp.tasks.sync_inventory",
-        "schedule": 300.0,
-        "kwargs": {"connection_id": None, "sync_type": "incremental"},
-        "options": {"queue": "erp"},
-    },
-    "erp-sync-products": {
-        "task": "app.erp.tasks.sync_products",
-        "schedule": 300.0,
-        "kwargs": {"connection_id": None, "sync_type": "incremental"},
-        "options": {"queue": "erp"},
-    },
-    "erp-sync-customers": {
-        "task": "app.erp.tasks.sync_customers",
-        "schedule": 300.0,
-        "kwargs": {"connection_id": None, "sync_type": "incremental"},
-        "options": {"queue": "erp"},
-    },
-    "erp-sync-sales-orders": {
-        "task": "app.erp.tasks.sync_sales_orders",
-        "schedule": 600.0,
-        "kwargs": {"connection_id": None, "sync_type": "incremental"},
-        "options": {"queue": "erp"},
-    },
-    "erp-sync-invoices": {
-        "task": "app.erp.tasks.sync_invoices",
-        "schedule": 600.0,
-        "kwargs": {"connection_id": None, "sync_type": "incremental"},
-        "options": {"queue": "erp"},
-    },
+    # --- ERP Sync (DISABLED — will be enabled after explicit approval) ---
+    # "erp-sync-inventory": {
+    #     "task": "app.erp.tasks.sync_inventory",
+    #     "schedule": 300.0,
+    #     "kwargs": {"connection_id": None, "sync_type": "incremental"},
+    #     "options": {"queue": "erp"},
+    # },
+    # "erp-sync-products": {
+    #     "task": "app.erp.tasks.sync_products",
+    #     "schedule": 300.0,
+    #     "kwargs": {"connection_id": None, "sync_type": "incremental"},
+    #     "options": {"queue": "erp"},
+    # },
+    # "erp-sync-customers": {
+    #     "task": "app.erp.tasks.sync_customers",
+    #     "schedule": 300.0,
+    #     "kwargs": {"connection_id": None, "sync_type": "incremental"},
+    #     "options": {"queue": "erp"},
+    # },
+    # "erp-sync-sales-orders": {
+    #     "task": "app.erp.tasks.sync_sales_orders",
+    #     "schedule": 600.0,
+    #     "kwargs": {"connection_id": None, "sync_type": "incremental"},
+    #     "options": {"queue": "erp"},
+    # },
+    # "erp-sync-invoices": {
+    #     "task": "app.erp.tasks.sync_invoices",
+    #     "schedule": 600.0,
+    #     "kwargs": {"connection_id": None, "sync_type": "incremental"},
+    #     "options": {"queue": "erp"},
+    # },
 
     # --- Social Media Sync (every 10 minutes) ---
     "social-sync-posts": {
@@ -174,21 +185,21 @@ beat_schedule = {
         "options": {"queue": "ai"},
     },
 
-    # --- RAG Periodic Re-index (every 6 hours) ---
-    "rag-periodic-reindex": {
-        "task": "app.ai.reindex_tasks.periodic_reindex",
-        "schedule": 21600.0,  # 6 hours
-        "kwargs": {"entity_types": ["product", "post", "prompt"]},
-        "options": {"queue": "ai"},
-    },
+    # --- RAG Periodic Re-index (DISABLED — will be enabled after explicit approval) ---
+    # "rag-periodic-reindex": {
+    #     "task": "app.ai.reindex_tasks.periodic_reindex",
+    #     "schedule": 21600.0,  # 6 hours
+    #     "kwargs": {"entity_types": ["product", "post", "prompt"]},
+    #     "options": {"queue": "ai"},
+    # },
 
-    # --- RAG Vector Health Check (every 30 minutes) ---
-    "rag-vector-health-check": {
-        "task": "app.ai.reindex_tasks.vector_health_check",
-        "schedule": 1800.0,  # 30 minutes
-        "kwargs": {},
-        "options": {"queue": "ai"},
-    },
+    # --- RAG Vector Health Check (DISABLED — will be enabled after explicit approval) ---
+    # "rag-vector-health-check": {
+    #     "task": "app.ai.reindex_tasks.vector_health_check",
+    #     "schedule": 1800.0,  # 30 minutes
+    #     "kwargs": {},
+    #     "options": {"queue": "ai"},
+    # },
 
     # --- Event Processing (every 30 seconds) ---
     "events-process-pending": {

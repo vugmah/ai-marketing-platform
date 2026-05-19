@@ -27,6 +27,7 @@ celery_app.autodiscover_tasks(
         "app.media",
         "app.ai",
         "app.events",
+        "app.reports",
     ]
 )
 

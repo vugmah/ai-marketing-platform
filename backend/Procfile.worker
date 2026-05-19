@@ -1,0 +1,2 @@
+worker: celery -A app.celery_app worker -Q events,media,social,reports --loglevel=info
+beat: celery -A app.celery_app beat --loglevel=info -s /tmp/celerybeat-schedule
