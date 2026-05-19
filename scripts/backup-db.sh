@@ -255,7 +255,7 @@ if [[ "$S3_ENABLED" == true && "$DRY_RUN" == false ]]; then
 
     # Cleanup old backups (retention policy)
     log_info "Cleaning up backups older than ${RETENTION_DAYS} days"
-    CUTOFF_DATE=$(date -d "-${RETENTION_DAYS} days" +%Y/%m/%d 2>/dev/null || date -v-${RETENTION_DAYS}d +%Y/%m/%d 2>/dev/null)
+    CUTOFF_DATE=$(date -d "-${RETENTION_DAYS} days" +%Y-%m-%d 2>/dev/null || date -v-${RETENTION_DAYS}d +%Y-%m-%d 2>/dev/null)
     if [[ -n "$CUTOFF_DATE" ]]; then
         # List and delete old objects
         AWS_ACCESS_KEY_ID="$S3_KEY" \

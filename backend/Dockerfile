@@ -11,11 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Cache bust arg - change to force rebuild
-ARG CACHEBUST=6
+ARG CACHEBUST=7
 
 # Install Python dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir awscli
 
 # Install Node.js dependencies for frontend
 COPY package*.json .
