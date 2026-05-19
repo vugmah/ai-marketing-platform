@@ -28,7 +28,7 @@ from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 import numpy as np
 from sqlalchemy import Column, ForeignKey, Integer, JSON, select, String, text, Text
-from sqlalchemy.dialects.postgresql import ARRAY, FLOAT
+# PostgreSQL-specific types removed for MySQL compatibility
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import Base, get_db_context
@@ -137,7 +137,7 @@ class VectorEmbedding(Base):
     id = Column(String(64), primary_key=True, index=True)
     # pgvector vector type - dimension set at runtime
     embedding = Column(
-        ARRAY(FLOAT),
+        JSON,
         nullable=False,
         comment="Vector embedding as float array (pgvector compatible)",
     )
@@ -230,7 +230,7 @@ def _generate_record_id(entity_type: str, entity_id: int, company_id: int) -> st
 class PGVectorStore:
     """PostgreSQL + pgvector vector store backend.
 
-    Uses SQLAlchemy with ARRAY(FLOAT) for vector storage.
+    Uses SQLAlchemy with JSON for vector storage (MySQL/PostgreSQL compatible).
     Supports cosine similarity via SQL operations.
     Recommended for production use.
 
@@ -258,7 +258,7 @@ class PGVectorStore:
                 if self._pgvector_available:
                     logger.info("pgvector extension detected and available")
                 else:
-                    logger.warning("pgvector extension NOT available - falling back to ARRAY storage")
+                    logger.warning("pgvector extension NOT available - falling back to JSON storage")
                 return self._pgvector_available
         except Exception as exc:
             logger.error("Error checking pgvector availability: %s", exc)
