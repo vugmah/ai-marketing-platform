@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Cache bust arg - change to force rebuild
-ARG CACHEBUST=2
+ARG CACHEBUST=3
 
 # Install Python dependencies
 COPY backend/requirements.txt .
@@ -41,14 +41,7 @@ RUN if [ -f package.json ] && [ -d frontend ]; then \
         mkdir -p /app/static; \
     fi
 
-RUN groupadd --gid 1000 aimp && \
-    useradd --uid 1000 --gid aimp --shell /bin/false --create-home aimp
-USER aimp
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-    CMD curl -fsS http://localhost:8000/api/v1/live || exit 1
-
 EXPOSE 8000
 
 # ONE-TIME MIGRATION: Run alembic upgrade before app start
-CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers 2
+CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 2 --proxy-headers --forwarded-allow-ips "*"
