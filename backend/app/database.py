@@ -147,13 +147,13 @@ async def init_db() -> None:
     env = os.environ.get("ENVIRONMENT", "development").lower()
 
     if env in ("staging", "production"):
-        # Staging/prod: create_all KAPALI; Alembic migration tek kaynak
+        # Staging/prod: create_all AÇIQ (geçici - cədvəllər yoxdursa yaradılsın)
         try:
             async with engine.begin() as conn:
-                await conn.execute(text("SELECT 1"))
-            logger.info(f"[DB] Connection OK (create_all skipped in {env}; use Alembic migrations)")
+                await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+            logger.info(f"[DB] Tables OK (create_all in {env}; checkfirst=True)")
         except Exception as e:
-            logger.exception(f"[DB] Connection failed: {type(e).__name__}: {e}")
+            logger.exception(f"[DB] init failed: {type(e).__name__}: {e}")
     else:
         # Local/dev: create_all açık (hızlı prototyping)
         try:
