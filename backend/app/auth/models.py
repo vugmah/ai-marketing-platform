@@ -25,20 +25,20 @@ from app.database import Base
 class UserRole(str, enum.Enum):
     """User role hierarchy for access control.
 
-    Values are UPPERCASE to match MySQL ENUM storage.
-    Router role checks use lowercase strings via _missing_ fallback.
+    Values are lowercase to match router string checks and MySQL ENUM storage.
+    UPPERCASE fallback via _missing_ for compatibility.
     """
 
-    SUPER_ADMIN = "SUPER_ADMIN"
-    COMPANY_ADMIN = "COMPANY_ADMIN"
-    BRANCH_MANAGER = "BRANCH_MANAGER"
-    MARKETING_MANAGER = "MARKETING_MANAGER"
-    SUPPORT_AGENT = "SUPPORT_AGENT"
-    ANALYST = "ANALYST"
+    SUPER_ADMIN = "super_admin"
+    COMPANY_ADMIN = "company_admin"
+    BRANCH_MANAGER = "branch_manager"
+    MARKETING_MANAGER = "marketing_manager"
+    SUPPORT_AGENT = "support_agent"
+    ANALYST = "analyst"
 
     @classmethod
     def _missing_(cls, value: object):
-        """Case-insensitive fallback for lowercase role checks."""
+        """Case-insensitive fallback for UPPERCASE role checks."""
         if not isinstance(value, str):
             return None
         for member in cls:
