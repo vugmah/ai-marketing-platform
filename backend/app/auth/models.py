@@ -92,8 +92,8 @@ class User(Base):
 
     # Role & status
     role = Column(
-        Enum(UserRole, name="userrole", create_type=True),
-        default=UserRole.COMPANY_ADMIN,
+        String(50),
+        default=UserRole.COMPANY_ADMIN.value,
         nullable=False,
     )
     status = Column(
