@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Cache bust arg - change to force rebuild
-ARG CACHEBUST=3
+ARG CACHEBUST=4
 
 # Install Python dependencies
 COPY backend/requirements.txt .
