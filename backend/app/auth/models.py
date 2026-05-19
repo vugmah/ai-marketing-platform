@@ -23,14 +23,17 @@ from app.database import Base
 
 
 class UserRole(str, enum.Enum):
-    """User role hierarchy for access control."""
+    """User role hierarchy for access control.
 
-    SUPER_ADMIN = "super_admin"
-    COMPANY_ADMIN = "company_admin"
-    BRANCH_MANAGER = "branch_manager"
-    MARKETING_MANAGER = "marketing_manager"
-    SUPPORT_AGENT = "support_agent"
-    ANALYST = "analyst"
+    Values must match the DB MySQL enum exactly (uppercase).
+    """
+
+    SUPER_ADMIN = "SUPER_ADMIN"
+    COMPANY_ADMIN = "COMPANY_ADMIN"
+    BRANCH_MANAGER = "BRANCH_MANAGER"
+    MARKETING_MANAGER = "MARKETING_MANAGER"
+    SUPPORT_AGENT = "SUPPORT_AGENT"
+    ANALYST = "ANALYST"
 
 
 class UserStatus(str, enum.Enum):
