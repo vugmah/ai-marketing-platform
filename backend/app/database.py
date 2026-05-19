@@ -99,7 +99,7 @@ logger.info(f"[DB] Final DATABASE_URL starts with: {DATABASE_URL.split('://')[0]
 _is_sqlite = "sqlite" in DATABASE_URL.lower()
 _engine_kwargs = {
     "echo": False,
-    "pool_pre_ping": True,
+    # "pool_pre_ping": True,  # aiomysql uyumsuzluğu səbəbindən söndürüldü
     "pool_recycle": 3600,  # Recycle connections after 1 hour
 }
 if not _is_sqlite:
