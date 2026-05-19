@@ -145,3 +145,4 @@ class User(Base):
             f"<User(id={self.id}, email='{self.email}', "
             f"role='{self.role}', company_id={self.company_id})>"
         )
+# Deploy trigger: 2026-05-19T07:01:09Z
