@@ -100,7 +100,7 @@ _is_sqlite = "sqlite" in DATABASE_URL.lower()
 _engine_kwargs = {
     "echo": False,
     # "pool_pre_ping": True,  # aiomysql uyumsuzluğu səbəbindən söndürüldü
-    "pool_recycle": 3600,  # Recycle connections after 1 hour
+    # "pool_recycle": 3600,   # aiomysql ping(reconnect) uyumsuzluğu səbəbindən söndürüldü
 }
 if not _is_sqlite:
     _engine_kwargs.update(pool_size=20, max_overflow=30)
