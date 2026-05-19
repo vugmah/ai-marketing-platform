@@ -57,15 +57,19 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Railway CLI
-        run: npm install -g @railway/cli
+        run: npm install -g @railway/cli@3.14.0
+
+      - name: Link Railway Project
+        run: railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service "ai-marketing-platform"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Deploy Backend to Railway
         run: |
           cd backend
-          railway up --service "ai-marketing-platform" || (echo "=== DEPLOY FAILED - Fetching logs ===" && railway logs --service "ai-marketing-platform" && exit 1)
+          railway up || (echo "=== DEPLOY FAILED - Fetching logs ===" && railway logs && exit 1)
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
 
   # ── Deploy Frontend ───────────────────────────
   deploy-frontend:
@@ -83,14 +87,17 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Railway CLI
-        run: npm install -g @railway/cli
+        run: npm install -g @railway/cli@3.14.0
 
-      - name: Deploy Frontend to Railway
-        run: |
-          railway up --service "ai-marketing-frontend"
+      - name: Link Railway Project
+        run: railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service "ai-marketing-frontend"
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+
+      - name: Deploy Frontend to Railway
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   # ── Health Check ──────────────────────────────
   logs:
@@ -105,10 +112,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Install Railway CLI
-        run: npm install -g @railway/cli
+        run: npm install -g @railway/cli@3.14.0
+
+      - name: Link Railway Project
+        run: railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service "ai-marketing-platform"
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Show backend logs
-        run: railway logs --service "ai-marketing-platform"
+        run: railway logs
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
