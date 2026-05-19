@@ -43,6 +43,15 @@ class UserRole(str, enum.Enum):
         return None
 
 
+# MySQL normalizes enum values to uppercase on read.
+# Populate _value2member_map_ with uppercase keys so SQLAlchemy
+# can resolve DB values like 'COMPANY_ADMIN' back to the enum member.
+# This covers the db.refresh() path which bypasses _missing_.
+for _ur in UserRole:
+    UserRole._value2member_map_.setdefault(_ur.name, _ur)          # e.g. COMPANY_ADMIN
+    UserRole._value2member_map_.setdefault(_ur.value.upper(), _ur)  # e.g. COMPANY_ADMIN
+
+
 class UserStatus(str, enum.Enum):
     """User account lifecycle statuses."""
 
@@ -145,4 +154,4 @@ class User(Base):
             f"<User(id={self.id}, email='{self.email}', "
             f"role='{self.role}', company_id={self.company_id})>"
         )
-# Deploy trigger: 2026-05-19T07:01:09Z
+
