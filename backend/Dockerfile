@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Cache bust arg - change to force rebuild
-ARG CACHEBUST=1
+ARG CACHEBUST=2
 
 # Install Python dependencies
 COPY backend/requirements.txt .
@@ -46,7 +46,7 @@ RUN groupadd --gid 1000 aimp && \
 USER aimp
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
-    CMD curl -fsS http://localhost:8000/api/v2/health/live || exit 1
+    CMD curl -fsS http://localhost:8000/api/v1/live || exit 1
 
 EXPOSE 8000
 
