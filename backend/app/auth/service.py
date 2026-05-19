@@ -108,14 +108,7 @@ async def register_user(data: UserRegister) -> UserResponse:
 
             return _user_to_response(user)
     except Exception as e:
-        import traceback
         logger.exception(f"[AUTH DEBUG] register_user error: {type(e).__name__}: {e}")
-        logger.critical(
-            "[REGISTER_CRITICAL] type=%s message=%s traceback=%s",
-            type(e).__name__,
-            str(e),
-            traceback.format_exc(),
-        )
         raise
 
 
