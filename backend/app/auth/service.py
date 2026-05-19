@@ -45,13 +45,13 @@ _ACCOUNT_LOCKOUT_DURATION_SECONDS = 1800  # 30 minutes
 def _user_to_response(user: User) -> UserResponse:
     """Convert User model instance to UserResponse schema."""
     return UserResponse(
-        id=user.id,
+        id=str(user.id),
         email=user.email,
         first_name=user.first_name,
         last_name=user.last_name,
         role=user.role,
-        company_id=user.company_id,
-        branch_id=user.branch_id,
+        company_id=str(user.company_id) if user.company_id else None,
+        branch_id=str(user.branch_id) if user.branch_id else None,
         is_active=user.is_active,
         created_at=user.created_at,
     )
