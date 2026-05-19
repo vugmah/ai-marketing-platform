@@ -157,11 +157,11 @@ if mysqldump \
     --single-transaction \
     --quick \
     --lock-tables=false \
-    --set-gtid-purged=OFF \
     --routines \
     --triggers \
     --events \
     --hex-blob \
+    --skip-ssl \
     2>"${BACKUP_DIR}/dump_${TIMESTAMP}.stderr" \
     > "${DUMP_FILE}"; then
     DUMP_END=$(date +%s)

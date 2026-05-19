@@ -5,13 +5,13 @@ WORKDIR /app
 
 # Install system dependencies + Node.js for frontend build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    default-libmysqlclient-dev curl \
+    default-libmysqlclient-dev mariadb-client curl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Cache bust arg - change to force rebuild
-ARG CACHEBUST=5
+ARG CACHEBUST=6
 
 # Install Python dependencies
 COPY backend/requirements.txt .
