@@ -46,7 +46,9 @@ services:
       - qdrant_data:/qdrant/storage
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: aimp_backend
     ports:
       - "8000:8000"
@@ -71,7 +73,9 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   celery_worker:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: aimp_celery_worker
     environment:
       DATABASE_URL: mysql+aiomysql://aimp:aimp123@mysql:3306/aimp
@@ -94,7 +98,9 @@ services:
       --concurrency=4
 
   celery_beat:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: aimp_celery_beat
     environment:
       DATABASE_URL: mysql+aiomysql://aimp:aimp123@mysql:3306/aimp
@@ -115,7 +121,9 @@ services:
       --schedule=/tmp/celerybeat-schedule
 
   celery_flower:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: aimp_celery_flower
     ports:
       - "5555:5555"
