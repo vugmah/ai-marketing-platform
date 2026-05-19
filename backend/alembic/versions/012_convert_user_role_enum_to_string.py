@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 # revision identifiers
 revision = "012_convert_user_role_enum_to_string"
-down_revision = "011_add_missing_foreign_keys"
+down_revision = "011"
 branch_labels = None
 depends_on = None
 
