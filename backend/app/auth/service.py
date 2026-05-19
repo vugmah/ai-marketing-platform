@@ -18,6 +18,7 @@ from app.auth.models import User
 from app.auth.schemas import TokenResponse, UserRegister, UserResponse
 from app.auth.utils import (
     create_access_token,
+    create_refresh_token,
     hash_password,
     is_token_rotated,
     mark_token_rotated,
